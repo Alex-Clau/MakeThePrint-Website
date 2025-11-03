@@ -18,7 +18,7 @@ This working website allows users to **browse, search, and favorite 3D models**,
 then **place orders directly via email**.  
 Users who **sign up and verify their email** get full access to favorites, order placement, and product reviews.
 
-[🎨 Live Demo](https://yourproject.web.app)
+[🎨 Live Demo](https://maketheprint.shop)
 
 ---
 
