@@ -1,31 +1,24 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { Mail, Phone, Instagram, Facebook } from "lucide-react";
-import {memo} from "react";
+import {memo, useEffect} from "react";
+import useScrollToElement from "../hooks/useScrollToElement.js";
 
 function Footer() {
     const currentYear = new Date().getFullYear();
-    const navigate = useNavigate();
+    const location = useLocation();
+    const scrollToOrder = useScrollToElement('order');
 
-    const scrollToTop = () => {
+    useEffect(() => {
         window.scrollTo({ top: 0, behavior: "smooth" });
-    };
+    }, [location.pathname]);
 
-    const handleContactClick = (e) => {
-        e.preventDefault();
-        navigate('/order');
-        setTimeout(() => {
-            const orderSection = document.getElementById('order');
-            if (orderSection) {
-                orderSection.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'// 'start', 'center', or 'end'
-                });
-            }
-        }, 500);
-    };
 
-    const handleNavClick = () => {
-        scrollToTop();
+    const handleNavClick = (path) => (e) => {
+        if (location.pathname === path) {
+            e.preventDefault(); // on the page already! and stops navigation
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+        // useEffect will scroll after navigation
     };
 
     return (
@@ -50,7 +43,7 @@ function Footer() {
                             <li>
                                 <NavLink
                                     to="/"
-                                    onClick={handleNavClick}
+                                    onClick={handleNavClick('/')}
                                     className="hover:text-secondary transition"
                                 >
                                     Home
@@ -58,8 +51,8 @@ function Footer() {
                             </li>
                             <li>
                                 <NavLink
-                                    to="products"
-                                    onClick={handleNavClick}
+                                    to="/products"
+                                    onClick={handleNavClick('/products')}
                                     className="hover:text-secondary transition"
                                 >
                                     Products
@@ -67,8 +60,8 @@ function Footer() {
                             </li>
                             <li>
                                 <NavLink
-                                    to="about"
-                                    onClick={handleNavClick}
+                                    to="/about"
+                                    onClick={handleNavClick('/about')}
                                     className="hover:text-secondary transition"
                                 >
                                     About
@@ -83,7 +76,7 @@ function Footer() {
                         <ul className="space-y-2 text-white/70 text-sm">
                             <li>
                                 <button
-                                    onClick={handleContactClick}
+                                    onClick={scrollToOrder}
                                     className="hover:text-secondary transition cursor-pointer bg-none border-none p-0"
                                 >
                                     Place an Order
@@ -95,13 +88,6 @@ function Footer() {
                                     contact@maketheprint.shop
                                 </a>
                             </li>
-                            {/*
-                            <li className="flex items-center gap-2">
-                                <Phone size={16} />
-                                <a href="tel:+1234567890" className="hover:text-secondary transition">
-                                    Not available now
-                                </a>
-                            </li>*/}
                         </ul>
                     </div>
 
@@ -126,14 +112,6 @@ function Footer() {
                 <div className="flex flex-col md:flex-row justify-between items-center text-white/60 text-sm">
                     <p>&copy; {currentYear} MakeThePrint. All rights reserved.</p>
                     <div className="flex gap-6 mt-4 md:mt-0">
-                        {/*
-                        <a href="#" className="hover:text-secondary transition">
-                            Privacy Policy
-                        </a>
-                        <a href="#" className="hover:text-secondary transition">
-                            Terms of Service
-                        </a>
-                        */}
                     </div>
                 </div>
             </div>

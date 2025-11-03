@@ -1,6 +1,7 @@
 import {Star, Zap, Heart, Rocket} from "lucide-react";
 import {NavLink} from "react-router-dom";
 import {useEffect, useRef} from "react";
+import {Helmet} from "react-helmet";
 
 function AboutPage() {
     const features = [
@@ -11,7 +12,10 @@ function AboutPage() {
     ];
 
     const coming = [
-        {title: "New Product Types", desc: "Expanding beyond our current lineup into new categories you've been asking for"},
+        {
+            title: "New Product Types",
+            desc: "Expanding beyond our current lineup into new categories you've been asking for"
+        },
         {title: "Faster Turnaround", desc: "Adding more printers so we can ship your orders even quicker"},
         {title: "Advent Specials", desc: "Special advent collections for christmas, holidays, and seasonal moments"},
     ];
@@ -39,7 +43,21 @@ function AboutPage() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
-    return (
+    return <>
+
+        <Helmet>
+            <title>MakeThePrint – About Us</title>
+            <meta
+                name="description"
+                content="Learn about MakeThePrint, our story, and how we craft beautiful 3D prints with care."
+            />
+            <meta
+                name="keywords"
+                content="3D models, MakeThePrint, custom printing, about us"
+            />
+            <meta name="robots" content="index, follow" />
+        </Helmet>
+
         <div className="min-h-screen bg-black/20 text-white overflow-x-hidden" ref={containerRef}>
             <style>{`
                 [data-animate] {
@@ -58,7 +76,8 @@ function AboutPage() {
             <section className="pt-30 pb-20 px-4 md:px-8 text-center">
                 <h1 className="text-5xl md:text-7xl font-bold mb-6" data-animate>
                     Hey, welcome.
-                    <span className="bg-gradient-to-r from-yellow-500 to-yellow-600 bg-clip-text text-transparent block">I'm MakeThePrint.</span>
+                    <span
+                        className="bg-gradient-to-r from-yellow-500 to-yellow-600 bg-clip-text text-transparent block">I'm MakeThePrint.</span>
                 </h1>
                 <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-20" data-animate>
                     My dad and I started this because we love beautiful prints. Now we're here to share that with you.
@@ -76,13 +95,20 @@ function AboutPage() {
             <section className="px-4 md:px-8 max-w-4xl mx-auto">
                 <h2 className="text-4xl font-bold mb-8 text-center" data-animate>Our Story</h2>
                 <p className="text-gray-300 text-lg leading-relaxed mb-6" data-animate>
-                    Honestly? My dad and I just really wanted to make cool printed stuff. We weren't trying to build some massive company—we just got tired of seeing mediocre prints out there. So we invested in some gear, learned the craft, and decided to do it our way.
+                    Honestly? My dad and I just really wanted to make cool printed stuff. We weren't trying to build
+                    some massive company—we just got tired of seeing mediocre prints out there. So we invested in some
+                    gear, learned the craft, and decided to do it our way.
                 </p>
                 <p className="text-gray-300 text-lg leading-relaxed mb-6" data-animate>
-                    Right now, we've got a collection we're genuinely proud of. These are designs we've chosen because we think they look incredible when printed. But here's the thing—if you've got something specific in mind, just reach out. We love a challenge, and we'll do our best to make it happen.
+                    Right now, we've got a collection we're genuinely proud of. These are designs we've chosen because
+                    we think they look incredible when printed. But here's the thing—if you've got something specific in
+                    mind, just reach out. We love a challenge, and we'll do our best to make it happen.
                 </p>
                 <p className="text-gray-300 text-lg leading-relaxed" data-animate>
-                    The plan? We want to keep growing. More printers, more products, a real online store. Every single person who orders from us is helping us get there. We're not some faceless company—it's literally my dad and me packing these boxes, making sure everything's perfect. When you support us, you're supporting two people who actually care about what they're doing.
+                    The plan? We want to keep growing. More printers, more products, a real online store. Every single
+                    person who orders from us is helping us get there. We're not some faceless company—it's literally my
+                    dad and me packing these boxes, making sure everything's perfect. When you support us, you're
+                    supporting two people who actually care about what they're doing.
                 </p>
             </section>
 
@@ -91,7 +117,9 @@ function AboutPage() {
                 <h2 className="text-4xl font-bold mb-16 text-center" data-animate>Why Work With Us</h2>
                 <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8">
                     {features.map(({icon: Icon, title, desc}, i) => (
-                        <div key={i} className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-8 hover:bg-white/15 transition-all" data-animate>
+                        <div key={i}
+                             className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-8 hover:bg-white/15 transition-all"
+                             data-animate>
                             <Icon className="w-12 h-12 text-yellow-500 mb-4"/>
                             <h3 className="text-2xl font-bold mb-2">{title}</h3>
                             <p className="text-gray-300">{desc}</p>
@@ -115,11 +143,12 @@ function AboutPage() {
                     ))}
                 </div>
                 <p className="text-gray-300 text-center text-lg max-w-3xl mx-auto" data-animate>
-                    Every order, every customer, every moment of support gets us closer to these goals. Thank you for being part of our journey.
+                    Every order, every customer, every moment of support gets us closer to these goals. Thank you for
+                    being part of our journey.
                 </p>
             </section>
         </div>
-    );
+    </>
 }
 
 export default AboutPage;

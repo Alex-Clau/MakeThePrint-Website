@@ -1,10 +1,14 @@
 import {useContext} from "react";
 import {ItemsContext} from "../../context/items-context/ItemsContext.jsx";
 import Modal from "./Modal.jsx";
+import { NavLink } from "react-router-dom";
+import useScrollToElement from "../../hooks/useScrollToElement.js";
 
 function ModalItemDetails({showModal, setShowModal, itemId}) {
     const {allItems} = useContext(ItemsContext);
     const item = allItems.find(i => i.id === itemId);
+
+    const scrollToOrder = useScrollToElement('order');
 
     if (!item) return null;
 
@@ -18,7 +22,7 @@ function ModalItemDetails({showModal, setShowModal, itemId}) {
                     <h3 className="text-xl md:text-2xl font-bold text-slate-900 mb-2">{item.name}</h3>
                     <p className="text-xs md:text-sm font-mono text-slate-600 mb-3 md:mb-4 break-all">Id:{item.id}</p>
                     <p className="text-sm md:text-base text-slate-700 leading-relaxed mb-3 md:mb-4 max-h-32 overflow-y-auto">{item.description}</p>
-                    <p className="text-xl md:text-2xl font-bold text-primary mb-3 md:mb-4">${item.price}</p>
+                    <p className="text-xl md:text-2xl font-bold text-secondary mb-3 md:mb-4">${item.price}</p>
                 </div>
                 <div className="flex flex-col md:flex-row gap-2 md:gap-3">
                     <button
@@ -27,6 +31,13 @@ function ModalItemDetails({showModal, setShowModal, itemId}) {
                     >
                         Close
                     </button>
+                    <NavLink
+                        to="order"
+                        onClick={scrollToOrder}
+                        className="cursor-pointer flex-1 px-4 py-2 text-slate-200 bg-slate-800/90 font-bold rounded-lg hover:bg-slate-900 transition-all text-sm md:text-base inline-flex justify-center items-center text-center no-underline"
+                    >
+                        Order Now
+                    </NavLink>
                 </div>
             </div>
         </Modal>

@@ -4,18 +4,41 @@ import {ChevronLeft, ChevronRight} from 'lucide-react';
 function Carousel({items, itemsPerSlide = 3, renderItem, mobileItemWidth = 32}) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 768 : false);
+    const [isMedium, setIsMedium] = useState(typeof window !== 'undefined' ? window.innerWidth >= 768 && window.innerWidth < 1024 : false);
 
     useEffect(() => {
-        const checkMobile = () => setIsMobile(window.innerWidth < 768);
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
+        const checkScreenSize = () => {
+            const width = window.innerWidth;
+            setIsMobile(width < 768);
+            setIsMedium(width >= 768 && width < 1024);
+        };
+        window.addEventListener('resize', checkScreenSize);
+        return () => window.removeEventListener('resize', checkScreenSize);
     }, []);
 
-    const totalSlides = Math.ceil(items.length / itemsPerSlide);
-    const currentItems = items.slice(currentIndex * itemsPerSlide, (currentIndex + 1) * itemsPerSlide);
+    // Handle responsive itemsPerSlide
+    const getItemsPerSlide = () => {
+        if (typeof itemsPerSlide === 'object') {
+            if (isMobile) return itemsPerSlide.mobile || 1;
+            if (isMedium) return itemsPerSlide.md || 2;
+            return itemsPerSlide.desktop || 3;
+        }
+        return itemsPerSlide;
+    };
+
+    const currentItemsPerSlide = getItemsPerSlide();
+    const totalSlides = Math.ceil(items.length / currentItemsPerSlide);
+    const currentItems = items.slice(currentIndex * currentItemsPerSlide, (currentIndex + 1) * currentItemsPerSlide);
 
     const next = () => setCurrentIndex((currentIndex + 1) % totalSlides);
     const prev = () => setCurrentIndex((currentIndex - 1 + totalSlides) % totalSlides);
+
+    // Reset index if it exceeds new total slides after resize
+    useEffect(() => {
+        if (currentIndex >= totalSlides) {
+            setCurrentIndex(0);
+        }
+    }, [totalSlides, currentIndex]);
 
     if (items.length === 0) return null;
 
@@ -32,7 +55,7 @@ function Carousel({items, itemsPerSlide = 3, renderItem, mobileItemWidth = 32}) 
                 </div>
             )}
 
-            {/* Desktop Carousel */}
+            {/* Desktop/Tablet Carousel */}
             {!isMobile && (
                 <div className="relative w-full rounded-lg group min-h-48 md:min-h-56 flex items-center overflow-hidden">
                     <div className="flex flex-col md:flex-row gap-3 md:gap-6 px-16 md:px-16 p-3 md:p-8 w-full">

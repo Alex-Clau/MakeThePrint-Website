@@ -1,23 +1,24 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import LoginForm from '../components/ui/login/LoginForm';
 import SignupForm from '../components/ui/login/SignupForm.jsx';
 import LoginHeader from '../components/ui/login/LoginHeader';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from "../components/firestore/firebaseConfig.js";
+import {signInWithEmailAndPassword} from 'firebase/auth';
+import {auth} from "../components/firestore/firebaseConfig.js";
 import AuthToggle from "../components/ui/login/AuthToggle.jsx";
 import LoginFooter from "../components/ui/login/LoginFooter.jsx";
-import { ensureUserDocument } from "../components/firestore/firestoreUserSetup.js";
+import {ensureUserDocument} from "../components/firestore/firestoreUserSetup.js";
+import {Helmet} from "react-helmet";
 
 export default function LoginPage() {
     const navigate = useNavigate();
     const [isLogin, setIsLogin] = useState(true);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [formData, setFormData] = useState({ email: '', password: '' });
+    const [formData, setFormData] = useState({email: '', password: ''});
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setFormData({...formData, [e.target.name]: e.target.value});
         setError('');
     };
 
@@ -48,7 +49,7 @@ export default function LoginPage() {
                 console.error("Could not create user document:", docErr);
             }
 
-            setFormData({ email: '', password: '' });
+            setFormData({email: '', password: ''});
             navigate('/');
         } catch (err) {
             const errorMap = {
@@ -66,19 +67,29 @@ export default function LoginPage() {
         // After successful signup with OTP verification, switch to login
         setIsLogin(true);
         setError('');
-        setFormData({ email: '', password: '' });
+        setFormData({email: '', password: ''});
     };
 
     const toggleAuthMode = () => {
         setIsLogin(!isLogin);
         setError('');
-        setFormData(isLogin ? { email: '', password: '' } : { email: '', password: '' });
+        setFormData(isLogin ? {email: '', password: ''} : {email: '', password: ''});
     };
 
-    return (
+    return <>
+        <Helmet>
+            <title>MakeThePrint – Login / Signup</title>
+            <meta
+                name="description"
+                content="Sign in or create an account to favorite, review, and order 3D models at MakeThePrint."
+            />
+            <meta name="robots" content="noindex, nofollow"/>
+        </Helmet>
+
+
         <div className="min-h-screen bg-black/20 flex items-center justify-center p-4">
             <div className="w-full max-w-md">
-                <LoginHeader isLogin={isLogin} />
+                <LoginHeader isLogin={isLogin}/>
 
                 <div className="bg-slate-800/40 backdrop-blur-md border border-slate-700/50 rounded-2xl p-8">
                     <h2 className="text-2xl font-bold text-white mb-6 text-center">
@@ -94,7 +105,7 @@ export default function LoginPage() {
                             onSubmit={handleLoginSubmit}
                         />
                     ) : (
-                        <SignupForm onSuccess={handleSignupSuccess} />
+                        <SignupForm onSuccess={handleSignupSuccess}/>
                     )}
 
                     <AuthToggle
@@ -104,8 +115,8 @@ export default function LoginPage() {
                     />
                 </div>
 
-                <LoginFooter />
+                <LoginFooter/>
             </div>
         </div>
-    );
+    </>
 }

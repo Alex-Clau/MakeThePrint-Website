@@ -1,7 +1,21 @@
 import {NavLink} from "react-router-dom";
+import {Helmet} from "react-helmet";
 
 function HomePage() {
-    return (
+    return <>
+        <Helmet>
+            <title>MakeThePrint – Home</title>
+            <meta
+                name="description"
+                content="Bring your imagination to life with beautifully printed 3D models at MakeThePrint."
+            />
+            <meta
+                name="keywords"
+                content="3D models, 3D printing, MakeThePrint, custom prints, favorite 3D items"
+            />
+            <meta name="robots" content="index, follow" />
+        </Helmet>
+
         <div className="relative w-full top-0 min-h-screen bg-black/20 flex flex-col items-center justify-center">
 
             {/* Mid Page Text */}
@@ -26,7 +40,7 @@ function HomePage() {
             </NavLink>
 
         </div>
-    );
+    </>
 }
 
 export default HomePage;
