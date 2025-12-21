@@ -1,58 +1,95 @@
-import { DeployButton } from "@/components/deploy-button";
-import { EnvVarWarning } from "@/components/env-var-warning";
-import { AuthButton } from "@/components/auth-button";
-import { Hero } from "@/components/hero";
+import { Navigation } from "@/components/navigation";
+import { HeroSection } from "@/components/home/hero-section";
+import { FeaturedProducts } from "@/components/home/featured-products";
+import { CategoryGrid } from "@/components/home/category-grid";
 import { ThemeSwitcher } from "@/components/theme-switcher";
-import { ConnectSupabaseSteps } from "@/components/tutorial/connect-supabase-steps";
-import { SignUpUserSteps } from "@/components/tutorial/sign-up-user-steps";
-import { hasEnvVars } from "@/lib/utils";
-import Link from "next/link";
-import { Suspense } from "react";
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col items-center">
-      <div className="flex-1 w-full flex flex-col gap-20 items-center">
-        <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-          <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
-            <div className="flex gap-5 items-center font-semibold">
-              <Link href={"/"}>Next.js Supabase Starter</Link>
-              <div className="flex items-center gap-2">
-                <DeployButton />
-              </div>
+    <main className="min-h-screen flex flex-col">
+      <Navigation />
+      <HeroSection />
+      <FeaturedProducts />
+      <CategoryGrid />
+      <footer className="w-full border-t mt-12 sm:mt-16 lg:mt-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-6 sm:mb-8">
+            <div>
+              <h3 className="font-bold text-lg mb-4">Make The Print</h3>
+              <p className="text-sm text-muted-foreground">
+                Premium 3D printed products for your home, office, and creative
+                projects.
+              </p>
             </div>
-            {!hasEnvVars ? (
-              <EnvVarWarning />
-            ) : (
-              <Suspense>
-                <AuthButton />
-              </Suspense>
-            )}
+            <div>
+              <h4 className="font-semibold mb-4">Shop</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>
+                  <a href="/products" className="hover:text-foreground">
+                    All Products
+                  </a>
+                </li>
+                <li>
+                  <a href="/categories" className="hover:text-foreground">
+                    Categories
+                  </a>
+                </li>
+                <li>
+                  <a href="/about" className="hover:text-foreground">
+                    About Us
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Support</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>
+                  <a href="/faq" className="hover:text-foreground">
+                    FAQ
+                  </a>
+                </li>
+                <li>
+                  <a href="/shipping" className="hover:text-foreground">
+                    Shipping
+                  </a>
+                </li>
+                <li>
+                  <a href="/contact" className="hover:text-foreground">
+                    Contact
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Account</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>
+                  <a href="/auth/login" className="hover:text-foreground">
+                    Sign In
+                  </a>
+                </li>
+                <li>
+                  <a href="/account" className="hover:text-foreground">
+                    My Account
+                  </a>
+                </li>
+                <li>
+                  <a href="/account/orders" className="hover:text-foreground">
+                    Order History
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
-        </nav>
-        <div className="flex-1 flex flex-col gap-20 max-w-5xl p-5">
-          <Hero />
-          <main className="flex-1 flex flex-col gap-6 px-4">
-            <h2 className="font-medium text-xl mb-4">Next steps</h2>
-            {hasEnvVars ? <SignUpUserSteps /> : <ConnectSupabaseSteps />}
-          </main>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 sm:pt-8 border-t">
+            <p className="text-xs text-muted-foreground text-center sm:text-left">
+              © 2024 Make The Print. All rights reserved.
+            </p>
+            <ThemeSwitcher />
+          </div>
         </div>
-
-        <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">
-          <p>
-            Powered by{" "}
-            <a
-              href="https://supabase.com/?utm_source=create-next-app&utm_medium=template&utm_term=nextjs"
-              target="_blank"
-              className="font-bold hover:underline"
-              rel="noreferrer"
-            >
-              Supabase
-            </a>
-          </p>
-          <ThemeSwitcher />
-        </footer>
-      </div>
+      </footer>
     </main>
   );
 }
