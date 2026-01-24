@@ -1,4 +1,13 @@
 /**
+ * Custom product configuration
+ */
+export interface CustomProductConfig {
+  colors?: string[];
+  defaultFont?: string;
+  [key: string]: any;
+}
+
+/**
  * Base product type matching the Supabase schema
  */
 export interface Product {
@@ -8,12 +17,10 @@ export interface Product {
   price: number;
   material_options: string[];
   stock_quantity: number;
-  dimensions?: string;
-  print_time_hours?: number;
-  weight_grams?: number;
-  rating?: number;
-  review_count?: number;
+  product_type?: "standard" | "custom_letters";
+  custom_config?: CustomProductConfig;
   image?: string;
+  images?: string[];
 }
 
 /**

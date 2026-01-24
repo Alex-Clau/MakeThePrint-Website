@@ -47,13 +47,24 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
-  if (
-    request.nextUrl.pathname !== "/" &&
-    !user &&
-    !request.nextUrl.pathname.startsWith("/login") &&
-    !request.nextUrl.pathname.startsWith("/auth")
-  ) {
-    // no user, potentially respond by redirecting the user to the login page
+  // Allow public access to product pages, about, cart, etc.
+  // Only protect account-related routes
+  const publicPaths = [
+    "/",
+    "/products",
+    "/collections",
+    "/about",
+    "/cart",
+    "/checkout",
+  ];
+  
+  const isPublicPath = publicPaths.some(path => 
+    request.nextUrl.pathname === path || 
+    request.nextUrl.pathname.startsWith(path + "/")
+  ) || request.nextUrl.pathname.startsWith("/auth");
+
+  if (!isPublicPath && !user) {
+    // Redirect to login only for protected routes
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
     return NextResponse.redirect(url);

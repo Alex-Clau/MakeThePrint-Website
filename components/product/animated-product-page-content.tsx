@@ -1,15 +1,37 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useState } from "react";
 import { ProductDetailForm } from "@/components/product/product-detail-form";
-import { AnimatedProductImage } from "@/components/product/animated-product-image";
+import { ProductImageGallery } from "@/components/product/product-image-gallery";
+import { TextPreview } from "@/components/product/text-preview";
 import { AnimatedProductPageContentProps } from "@/types/components";
 
 export function AnimatedProductPageContent({
   product,
 }: AnimatedProductPageContentProps) {
+  const isCustomLetters = product.product_type === "custom_letters";
+  const [preview, setPreview] = useState<{
+    text: string;
+    font: string;
+    color: string;
+    size: number; // Size in cm
+  }>({
+    text: "",
+    font: product.custom_config?.defaultFont || product.material_options[0] || "",
+    color: product.custom_config?.colors?.[0] || "black",
+    size: 20, // Default 20cm
+  });
+  // Get all images, using image as fallback if images array is empty
+  const allImages = product.images && product.images.length > 0 
+    ? product.images 
+    : product.image 
+    ? [product.image] 
+    : [];
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-start lg:items-center relative">
+    <div className="space-y-12 relative z-10">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-start lg:items-center relative">
 
       {/* Left Side - Product Info */}
       <motion.div
@@ -30,9 +52,10 @@ export function AnimatedProductPageContent({
         transition={{ 
           duration: 0.9,
           ease: [0.16, 1, 0.3, 1],
-          type: "spring",
-          stiffness: 100,
-          damping: 15,
+          filter: {
+            duration: 0.9,
+            ease: [0.16, 1, 0.3, 1],
+          },
         }}
         style={{ perspective: 1000 }}
       >
@@ -47,11 +70,14 @@ export function AnimatedProductPageContent({
             damping: 15,
           }}
         >
-          <ProductDetailForm product={product} />
+          <ProductDetailForm 
+            product={product} 
+            onPreviewChange={setPreview}
+          />
         </motion.div>
       </motion.div>
 
-      {/* Right Side - Animated Product Image */}
+      {/* Right Side - Product Image Gallery */}
       <motion.div
         initial={{ 
           opacity: 0, 
@@ -73,9 +99,11 @@ export function AnimatedProductPageContent({
           duration: 1,
           delay: 0.3,
           ease: [0.16, 1, 0.3, 1],
-          type: "spring",
-          stiffness: 100,
-          damping: 15,
+          filter: {
+            duration: 1,
+            delay: 0.3,
+            ease: [0.16, 1, 0.3, 1],
+          },
         }}
         style={{ perspective: 1000 }}
         className="relative flex items-center justify-center group"
@@ -91,9 +119,31 @@ export function AnimatedProductPageContent({
             damping: 12,
           }}
         >
-          <AnimatedProductImage src={product.image} alt={product.name} />
+          <ProductImageGallery
+            images={allImages.length > 1 ? allImages.slice(1) : []} // All images except the first
+            alt={product.name}
+            defaultImage={allImages[0] || undefined} // First image as default
+          />
         </motion.div>
       </motion.div>
+      </div>
+
+      {/* Text Preview Section for Custom Letters */}
+      {isCustomLetters && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          <TextPreview
+            text={preview.text}
+            font={preview.font}
+            color={preview.color}
+            size={preview.size}
+          />
+        </motion.div>
+      )}
+
     </div>
   );
 }

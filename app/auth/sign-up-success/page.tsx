@@ -12,6 +12,8 @@ import { createClient } from "@/lib/supabase/client";
 import { useState } from "react";
 import { Mail, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
+import { getUserFriendlyError } from "@/lib/utils/error-messages";
 
 export default function Page() {
   const [resent, setResent] = useState(false);
@@ -43,8 +45,9 @@ export default function Page() {
       
       if (error) throw error;
       setResent(true);
-    } catch (error) {
-      console.error("Error resending email:", error);
+      toast.success("Confirmation email resent!");
+    } catch (error: any) {
+      toast.error(getUserFriendlyError(error));
     } finally {
       setIsResending(false);
     }

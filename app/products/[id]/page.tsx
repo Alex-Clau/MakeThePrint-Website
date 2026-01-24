@@ -1,32 +1,85 @@
+import { Suspense } from "react";
 import { Navigation } from "@/components/navigation";
 import { AnimatedProductPageContent } from "@/components/product/animated-product-page-content";
-import { ProductWithImage } from "@/types/product";
+import { ProductReviews } from "@/components/product/product-reviews";
+import { getProductById } from "@/lib/supabase/products";
+import { transformProductToFull } from "@/lib/utils/products";
 import { ProductPageParams } from "@/types/pages";
+import { notFound } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 
-// Mock data - in real app, this would come from your database
-const product: ProductWithImage = {
-  id: "1",
-  name: "Geometric Vase Collection",
-  description:
-    "A stunning collection of geometric vases that combine modern design with functional elegance. Each piece is carefully 3D printed using premium materials to ensure durability and aesthetic appeal.",
-  price: 29.99,
-  material_options: ["PLA", "ABS", "PETG", "TPU"],
-  stock_quantity: 15,
-  dimensions: "15cm x 15cm x 20cm",
-  print_time_hours: 4.5,
-  weight_grams: 250,
-  rating: 4.8,
-  review_count: 24,
-  image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=800&fit=crop",
-};
+async function ProductContent({ productId }: { productId: string }) {
+  const product = await getProductById(productId);
+  if (!product) notFound();
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const transformedProduct = transformProductToFull(product);
+  return (
+    <>
+      <AnimatedProductPageContent product={transformedProduct} />
+      <Suspense
+        fallback={
+          <div className="space-y-6 border-t pt-8 sm:pt-12">
+            <div className="h-8 bg-muted animate-pulse rounded w-48" />
+            <div className="space-y-4">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-32 bg-muted animate-pulse rounded-lg" />
+              ))}
+            </div>
+          </div>
+        }
+      >
+        <ProductReviews productId={productId} userId={user?.id} />
+      </Suspense>
+    </>
+  );
+}
+
+async function ProductPageContent({ params }: ProductPageParams) {
+  const { id } = await params;
+
+  return (
+    <Suspense
+      fallback={
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
+          <div className="space-y-4">
+            <div className="h-8 bg-muted animate-pulse rounded w-3/4" />
+            <div className="h-4 bg-muted animate-pulse rounded w-full" />
+            <div className="h-4 bg-muted animate-pulse rounded w-2/3" />
+          </div>
+          <div className="h-96 bg-muted animate-pulse rounded-lg" />
+        </div>
+      }
+    >
+      <ProductContent productId={id} />
+    </Suspense>
+  );
+}
 
 export default function ProductDetailPage({ params }: ProductPageParams) {
   return (
-    <main className="min-h-screen flex flex-col bg-background">
+    <main className="min-h-screen flex flex-col">
       <Navigation />
       
       <div className="flex-1 max-w-7xl mx-auto w-full px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-12">
-        <AnimatedProductPageContent product={product} />
+        <Suspense
+          fallback={
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
+              <div className="space-y-4">
+                <div className="h-8 bg-muted animate-pulse rounded w-3/4" />
+                <div className="h-4 bg-muted animate-pulse rounded w-full" />
+                <div className="h-4 bg-muted animate-pulse rounded w-2/3" />
+              </div>
+              <div className="h-96 bg-muted animate-pulse rounded-lg" />
+            </div>
+          }
+        >
+          <ProductPageContent params={params} />
+        </Suspense>
       </div>
     </main>
   );

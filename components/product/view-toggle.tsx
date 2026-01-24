@@ -2,11 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Grid, List } from "lucide-react";
-
-interface ViewToggleProps {
-  viewMode: "grid" | "list";
-  onViewChange: (mode: "grid" | "list") => void;
-}
+import { ViewToggleProps } from "@/types/components";
 
 export function ViewToggle({ viewMode, onViewChange }: ViewToggleProps) {
   return (
@@ -15,7 +11,7 @@ export function ViewToggle({ viewMode, onViewChange }: ViewToggleProps) {
         variant={viewMode === "grid" ? "default" : "outline"}
         size="icon"
         onClick={() => onViewChange("grid")}
-        className="h-9 w-9"
+        className="h-10 w-10 sm:h-9 sm:w-9 touch-manipulation"
       >
         <Grid className="h-4 w-4" />
       </Button>
@@ -23,7 +19,7 @@ export function ViewToggle({ viewMode, onViewChange }: ViewToggleProps) {
         variant={viewMode === "list" ? "default" : "outline"}
         size="icon"
         onClick={() => onViewChange("list")}
-        className="h-9 w-9"
+        className="h-10 w-10 sm:h-9 sm:w-9 touch-manipulation"
       >
         <List className="h-4 w-4" />
       </Button>

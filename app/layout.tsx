@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
+import { ToastProvider } from "@/components/providers/toast-provider";
+import { SnowEffect } from "@/components/snow-effect";
+import { Footer } from "@/components/footer/footer";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -33,7 +36,12 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <SnowEffect />
+          <ToastProvider />
+          <div className="min-h-screen flex flex-col">
+            {children}
+            <Footer />
+          </div>
         </ThemeProvider>
       </body>
     </html>

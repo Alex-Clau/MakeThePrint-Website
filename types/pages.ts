@@ -8,9 +8,3 @@ export interface ProductPageParams {
   }>;
 }
 
-export interface CategoryPageParams {
-  params: Promise<{
-    slug: string;
-  }>;
-}
-

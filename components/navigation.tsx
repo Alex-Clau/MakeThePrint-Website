@@ -1,53 +1,51 @@
+"use client";
+
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { AuthButton } from "./auth-button";
+import { AuthButtonClient } from "./auth-button-client";
 import { ThemeSwitcher } from "./theme-switcher";
 import { NavigationMobileMenu } from "./navigation-mobile-menu";
 import { ShoppingCart } from "lucide-react";
-import { Suspense } from "react";
+import { CartCount } from "./navigation/cart-count";
 
 export function Navigation() {
   return (
-    <nav className="w-full border-b border-b-foreground/10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 relative">
+    <nav className="w-full border-b border-accent-primary/20 bg-background backdrop-blur supports-[backdrop-filter]:bg-background sticky top-0 z-50 relative dark:border-border/50">
       <div className="w-full max-w-7xl mx-auto flex justify-between items-center h-14 sm:h-16 px-3 sm:px-4 lg:px-8">
         <div className="flex items-center gap-2 sm:gap-4 lg:gap-8">
-          <Link href="/" className="font-bold text-base sm:text-lg lg:text-xl">
+          <Link href="/" className="font-bold text-base sm:text-lg lg:text-xl hover:text-accent-primary-dark">
             Make The Print
           </Link>
           <div className="hidden md:flex items-center gap-4 lg:gap-6">
             <Link
               href="/products"
-              className="text-sm font-medium hover:text-primary transition-colors"
+              className="text-sm font-medium hover:text-accent-primary-dark transition-colors"
             >
               Products
             </Link>
             <Link
-              href="/categories"
-              className="text-sm font-medium hover:text-primary transition-colors"
+              href="/collections"
+              className="text-sm font-medium hover:text-accent-primary-dark transition-colors"
             >
-              Categories
+              Seasonal Collections
             </Link>
             <Link
               href="/about"
-              className="text-sm font-medium hover:text-primary transition-colors"
+              className="text-sm font-medium hover:text-accent-primary-dark transition-colors"
             >
               About
             </Link>
           </div>
         </div>
         <div className="flex items-center gap-2 sm:gap-3 lg:gap-4">
-          <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10" asChild>
+          <Button variant="ghost" size="icon" className="h-10 w-10 sm:h-10 sm:w-10 touch-manipulation" asChild>
             <Link href="/cart" className="relative">
-              <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />
-              <span className="absolute -top-1 -right-1 h-3.5 w-3.5 sm:h-4 sm:w-4 rounded-full bg-primary text-primary-foreground text-[10px] sm:text-xs flex items-center justify-center">
-                0
-              </span>
+              <ShoppingCart className="h-5 w-5 sm:h-5 sm:w-5" />
+              <CartCount />
             </Link>
           </Button>
           <div className="hidden md:flex items-center gap-2 sm:gap-3 lg:gap-4">
-            <Suspense>
-              <AuthButton />
-            </Suspense>
+            <AuthButtonClient />
             <ThemeSwitcher />
           </div>
           <NavigationMobileMenu />

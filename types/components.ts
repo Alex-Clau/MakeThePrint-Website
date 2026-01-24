@@ -1,4 +1,4 @@
-import { Product } from "./product";
+import { Product, ProductCardData } from "./product";
 
 /**
  * ProductCard component props
@@ -18,6 +18,12 @@ export interface ProductCardProps {
  */
 export interface ProductDetailFormProps {
   product: Product;
+  onPreviewChange?: (preview: {
+    text: string;
+    font: string;
+    color: string;
+    size: number; // Size in cm
+  }) => void;
 }
 
 /**
@@ -33,5 +39,27 @@ export interface AnimatedProductPageContentProps {
 export interface AnimatedProductImageProps {
   src: string;
   alt: string;
+}
+
+/**
+ * ProductListItem component props
+ */
+export interface ProductListItemProps {
+  product: ProductCardData;
+}
+
+/**
+ * ProductsContent component props
+ */
+export interface ProductsContentProps {
+  products: ProductCardData[];
+}
+
+/**
+ * ViewToggle component props
+ */
+export interface ViewToggleProps {
+  viewMode: "grid" | "list";
+  onViewChange: (mode: "grid" | "list") => void;
 }
 

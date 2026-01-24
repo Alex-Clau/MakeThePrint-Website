@@ -1,22 +1,52 @@
+import { Suspense } from "react";
 import { Navigation } from "@/components/navigation";
 import { ProductsContent } from "@/components/product/products-content";
-import { mockProducts } from "@/lib/data/mock-products";
+import { ProductsPageSearch } from "@/components/product/products-page-search";
+import { getProducts } from "@/lib/supabase/products";
+import { transformProductToCardData } from "@/lib/utils/products";
+
+async function ProductsList() {
+  const products = await getProducts();
+  const transformedProducts = products.map(transformProductToCardData);
+
+  return <ProductsContent products={transformedProducts} />;
+}
 
 export default function ProductsPage() {
   return (
     <main className="min-h-screen flex flex-col">
       <Navigation />
-      <div className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-        <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2">
-            All Products
-          </h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
-            Discover our complete collection of 3D printed items
-          </p>
+      <div className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="mb-6 sm:mb-8 border-b border-accent-primary/30 pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 text-accent-primary-dark">
+                All Products
+              </h1>
+              <p className="text-sm sm:text-base text-muted-foreground">
+                Discover our complete collection of 3D printed items
+              </p>
+            </div>
+            <Suspense fallback={<div className="w-full sm:w-64 h-10 bg-muted animate-pulse rounded-md" />}>
+              <ProductsPageSearch />
+            </Suspense>
+          </div>
         </div>
 
-        <ProductsContent products={mockProducts} />
+        <Suspense
+          fallback={
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+              {[...Array(8)].map((_, i) => (
+                <div
+                  key={i}
+                  className="h-64 bg-muted animate-pulse rounded-lg"
+                />
+              ))}
+            </div>
+          }
+        >
+          <ProductsList />
+        </Suspense>
       </div>
     </main>
   );

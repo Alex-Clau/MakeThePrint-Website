@@ -4,11 +4,7 @@ import { useState } from "react";
 import { ProductCard } from "@/components/product/product-card";
 import { ProductListItem } from "@/components/product/product-list-item";
 import { ViewToggle } from "@/components/product/view-toggle";
-import { ProductCardData } from "@/types/product";
-
-interface ProductsContentProps {
-  products: ProductCardData[];
-}
+import { ProductsContentProps } from "@/types/components";
 
 export function ProductsContent({ products }: ProductsContentProps) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");

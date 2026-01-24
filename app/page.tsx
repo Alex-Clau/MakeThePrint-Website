@@ -1,95 +1,33 @@
+import { Suspense } from "react";
 import { Navigation } from "@/components/navigation";
 import { HeroSection } from "@/components/home/hero-section";
 import { FeaturedProducts } from "@/components/home/featured-products";
-import { CategoryGrid } from "@/components/home/category-grid";
-import { ThemeSwitcher } from "@/components/theme-switcher";
+import { CustomPrintingSection } from "@/components/home/custom-printing-section";
 
 export default function Home() {
   return (
     <main className="min-h-screen flex flex-col">
       <Navigation />
       <HeroSection />
-      <FeaturedProducts />
-      <CategoryGrid />
-      <footer className="w-full border-t mt-12 sm:mt-16 lg:mt-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-6 sm:mb-8">
-            <div>
-              <h3 className="font-bold text-lg mb-4">Make The Print</h3>
-              <p className="text-sm text-muted-foreground">
-                Premium 3D printed products for your home, office, and creative
-                projects.
-              </p>
+      <Suspense
+        fallback={
+          <section className="py-8 sm:py-12 lg:py-16 xl:py-24">
+            <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                {[...Array(4)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-64 bg-muted animate-pulse rounded-lg"
+                  />
+                ))}
+              </div>
             </div>
-            <div>
-              <h4 className="font-semibold mb-4">Shop</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <a href="/products" className="hover:text-foreground">
-                    All Products
-                  </a>
-                </li>
-                <li>
-                  <a href="/categories" className="hover:text-foreground">
-                    Categories
-                  </a>
-                </li>
-                <li>
-                  <a href="/about" className="hover:text-foreground">
-                    About Us
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Support</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <a href="/faq" className="hover:text-foreground">
-                    FAQ
-                  </a>
-                </li>
-                <li>
-                  <a href="/shipping" className="hover:text-foreground">
-                    Shipping
-                  </a>
-                </li>
-                <li>
-                  <a href="/contact" className="hover:text-foreground">
-                    Contact
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Account</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>
-                  <a href="/auth/login" className="hover:text-foreground">
-                    Sign In
-                  </a>
-                </li>
-                <li>
-                  <a href="/account" className="hover:text-foreground">
-                    My Account
-                  </a>
-                </li>
-                <li>
-                  <a href="/account/orders" className="hover:text-foreground">
-                    Order History
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 sm:pt-8 border-t">
-            <p className="text-xs text-muted-foreground text-center sm:text-left">
-              © 2024 Make The Print. All rights reserved.
-            </p>
-            <ThemeSwitcher />
-          </div>
-        </div>
-      </footer>
+          </section>
+        }
+      >
+        <FeaturedProducts />
+      </Suspense>
+      <CustomPrintingSection />
     </main>
   );
 }
