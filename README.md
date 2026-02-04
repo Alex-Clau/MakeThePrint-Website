@@ -4,9 +4,9 @@ A modern e-commerce platform for custom 3D printed products, built with Next.js,
 
 ## Status
 
-**This application is currently under active development and is not hosted yet.**
+**This application is currently under active development.**
 
-**Previous version:** [maketheprint.shop](https://maketheprint.shop)
+**Live version:** [maketheprint.store](https://maketheprint.store)
 
 ## Features
 
