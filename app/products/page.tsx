@@ -1,14 +1,13 @@
 import { Suspense } from "react";
 import { Navigation } from "@/components/navigation";
 import { ProductsContent } from "@/components/product/products-content";
-import { ProductsPageSearch } from "@/components/product/products-page-search";
 import { getProducts } from "@/lib/supabase/products";
 import { transformProductToCardData } from "@/lib/utils/products";
 
 async function ProductsList() {
   // Get custom products (wall letters and keychains)
-  const products = await getProducts({ 
-    product_type: "custom" 
+  const products = await getProducts({
+    product_type: "custom"
   });
   const transformedProducts = products.map(transformProductToCardData);
 
@@ -30,9 +29,6 @@ export default function ProductsPage() {
                 Custom wall letters and keychains designed just for you
               </p>
             </div>
-            <Suspense fallback={<div className="w-full sm:w-64 h-10 bg-muted animate-pulse rounded-md" />}>
-              <ProductsPageSearch />
-            </Suspense>
           </div>
         </div>
 
