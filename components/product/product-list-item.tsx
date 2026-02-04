@@ -27,34 +27,36 @@ export function ProductListItem({ product }: ProductListItemProps) {
               <h3 className="font-semibold text-base sm:text-lg lg:text-xl group-hover:text-accent-primary-dark transition-colors mb-2 line-clamp-2">
                 {product.name}
               </h3>
-              {product.rating && (
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="flex items-center">
-                    {[...Array(5)].map((_, i) => (
-                      <span
-                        key={i}
-                        className={`text-xs sm:text-sm ${
-                          i < Math.floor(product.rating as number)
-                            ? "text-yellow-400"
-                            : "text-muted-foreground"
-                        }`}
-                      >
-                        ★
-                      </span>
-                    ))}
-                  </div>
-                  <span className="text-xs sm:text-sm text-muted-foreground">
-                    ({product.rating.toFixed(1)})
-                  </span>
-                </div>
-              )}
             </Link>
           </div>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 pt-2 border-t border-accent-primary/20">
-            <p className="text-xl sm:text-2xl font-bold">{product.price.toFixed(2)} RON</p>
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <ProductCardActions productId={product.id} />
+          <div className="flex flex-col gap-3 pt-2 border-t border-accent-primary/20">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+              <p className="text-xl sm:text-2xl font-bold">{product.price.toFixed(2)} RON</p>
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <ProductCardActions productId={product.id} />
+              </div>
             </div>
+            {product.rating !== undefined && product.rating > 0 && (
+              <div className="flex items-center gap-2">
+                <div className="flex items-center">
+                  {[...Array(5)].map((_, i) => (
+                    <span
+                      key={i}
+                      className={`text-xs sm:text-sm ${
+                        i < Math.floor(product.rating as number)
+                          ? "text-yellow-400"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      ★
+                    </span>
+                  ))}
+                </div>
+                <span className="text-xs sm:text-sm text-muted-foreground">
+                  {product.review_count !== undefined ? `${product.review_count} ${product.review_count === 1 ? 'review' : 'reviews'}` : ''}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -124,7 +124,8 @@ export function AnimatedProductPageContent({
           }}
         >
           <ProductDetailForm 
-            product={product} 
+            product={product}
+            previewText={preview.text}
             onPreviewChange={setPreview}
           />
         </motion.div>
@@ -143,6 +144,7 @@ export function AnimatedProductPageContent({
             font={preview.font}
             color={preview.color}
             size={preview.size}
+            onTextChange={(text) => setPreview((prev) => ({ ...prev, text }))}
           />
         </motion.div>
       )}

@@ -24,7 +24,6 @@ interface ProductFormData {
   category: string;
   featured: boolean;
   seasonal: boolean;
-  stock_quantity: number;
   material_options: string[];
   custom_config?: {
     colors?: string[];
@@ -73,7 +72,6 @@ export function AdminProductForm({ product, initialType = "seasonal" }: AdminPro
     category: initialCategory,
     featured: product?.featured || false,
     seasonal: product?.seasonal || (initialType === "seasonal"),
-    stock_quantity: product?.stock_quantity || 0,
     material_options: product?.material_options || [],
     custom_config: product?.custom_config || getDefaultConfig(initialCategory),
   });
@@ -349,18 +347,6 @@ export function AdminProductForm({ product, initialType = "seasonal" }: AdminPro
                 Keychains use WhatsApp inquiry - price is for reference only
               </p>
             )}
-          </div>
-
-          {/* Stock Quantity */}
-          <div className="space-y-2">
-            <Label htmlFor="stock_quantity">Stock Quantity</Label>
-            <Input
-              id="stock_quantity"
-              type="number"
-              min="0"
-              value={formData.stock_quantity}
-              onChange={(e) => setFormData({ ...formData, stock_quantity: parseInt(e.target.value) })}
-            />
           </div>
 
           {/* Featured Checkbox */}

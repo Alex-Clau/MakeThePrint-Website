@@ -21,7 +21,6 @@ interface Product {
   category: string;
   featured: boolean;
   seasonal: boolean;
-  stock_quantity: number;
 }
 
 export function AdminProductsList({ products }: { products: Product[] }) {
@@ -122,9 +121,6 @@ export function AdminProductsList({ products }: { products: Product[] }) {
                     <div className="flex items-center gap-4 text-sm">
                       <span className="font-bold text-lg">
                         {product.price.toFixed(2)} RON
-                      </span>
-                      <span className="text-muted-foreground">
-                        Stock: {product.stock_quantity}
                       </span>
                       <span className="text-muted-foreground">
                         {product.images?.length || 0} images

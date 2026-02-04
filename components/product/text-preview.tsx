@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { TextPreviewProps } from "@/types/product-components";
 
@@ -36,47 +37,64 @@ const getColorValue = (color: string) => {
   return colorMap[color] || color;
 };
 
-export function TextPreview({ text, font, color, size }: TextPreviewProps) {
-  if (!text.trim()) {
-    return (
-      <Card className="border-dashed border-2">
-        <CardContent className="p-8 sm:p-12 text-center">
-          <p className="text-muted-foreground text-sm sm:text-base font-medium">
-            Preview Your Text
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            Start typing above to see how your text will look
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
+export function TextPreview({ text, font, color, size, onTextChange }: TextPreviewProps) {
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-resize textarea to fit content
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.style.height = "auto";
+      inputRef.current.style.height = `${inputRef.current.scrollHeight}px`;
+    }
+  }, [text, size, font]);
+
+  const isEditable = !!onTextChange;
+  const colorValue = getColorValue(color);
+  const fontSize = getFontSize(size);
+  const fontFamily = getFontFamily(font);
 
   return (
-    <Card className="border-accent-primary/30 bg-card/50">
+    <Card className={`border-accent-primary/30 bg-card/50 ${isEditable ? 'cursor-text' : ''}`}>
       <CardContent className="p-6 sm:p-8 lg:p-12">
         <div className="text-center space-y-3">
-          <div className="mb-4">
-            <h3 className="text-sm font-semibold text-muted-foreground mb-1">Preview:</h3>
-          </div>
-          <p
-            className="font-bold break-words mx-auto"
-            style={{
-              fontFamily: getFontFamily(font),
-              color: getColorValue(color),
-              fontSize: getFontSize(size),
-              lineHeight: "1.2",
-            }}
-          >
-            {text}
-          </p>
-          <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground pt-2 border-t border-accent-primary/10">
-            <span>Font: {font}</span>
-            <span>•</span>
-            <span>Color: {color}</span>
-            <span>•</span>
-            <span>Height: {size} cm</span>
-          </div>
+          {isEditable ? (
+            <textarea
+              ref={inputRef}
+              value={text}
+              onChange={(e) => onTextChange(e.target.value)}
+              placeholder="Enter your text"
+              className="w-full bg-transparent border-none outline-none resize-none text-center font-bold placeholder:text-muted-foreground/50"
+              style={{
+                fontFamily,
+                color: text ? colorValue : undefined,
+                fontSize,
+                lineHeight: "1.2",
+                minHeight: fontSize,
+              }}
+              rows={1}
+            />
+          ) : (
+            <p
+              className="font-bold break-words mx-auto"
+              style={{
+                fontFamily,
+                color: colorValue,
+                fontSize,
+                lineHeight: "1.2",
+              }}
+            >
+              {text || "Enter your text"}
+            </p>
+          )}
+          {(text || !isEditable) && (
+            <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground pt-2 border-t border-accent-primary/10">
+              <span>Font: {font}</span>
+              <span>•</span>
+              <span>Color: {color}</span>
+              <span>•</span>
+              <span>Height: {size} cm</span>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

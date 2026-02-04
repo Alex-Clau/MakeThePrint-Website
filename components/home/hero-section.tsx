@@ -5,16 +5,18 @@ import { ArrowRight, Sparkles } from "lucide-react";
 
 export function HeroSection() {
   return (
-    <section className="relative w-full overflow-hidden min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] flex items-center">
+    <section className="relative w-full overflow-hidden min-h-[700px] lg:h-[850px] flex items-center">
       {/* Background Image */}
       <div className="absolute inset-0">
         <Image
           src="/hero-backdrop.png"
           alt="3D Printers"
           fill
-          className="object-cover object-center"
           priority
           quality={75}
+          className="object-contain object-top"
+          sizes="100vw"
+          unoptimized
         />
         {/* Overlay for better text readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/90 to-background/60" />

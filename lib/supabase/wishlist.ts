@@ -15,10 +15,7 @@ export async function getWishlist(userId: string) {
         id,
         name,
         price,
-        images,
-        stock_quantity,
-        rating,
-        review_count
+        images
       )
     `
     )

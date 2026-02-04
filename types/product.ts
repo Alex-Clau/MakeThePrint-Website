@@ -24,7 +24,6 @@ export interface Product {
   description: string;
   price: number;
   material_options: string[];
-  stock_quantity: number;
   product_type?: "custom" | "seasonal";
   category?: string; // 'indoor_wall_letters', 'outdoor_wall_letters', 'keychains', 'seasonal_decor'
   custom_config?: CustomProductConfig | KeychainConfig;
@@ -34,13 +33,6 @@ export interface Product {
   images?: string[];
   created_at?: string;
   updated_at?: string;
-}
-
-/**
- * Product with image (for display purposes)
- */
-export interface ProductWithImage extends Product {
-  image: string;
 }
 
 /**

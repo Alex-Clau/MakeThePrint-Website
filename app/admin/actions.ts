@@ -41,7 +41,6 @@ export async function createProductAction(product: {
   price: number;
   images?: string[];
   material_options?: string[];
-  stock_quantity?: number;
   featured?: boolean;
   seasonal?: boolean;
   product_type?: "custom" | "seasonal";
@@ -79,7 +78,6 @@ export async function updateProductAction(
     price: number;
     images: string[];
     material_options: string[];
-    stock_quantity: number;
     featured: boolean;
     seasonal?: boolean;
     product_type?: "custom" | "seasonal";

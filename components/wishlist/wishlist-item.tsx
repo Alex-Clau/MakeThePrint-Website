@@ -37,13 +37,6 @@ export function WishlistItem({ product, onRemove }: WishlistItemProps) {
             {product.name}
           </h3>
           <p className="text-xl sm:text-2xl font-bold">{product.price.toFixed(2)} RON</p>
-          {product.stock_quantity !== undefined && (
-            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-              {product.stock_quantity > 0
-                ? `${product.stock_quantity} in stock`
-                : "Out of stock"}
-            </p>
-          )}
         </Link>
       </CardContent>
       <CardFooter className="p-3 sm:p-4 pt-0 flex gap-2">

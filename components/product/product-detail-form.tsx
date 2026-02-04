@@ -14,7 +14,7 @@ import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { CustomLettersForm } from "./custom-letters-form";
 import { KeychainConfig } from "@/types/product";
 
-export function ProductDetailForm({ product, onPreviewChange }: ProductDetailFormProps) {
+export function ProductDetailForm({ product, previewText = "", onPreviewChange }: ProductDetailFormProps) {
   const router = useRouter();
   // Check category instead of product_type for specific behaviors
   const isKeychains = product.category === "keychains";
@@ -53,8 +53,7 @@ export function ProductDetailForm({ product, onPreviewChange }: ProductDetailFor
   const totalPrice = isCustomLetters 
     ? customConfig.totalPrice 
     : product.price * quantity;
-  const isOutOfStock = product.stock_quantity === 0;
-  const maxQuantity = Math.min(product.stock_quantity, 10); // Limit to 10 or stock quantity
+  const maxQuantity = 10; // Limit to 10 per order
 
   const handleQuantityChange = (delta: number) => {
     setQuantity((prev) => {
@@ -205,6 +204,7 @@ export function ProductDetailForm({ product, onPreviewChange }: ProductDetailFor
           availableFonts={product.material_options}
           customConfig={product.custom_config || {}}
           productName={product.name}
+          text={previewText}
           onConfigChange={(config) => {
             setCustomConfig(config);
             onPreviewChange?.({
@@ -268,21 +268,10 @@ export function ProductDetailForm({ product, onPreviewChange }: ProductDetailFor
                   size="icon"
                   className="h-10 w-10 sm:h-12 sm:w-12 touch-manipulation"
                   onClick={() => handleQuantityChange(1)}
-                  disabled={quantity >= maxQuantity || isOutOfStock}
+                  disabled={quantity >= maxQuantity}
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
-              </div>
-              <div className="flex-1 sm:flex-none">
-                {isOutOfStock ? (
-                  <p className="text-xs sm:text-sm text-destructive font-medium">
-                    Out of Stock
-                  </p>
-                ) : (
-                  <p className="text-xs sm:text-sm text-muted-foreground">
-                    {product.stock_quantity} available
-                  </p>
-                )}
               </div>
             </div>
           </div>
@@ -294,12 +283,10 @@ export function ProductDetailForm({ product, onPreviewChange }: ProductDetailFor
             size="lg"
             className="w-full bg-accent-primary-dark hover:bg-accent-primary-dark/90 text-white text-base sm:text-base py-4 sm:py-5 lg:py-6 touch-manipulation"
             onClick={handleAddToCart}
-            disabled={isOutOfStock || isAdding || (isCustomLetters && customConfig.characterCount === 0)}
+            disabled={isAdding || (isCustomLetters && customConfig.characterCount === 0)}
           >
             {isAdding
               ? "Adding..."
-              : isOutOfStock
-              ? "Out of Stock"
               : isCustomLetters && customConfig.characterCount === 0
               ? "Enter Text to Continue"
               : "Add to Cart"}

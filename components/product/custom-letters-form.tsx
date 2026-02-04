@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CustomLettersFormProps } from "@/types/product-components";
 import { getPricePerCharacter, calculateCustomLettersPrice, isOutdoorProduct } from "@/lib/utils/custom-letters-pricing";
@@ -12,9 +11,9 @@ export function CustomLettersForm({
   availableFonts,
   customConfig,
   productName = "",
+  text, // Text now comes from the preview box
   onConfigChange,
 }: CustomLettersFormProps) {
-  const [text, setText] = useState("");
   const [font, setFont] = useState(customConfig.defaultFont || availableFonts[0] || "");
   const [color, setColor] = useState(customConfig.colors?.[0] || "black");
   const [size, setSize] = useState<number>(20); // Default 20cm
@@ -41,10 +40,6 @@ export function CustomLettersForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [text, font, color, size]);
 
-  const handleTextChange = (newText: string) => {
-    setText(newText);
-  };
-
   const handleFontChange = (newFont: string) => {
     setFont(newFont);
   };
@@ -55,31 +50,19 @@ export function CustomLettersForm({
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Text Input */}
-      <div>
-        <Label htmlFor="custom-text" className="text-sm sm:text-base font-semibold mb-2 block">
-          Enter Your Text:
-        </Label>
-        <Input
-          id="custom-text"
-          value={text}
-          onChange={(e) => handleTextChange(e.target.value)}
-          placeholder="e.g., Welcome Home"
-          className="w-full"
-        />
-        {text && (
-          <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
-            <span>{characterCount} {characterCount === 1 ? "character" : "characters"}</span>
-            <span>•</span>
-            <span>{currentPricePerCharacter.toFixed(2)} RON per character ({size} cm)</span>
-          </div>
-        )}
-        {!text && (
-          <p className="text-xs text-muted-foreground mt-1">
-            Type the text you want on your wall. Each character (including spaces) is priced separately.
-          </p>
-        )}
-      </div>
+      {/* Character count and pricing info */}
+      {text && (
+        <div className="flex items-center gap-2 text-xs text-muted-foreground p-3 bg-accent-primary/5 rounded-lg">
+          <span>{characterCount} {characterCount === 1 ? "character" : "characters"}</span>
+          <span>•</span>
+          <span>{currentPricePerCharacter.toFixed(2)} RON per character ({size} cm)</span>
+        </div>
+      )}
+      {!text && (
+        <p className="text-xs text-muted-foreground p-3 bg-accent-primary/5 rounded-lg">
+          Type your text in the preview box below. Each character (including spaces) is priced separately.
+        </p>
+      )}
 
       {/* Font Selector */}
       {availableFonts.length > 0 && (

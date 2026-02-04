@@ -16,6 +16,7 @@ export function ProductCard({
   category,
   featured,
   rating,
+  review_count,
 }: ProductCardProps) {
   const isKeychain = category === "keychains";
   return (
@@ -80,45 +81,45 @@ export function ProductCard({
         </div>
       <CardContent className="p-3 sm:p-4">
         <Link href={`/products/${id}`}>
-          <div className="space-y-1.5 sm:space-y-2">
-            <h3 className="font-semibold text-base sm:text-lg group-hover:text-accent-primary-dark transition-colors line-clamp-2">
-              {name}
-            </h3>
-            {rating && (
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                <div className="flex items-center">
-                  {[...Array(5)].map((_, i) => (
-                    <span
-                      key={i}
-                      className={`text-xs sm:text-sm ${
-                        i < Math.floor(rating)
-                          ? "text-yellow-400"
-                          : "text-muted-foreground"
-                      }`}
-                    >
-                      ★
-                    </span>
-                  ))}
-                </div>
-                <span className="text-[10px] sm:text-xs text-muted-foreground">
-                  ({rating.toFixed(1)})
-                </span>
-              </div>
-            )}
-          </div>
+          <h3 className="font-semibold text-base sm:text-lg group-hover:text-accent-primary-dark transition-colors line-clamp-2">
+            {name}
+          </h3>
         </Link>
       </CardContent>
-      <CardFooter className="p-4 sm:p-4 pt-0 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-0">
-        <div>
-          {isKeychain ? (
-            <p className="text-sm sm:text-base font-medium text-muted-foreground">Contact for pricing</p>
-          ) : (
-            <p className="text-xl sm:text-2xl font-bold">{price.toFixed(2)} RON</p>
+      <CardFooter className="p-4 sm:p-4 pt-0 flex flex-col gap-3">
+        <div className="w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-0">
+          <div>
+            {isKeychain ? (
+              <p className="text-sm sm:text-base font-medium text-muted-foreground">Contact for pricing</p>
+            ) : (
+              <p className="text-lg sm:text-lg font-bold">{price.toFixed(2)} RON</p>
+            )}
+          </div>
+          {!isKeychain && (
+            <div className="w-full sm:w-auto">
+              <ProductCardActions productId={id} showCartOnly />
+            </div>
           )}
         </div>
-        {!isKeychain && (
-          <div className="w-full sm:w-auto">
-            <ProductCardActions productId={id} showCartOnly />
+        {rating !== undefined && rating > 0 && (
+          <div className="w-full flex items-center gap-1.5 border-t border-accent-primary/10 pt-3">
+            <div className="flex items-center">
+              {[...Array(5)].map((_, i) => (
+                <span
+                  key={i}
+                  className={`text-xs sm:text-sm ${
+                    i < Math.floor(rating)
+                      ? "text-yellow-400"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  ★
+                </span>
+              ))}
+            </div>
+            <span className="text-[10px] sm:text-xs text-muted-foreground">
+              {review_count !== undefined ? `${review_count} ${review_count === 1 ? 'review' : 'reviews'}` : ''}
+            </span>
           </div>
         )}
       </CardFooter>

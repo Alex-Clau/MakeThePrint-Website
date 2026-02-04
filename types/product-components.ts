@@ -8,6 +8,7 @@ export interface CustomLettersFormProps {
   availableFonts: string[];
   customConfig: CustomProductConfig;
   productName?: string; // Used to determine if indoor or outdoor
+  text: string; // Text input comes from the preview box
   onConfigChange: (config: {
     text: string;
     characterCount: number;
@@ -72,13 +73,6 @@ export interface CreateReviewFormProps {
   onClose?: () => void;
 }
 
-/**
- * Product Search component props
- */
-export interface ProductSearchProps {
-  onSearch: (query: string) => void;
-  placeholder?: string;
-}
 
 /**
  * Product Card Actions component props
@@ -98,5 +92,6 @@ export interface TextPreviewProps {
   font: string;
   color: string;
   size: number; // Size in cm
+  onTextChange?: (text: string) => void;
 }
 

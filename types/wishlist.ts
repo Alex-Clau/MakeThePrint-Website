@@ -8,7 +8,6 @@ export interface WishlistItemProps {
     name: string;
     price: number;
     images?: string[];
-    stock_quantity?: number;
     rating?: number;
     review_count?: number;
   };
@@ -27,7 +26,6 @@ export interface WishlistContentProps {
       name: string;
       price: number;
       images?: string[];
-      stock_quantity?: number;
       rating?: number;
       review_count?: number;
     };

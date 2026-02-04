@@ -11,6 +11,7 @@ export interface ProductCardProps {
   category?: string;
   featured?: boolean;
   rating?: number;
+  review_count?: number;
 }
 
 /**
@@ -18,6 +19,7 @@ export interface ProductCardProps {
  */
 export interface ProductDetailFormProps {
   product: Product;
+  previewText?: string; // Text from the editable preview box
   onPreviewChange?: (preview: {
     text: string;
     font: string;

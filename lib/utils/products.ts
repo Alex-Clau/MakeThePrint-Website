@@ -11,8 +11,9 @@ export function transformProductToCardData(product: any): ProductCardData {
     image: product.images?.[0] || "",
     category: product.category,
     featured: product.featured,
-    // Rating will be calculated dynamically from reviews when needed
-    rating: undefined,
+    // Rating and review count will be calculated dynamically from reviews when needed
+    ...(product.rating && {rating: product.rating}),
+    ...(product.review_count !== undefined && {review_count: product.review_count}),
   };
 }
 
@@ -26,7 +27,6 @@ export function transformProductToFull(product: any) {
     description: product.description || "",
     price: parseFloat(product.price),
     material_options: (product.material_options as string[]) || [],
-    stock_quantity: product.stock_quantity || 0,
     product_type: product.product_type || "custom",
     category: product.category || "",
     custom_config: product.custom_config || {},

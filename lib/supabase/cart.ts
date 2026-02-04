@@ -15,8 +15,7 @@ export async function getCartItems(userId: string) {
         id,
         name,
         price,
-        images,
-        stock_quantity
+        images
       )
     `
     )
