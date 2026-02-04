@@ -37,7 +37,9 @@ const getColorValue = (color: string) => {
   return colorMap[color] || color;
 };
 
-export function TextPreview({ text, font, color, size, onTextChange }: TextPreviewProps) {
+const MAX_TEXT_LENGTH = 50; // Default maximum characters
+
+export function TextPreview({ text, font, color, size, maxLength = MAX_TEXT_LENGTH, onTextChange }: TextPreviewProps) {
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // Auto-resize textarea to fit content
@@ -52,6 +54,8 @@ export function TextPreview({ text, font, color, size, onTextChange }: TextPrevi
   const colorValue = getColorValue(color);
   const fontSize = getFontSize(size);
   const fontFamily = getFontFamily(font);
+  const remainingChars = maxLength - text.length;
+  const isNearLimit = remainingChars <= 10;
 
   return (
     <Card className={`border-accent-primary/30 bg-card/50 ${isEditable ? 'cursor-text' : ''}`}>
@@ -63,6 +67,7 @@ export function TextPreview({ text, font, color, size, onTextChange }: TextPrevi
               value={text}
               onChange={(e) => onTextChange(e.target.value)}
               placeholder="Enter your text"
+              maxLength={maxLength}
               className="w-full bg-transparent border-none outline-none resize-none text-center font-bold placeholder:text-muted-foreground/50"
               style={{
                 fontFamily,
@@ -86,15 +91,21 @@ export function TextPreview({ text, font, color, size, onTextChange }: TextPrevi
               {text || "Enter your text"}
             </p>
           )}
-          {(text || !isEditable) && (
-            <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground pt-2 border-t border-accent-primary/10">
-              <span>Font: {font}</span>
-              <span>•</span>
-              <span>Color: {color}</span>
-              <span>•</span>
-              <span>Height: {size} cm</span>
-            </div>
-          )}
+          <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground pt-2 border-t border-accent-primary/10">
+            {isEditable && (
+              <>
+                <span className={isNearLimit ? "text-yellow-500 font-medium" : ""}>
+                  {text.length}/{maxLength}
+                </span>
+                <span>•</span>
+              </>
+            )}
+            <span>Font: {font}</span>
+            <span>•</span>
+            <span>Color: {color}</span>
+            <span>•</span>
+            <span>Height: {size} cm</span>
+          </div>
         </div>
       </CardContent>
     </Card>

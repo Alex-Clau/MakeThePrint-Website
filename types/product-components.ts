@@ -92,6 +92,7 @@ export interface TextPreviewProps {
   font: string;
   color: string;
   size: number; // Size in cm
+  maxLength?: number; // Maximum characters allowed
   onTextChange?: (text: string) => void;
 }
 
