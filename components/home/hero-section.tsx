@@ -7,19 +7,19 @@ export function HeroSection() {
   return (
     <section className="relative w-full overflow-hidden min-h-[700px] lg:h-[850px] flex items-center">
       {/* Background Image */}
-      <div className="absolute inset-0">
+      <div className="hidden md:block">
         <Image
-          src="/hero-backdrop.png"
+          src="/hero.png"
           alt="3D Printers"
           fill
           priority
           quality={75}
-          className="object-contain object-top"
+          className="object-contain object-center"
           sizes="100vw"
           unoptimized
         />
-        {/* Overlay for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/90 to-background/60" />
+      {/* Overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background" />
       </div>
       <div className="relative max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 w-full">
         <div className="text-center flex flex-col justify-around min-h-[calc(100vh-3.5rem)] sm:min-h-0 sm:justify-center sm:items-center lg:block">
