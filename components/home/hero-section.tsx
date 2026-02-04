@@ -1,11 +1,24 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 
 export function HeroSection() {
   return (
     <section className="relative w-full overflow-hidden min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] flex items-center">
-      <div className="absolute inset-0 bg-gradient-to-br from-accent-primary-light/10 via-background to-background" />
+      {/* Background Image */}
+      <div className="absolute inset-0">
+        <Image
+          src="/hero-backdrop.png"
+          alt="3D Printers"
+          fill
+          className="object-cover object-center"
+          priority
+          quality={75}
+        />
+        {/* Overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/90 to-background/60" />
+      </div>
       <div className="relative max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 w-full">
         <div className="text-center flex flex-col justify-around min-h-[calc(100vh-3.5rem)] sm:min-h-0 sm:justify-center sm:items-center lg:block">
           <div>

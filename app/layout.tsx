@@ -36,7 +36,6 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SnowEffect />
           <ToastProvider />
           <div className="min-h-screen flex flex-col">
             {children}

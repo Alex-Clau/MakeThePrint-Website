@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ProductDetailFormProps } from "@/types/components";
@@ -12,10 +12,13 @@ import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { CustomLettersForm } from "./custom-letters-form";
+import { KeychainConfig } from "@/types/product";
 
 export function ProductDetailForm({ product, onPreviewChange }: ProductDetailFormProps) {
   const router = useRouter();
-  const isCustomLetters = product.product_type === "custom_letters";
+  // Check category instead of product_type for specific behaviors
+  const isKeychains = product.category === "keychains";
+  const isCustomLetters = product.product_type === "custom" && !isKeychains;
   
   // For standard products
   const [selectedFeature, setSelectedFeature] = useState(
@@ -23,6 +26,11 @@ export function ProductDetailForm({ product, onPreviewChange }: ProductDetailFor
   );
   const [quantity, setQuantity] = useState(1);
   
+  // Type guard for custom config
+  const customProductConfig = isCustomLetters && product.custom_config && 'defaultFont' in product.custom_config 
+    ? product.custom_config 
+    : null;
+
   // For custom letters
   const [customConfig, setCustomConfig] = useState<{
     text: string;
@@ -34,8 +42,8 @@ export function ProductDetailForm({ product, onPreviewChange }: ProductDetailFor
   }>({
     text: "",
     characterCount: 0,
-    font: product.custom_config?.defaultFont || product.material_options[0] || "",
-    color: product.custom_config?.colors?.[0] || "black",
+    font: customProductConfig?.defaultFont || product.material_options[0] || "",
+    color: customProductConfig?.colors?.[0] || "black",
     size: 20, // Default 20cm
     totalPrice: 0,
   });
@@ -55,6 +63,27 @@ export function ProductDetailForm({ product, onPreviewChange }: ProductDetailFor
       if (newQuantity > maxQuantity) return maxQuantity;
       return newQuantity;
     });
+  };
+
+  const handleWhatsAppInquiry = () => {
+    const keychainConfig = product.custom_config as KeychainConfig;
+    const phoneNumber = keychainConfig?.whatsappNumber;
+    
+    if (!phoneNumber) {
+      toast.error("WhatsApp number not configured for this product");
+      return;
+    }
+
+    // Use custom message or default, replace {product_name} placeholder
+    const messageTemplate = keychainConfig?.whatsappMessage || 
+      `Hi! I'm interested in the {product_name}. Can you provide more details about customization options?`;
+    
+    const message = messageTemplate.replace(/{product_name}/g, product.name);
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+    
+    window.open(whatsappUrl, '_blank');
+    toast.success("Opening WhatsApp...");
   };
 
   const handleAddToCart = async () => {
@@ -110,29 +139,67 @@ export function ProductDetailForm({ product, onPreviewChange }: ProductDetailFor
         </p>
       </div>
 
-      {/* Price Display */}
-      <div>
-        <p className="text-3xl sm:text-4xl font-bold mb-1 sm:mb-2">
-          {totalPrice.toFixed(2)} RON
-        </p>
-        {isCustomLetters ? (
-          <p className="text-xs sm:text-sm text-muted-foreground">
-            Price varies by size (5-24 cm)
-            {customConfig.characterCount > 0 && (
-              <span className="ml-1">
-                • {customConfig.characterCount} {customConfig.characterCount === 1 ? "character" : "characters"}
-              </span>
+      {/* Keychains - Show inquiry info only */}
+      {isKeychains ? (
+        <div className="space-y-4">
+          <div className="p-4 sm:p-6 bg-accent-primary/10 rounded-lg border-2 border-accent-primary/30">
+            <h3 className="text-lg sm:text-xl font-semibold mb-2 text-accent-primary-dark">
+              Custom Keychain Design
+            </h3>
+            <p className="text-sm sm:text-base text-muted-foreground mb-4">
+              Each keychain is custom-made to your specifications. Browse our portfolio above for inspiration, 
+              then contact us to discuss your unique design ideas!
+            </p>
+            <ul className="space-y-2 text-sm sm:text-base">
+              <li className="flex items-start gap-2">
+                <span className="text-accent-primary-dark">•</span>
+                <span>Personalized designs tailored to your needs</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-accent-primary-dark">•</span>
+                <span>High-quality materials and craftsmanship</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-accent-primary-dark">•</span>
+                <span>Direct consultation with our design team</span>
+              </li>
+            </ul>
+          </div>
+          
+          <Button
+            size="lg"
+            className="w-full bg-green-600 hover:bg-green-700 text-white text-base sm:text-base py-4 sm:py-5 lg:py-6 touch-manipulation"
+            onClick={handleWhatsAppInquiry}
+          >
+            <MessageCircle className="mr-2 h-5 w-5" />
+            Inquire on WhatsApp
+          </Button>
+        </div>
+      ) : (
+        <>
+          {/* Price Display */}
+          <div>
+            <p className="text-3xl sm:text-4xl font-bold mb-1 sm:mb-2">
+              {totalPrice.toFixed(2)} RON
+            </p>
+            {isCustomLetters ? (
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                Price varies by size (5-24 cm)
+                {customConfig.characterCount > 0 && (
+                  <span className="ml-1">
+                    • {customConfig.characterCount} {customConfig.characterCount === 1 ? "character" : "characters"}
+                  </span>
+                )}
+              </p>
+            ) : quantity > 1 && (
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                {product.price.toFixed(2)} RON each
+              </p>
             )}
-          </p>
-        ) : quantity > 1 && (
-          <p className="text-xs sm:text-sm text-muted-foreground">
-            {product.price.toFixed(2)} RON each
-          </p>
-        )}
-      </div>
+          </div>
 
-      {/* Custom Letters Form */}
-      {isCustomLetters ? (
+          {/* Custom Letters Form */}
+          {isCustomLetters ? (
         <CustomLettersForm
           pricePerCharacter={product.price}
           availableFonts={product.material_options}
@@ -219,24 +286,26 @@ export function ProductDetailForm({ product, onPreviewChange }: ProductDetailFor
               </div>
             </div>
           </div>
+          </>
+          )}
+
+          {/* Add to Cart Button */}
+          <Button
+            size="lg"
+            className="w-full bg-accent-primary-dark hover:bg-accent-primary-dark/90 text-white text-base sm:text-base py-4 sm:py-5 lg:py-6 touch-manipulation"
+            onClick={handleAddToCart}
+            disabled={isOutOfStock || isAdding || (isCustomLetters && customConfig.characterCount === 0)}
+          >
+            {isAdding
+              ? "Adding..."
+              : isOutOfStock
+              ? "Out of Stock"
+              : isCustomLetters && customConfig.characterCount === 0
+              ? "Enter Text to Continue"
+              : "Add to Cart"}
+          </Button>
         </>
       )}
-
-      {/* Add to Cart Button */}
-      <Button
-        size="lg"
-        className="w-full bg-accent-primary-dark hover:bg-accent-primary-dark/90 text-white text-base sm:text-base py-4 sm:py-5 lg:py-6 touch-manipulation"
-        onClick={handleAddToCart}
-        disabled={isOutOfStock || isAdding || (isCustomLetters && customConfig.characterCount === 0)}
-      >
-        {isAdding
-          ? "Adding..."
-          : isOutOfStock
-          ? "Out of Stock"
-          : isCustomLetters && customConfig.characterCount === 0
-          ? "Enter Text to Continue"
-          : "Add to Cart"}
-      </Button>
     </div>
   );
 }

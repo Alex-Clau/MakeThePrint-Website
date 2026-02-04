@@ -8,6 +8,14 @@ export interface CustomProductConfig {
 }
 
 /**
+ * Keychain product configuration
+ */
+export interface KeychainConfig {
+  whatsappNumber: string; // Phone number for WhatsApp inquiry (format: 1234567890)
+  whatsappMessage?: string; // Pre-filled message template
+}
+
+/**
  * Base product type matching the Supabase schema
  */
 export interface Product {
@@ -17,10 +25,15 @@ export interface Product {
   price: number;
   material_options: string[];
   stock_quantity: number;
-  product_type?: "standard" | "custom_letters";
-  custom_config?: CustomProductConfig;
+  product_type?: "custom" | "seasonal";
+  category?: string; // 'indoor_wall_letters', 'outdoor_wall_letters', 'keychains', 'seasonal_decor'
+  custom_config?: CustomProductConfig | KeychainConfig;
+  featured?: boolean;
+  seasonal?: boolean;
   image?: string;
   images?: string[];
+  created_at?: string;
+  updated_at?: string;
 }
 
 /**
@@ -31,7 +44,7 @@ export interface ProductWithImage extends Product {
 }
 
 /**
- * Product card display data
+ * Product card display data with calculated rating
  */
 export interface ProductCardData {
   id: string;
@@ -40,6 +53,7 @@ export interface ProductCardData {
   image: string;
   category?: string;
   featured?: boolean;
-  rating?: number;
+  rating?: number; // Calculated from product_reviews, not stored in products table
+  review_count?: number; // Calculated from product_reviews, not stored in products table
 }
 

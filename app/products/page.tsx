@@ -6,7 +6,10 @@ import { getProducts } from "@/lib/supabase/products";
 import { transformProductToCardData } from "@/lib/utils/products";
 
 async function ProductsList() {
-  const products = await getProducts();
+  // Get custom products (wall letters and keychains)
+  const products = await getProducts({ 
+    product_type: "custom" 
+  });
   const transformedProducts = products.map(transformProductToCardData);
 
   return <ProductsContent products={transformedProducts} />;
@@ -21,10 +24,10 @@ export default function ProductsPage() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
             <div>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 text-accent-primary-dark">
-                All Products
+                Custom Products
               </h1>
               <p className="text-sm sm:text-base text-muted-foreground">
-                Discover our complete collection of 3D printed items
+                Custom wall letters and keychains designed just for you
               </p>
             </div>
             <Suspense fallback={<div className="w-full sm:w-64 h-10 bg-muted animate-pulse rounded-md" />}>

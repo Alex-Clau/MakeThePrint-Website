@@ -13,9 +13,11 @@ export function ProductCard({
   name,
   price,
   image,
+  category,
   featured,
   rating,
 }: ProductCardProps) {
+  const isKeychain = category === "keychains";
   return (
     <motion.div
       initial={{ opacity: 0, y: 30, scale: 0.9, rotateX: -15 }}
@@ -60,11 +62,18 @@ export function ProductCard({
               />
             </motion.div>
           </Link>
-          {featured && (
-            <Badge className="absolute top-2 left-2 bg-accent-primary-dark text-white z-20">
-              Featured
-            </Badge>
-          )}
+          <div className="absolute top-2 left-2 z-20 flex flex-col gap-2">
+            {featured && (
+              <Badge className="bg-accent-primary-dark text-white">
+                Featured
+              </Badge>
+            )}
+            {isKeychain && (
+              <Badge className="bg-green-600 text-white">
+                Custom Inquiry
+              </Badge>
+            )}
+          </div>
           <div className="absolute top-2 right-2 z-20">
             <ProductCardActions productId={id} showWishlistOnly />
           </div>
@@ -101,11 +110,17 @@ export function ProductCard({
       </CardContent>
       <CardFooter className="p-4 sm:p-4 pt-0 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-0">
         <div>
-          <p className="text-xl sm:text-2xl font-bold">{price.toFixed(2)} RON</p>
+          {isKeychain ? (
+            <p className="text-sm sm:text-base font-medium text-muted-foreground">Contact for pricing</p>
+          ) : (
+            <p className="text-xl sm:text-2xl font-bold">{price.toFixed(2)} RON</p>
+          )}
         </div>
-        <div className="w-full sm:w-auto">
-          <ProductCardActions productId={id} showCartOnly />
-        </div>
+        {!isKeychain && (
+          <div className="w-full sm:w-auto">
+            <ProductCardActions productId={id} showCartOnly />
+          </div>
+        )}
       </CardFooter>
     </Card>
     </motion.div>

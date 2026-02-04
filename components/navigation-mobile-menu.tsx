@@ -53,14 +53,14 @@ export function NavigationMobileMenu() {
                 className="block py-3 text-base font-medium hover:text-accent-primary-dark transition-colors border-b border-border/40 touch-manipulation"
                 onClick={closeMenu}
               >
-                Products
+                Custom Products
               </Link>
               <Link
                 href="/collections"
                 className="block py-3 text-base font-medium hover:text-accent-primary-dark transition-colors border-b border-border/40 touch-manipulation"
                 onClick={closeMenu}
               >
-                Seasonal Collections
+                Seasonal Products
               </Link>
               <Link
                 href="/about"

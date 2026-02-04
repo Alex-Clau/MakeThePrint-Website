@@ -8,6 +8,7 @@ import { handleSupabaseError } from "../utils/supabase-errors";
 export async function getProducts(options?: {
   featured?: boolean;
   seasonal?: boolean;
+  product_type?: string | string[];
   limit?: number;
   offset?: number;
   search?: string;
@@ -23,6 +24,14 @@ export async function getProducts(options?: {
 
   if (options?.seasonal !== undefined) {
     query = query.eq("seasonal", options.seasonal);
+  }
+
+  if (options?.product_type) {
+    if (Array.isArray(options.product_type)) {
+      query = query.in("product_type", options.product_type);
+    } else {
+      query = query.eq("product_type", options.product_type);
+    }
   }
 
   if (options?.search) {
@@ -76,7 +85,8 @@ export async function createProduct(product: {
   stock_quantity?: number;
   featured?: boolean;
   seasonal?: boolean;
-  product_type?: "standard" | "custom_letters";
+  product_type?: "custom" | "seasonal";
+  category?: string;
   custom_config?: Record<string, any>;
 }) {
   const supabase = await createClient();
@@ -110,7 +120,8 @@ export async function updateProduct(
     stock_quantity: number;
     featured: boolean;
     seasonal?: boolean;
-    product_type?: "standard" | "custom_letters";
+    product_type?: "custom" | "seasonal";
+    category?: string;
     custom_config?: Record<string, any>;
   }>
 ) {

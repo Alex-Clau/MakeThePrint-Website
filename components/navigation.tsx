@@ -21,13 +21,13 @@ export function Navigation() {
               href="/products"
               className="text-sm font-medium hover:text-accent-primary-dark transition-colors"
             >
-              Products
+              Custom Products
             </Link>
             <Link
               href="/collections"
               className="text-sm font-medium hover:text-accent-primary-dark transition-colors"
             >
-              Seasonal Collections
+              Seasonal Products
             </Link>
             <Link
               href="/about"
