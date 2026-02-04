@@ -20,8 +20,6 @@ export interface CheckoutFormsProps {
   }) => void;
 }
 
-import { CartItem } from "./cart";
-
 /**
  * Order Summary component props
  */
@@ -32,8 +30,6 @@ export interface OrderSummaryProps {
   tax: number;
   total: number;
 }
-
-import { CartItem } from "./cart";
 
 /**
  * Order Item component props

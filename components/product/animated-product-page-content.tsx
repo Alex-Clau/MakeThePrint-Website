@@ -20,8 +20,8 @@ export function AnimatedProductPageContent({
     size: number; // Size in cm
   }>({
     text: "",
-    font: product.custom_config?.defaultFont || product.material_options[0] || "",
-    color: product.custom_config?.colors?.[0] || "black",
+    font: product.material_options[0] || "",
+    color: "black",
     size: 20, // Default 20cm
   });
   // Get all images, using image as fallback if images array is empty

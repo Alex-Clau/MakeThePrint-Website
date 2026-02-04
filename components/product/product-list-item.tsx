@@ -34,7 +34,7 @@ export function ProductListItem({ product }: ProductListItemProps) {
                       <span
                         key={i}
                         className={`text-xs sm:text-sm ${
-                          i < Math.floor(product.rating)
+                          i < Math.floor(product.rating as number)
                             ? "text-yellow-400"
                             : "text-muted-foreground"
                         }`}

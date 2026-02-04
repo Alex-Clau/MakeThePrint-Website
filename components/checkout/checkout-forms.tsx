@@ -5,8 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { CreditCard } from "lucide-react";
 import { CheckoutFormsProps } from "@/types/checkout";
+import {AddressFormData} from "@/types";
 
 export function CheckoutForms({ onFormDataChange }: CheckoutFormsProps) {
   const [shipping, setShipping] = useState<AddressFormData>({
