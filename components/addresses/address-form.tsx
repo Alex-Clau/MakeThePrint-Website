@@ -2,12 +2,11 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
 import { AddressFields } from "./address-fields";
 import { AddressFormProps } from "@/types/address-components";
+import {AddressFormData} from "@/types";
 
 export function AddressForm({ onSave, initialData, onCancel }: AddressFormProps) {
   const [formData, setFormData] = useState<AddressFormData>({

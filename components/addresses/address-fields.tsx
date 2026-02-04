@@ -1,6 +1,5 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AddressFormData } from "@/types/address";
 import { AddressFieldsProps } from "@/types/address-components";
 
 export function AddressFields({ formData, onChange }: AddressFieldsProps) {

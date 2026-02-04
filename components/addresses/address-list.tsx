@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trash2, Edit, MapPin } from "lucide-react";
-import { AddressListProps, Address } from "@/types/address-components";
+import { AddressListProps } from "@/types/address-components";
 
 export function AddressList({
   addresses,
