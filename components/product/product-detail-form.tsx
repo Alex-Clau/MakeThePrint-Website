@@ -13,8 +13,14 @@ import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { CustomLettersForm } from "./custom-letters-form";
 import { KeychainConfig } from "@/types/product";
+import { getProductDisplayName } from "@/lib/utils/products";
+import { useLocale, useTranslations } from "@/components/locale-provider";
 
 export function ProductDetailForm({ product, previewText = "", onPreviewChange }: ProductDetailFormProps) {
+  const { locale } = useLocale();
+  const displayName = getProductDisplayName(product, locale);
+  const t = useTranslations().product;
+  const c = useTranslations().common;
   const router = useRouter();
   // Check category instead of product_type for specific behaviors
   const isKeychains = product.category === "keychains";
@@ -69,7 +75,7 @@ export function ProductDetailForm({ product, previewText = "", onPreviewChange }
     const phoneNumber = keychainConfig?.whatsappNumber;
     
     if (!phoneNumber) {
-      toast.error("WhatsApp number not configured for this product");
+      toast.error(t.whatsappNotConfigured);
       return;
     }
 
@@ -77,12 +83,12 @@ export function ProductDetailForm({ product, previewText = "", onPreviewChange }
     const messageTemplate = keychainConfig?.whatsappMessage || 
       `Hi! I'm interested in the {product_name}. Can you provide more details about customization options?`;
     
-    const message = messageTemplate.replace(/{product_name}/g, product.name);
+    const message = messageTemplate.replace(/{product_name}/g, displayName);
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
     
     window.open(whatsappUrl, '_blank');
-    toast.success("Opening WhatsApp...");
+    toast.success(t.openingWhatsApp);
   };
 
   const handleAddToCart = async () => {
@@ -131,7 +137,7 @@ export function ProductDetailForm({ product, previewText = "", onPreviewChange }
       {/* Product Name */}
       <div>
         <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 sm:mb-3 lg:mb-4 text-accent-primary-dark">
-          {product.name}
+          {displayName}
         </h1>
         <p className="text-sm sm:text-base lg:text-lg text-muted-foreground mb-2 sm:mb-3 lg:mb-4">
           {product.description}
@@ -143,24 +149,23 @@ export function ProductDetailForm({ product, previewText = "", onPreviewChange }
         <div className="space-y-4">
           <div className="p-4 sm:p-6 bg-accent-primary/10 rounded-lg border-2 border-accent-primary/30">
             <h3 className="text-lg sm:text-xl font-semibold mb-2 text-accent-primary-dark">
-              Custom Keychain Design
+              {t.keychainTitle}
             </h3>
             <p className="text-sm sm:text-base text-muted-foreground mb-4">
-              Each keychain is custom-made to your specifications. Browse our portfolio above for inspiration, 
-              then contact us to discuss your unique design ideas!
+              {t.keychainDesc}
             </p>
             <ul className="space-y-2 text-sm sm:text-base">
               <li className="flex items-start gap-2">
                 <span className="text-accent-primary-dark">•</span>
-                <span>Personalized designs tailored to your needs</span>
+                <span>{t.keychainBullet1}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-accent-primary-dark">•</span>
-                <span>High-quality materials and craftsmanship</span>
+                <span>{t.keychainBullet2}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-accent-primary-dark">•</span>
-                <span>Direct consultation with our design team</span>
+                <span>{t.keychainBullet3}</span>
               </li>
             </ul>
           </div>
@@ -171,7 +176,7 @@ export function ProductDetailForm({ product, previewText = "", onPreviewChange }
             onClick={handleWhatsAppInquiry}
           >
             <MessageCircle className="mr-2 h-5 w-5" />
-            Inquire on WhatsApp
+            {t.inquireWhatsApp}
           </Button>
         </div>
       ) : (
@@ -179,20 +184,20 @@ export function ProductDetailForm({ product, previewText = "", onPreviewChange }
           {/* Price Display */}
           <div>
             <p className="text-3xl sm:text-4xl font-bold mb-1 sm:mb-2">
-              {totalPrice.toFixed(2)} RON
+              {totalPrice.toFixed(2)} {c.ron}
             </p>
             {isCustomLetters ? (
               <p className="text-xs sm:text-sm text-muted-foreground">
-                Price varies by size (5-24 cm)
+                {t.priceVariesBySize}
                 {customConfig.characterCount > 0 && (
                   <span className="ml-1">
-                    • {customConfig.characterCount} {customConfig.characterCount === 1 ? "character" : "characters"}
+                    • {customConfig.characterCount} {customConfig.characterCount === 1 ? t.character : t.characters}
                   </span>
                 )}
               </p>
             ) : quantity > 1 && (
               <p className="text-xs sm:text-sm text-muted-foreground">
-                {product.price.toFixed(2)} RON each
+                {product.price.toFixed(2)} {t.ronEach}
               </p>
             )}
           </div>
@@ -203,7 +208,7 @@ export function ProductDetailForm({ product, previewText = "", onPreviewChange }
           pricePerCharacter={product.price}
           availableFonts={product.material_options}
           customConfig={product.custom_config || {}}
-          productName={product.name}
+          productName={displayName}
           text={previewText}
           onConfigChange={(config) => {
             setCustomConfig(config);
@@ -221,7 +226,7 @@ export function ProductDetailForm({ product, previewText = "", onPreviewChange }
           {product.material_options.length > 0 && (
             <div>
               <Label className="text-sm sm:text-base font-semibold mb-3 sm:mb-4 block">
-                Choose Features:
+                {t.chooseFeatures}
               </Label>
               <RadioGroup
                 value={selectedFeature}
@@ -248,7 +253,7 @@ export function ProductDetailForm({ product, previewText = "", onPreviewChange }
 
           {/* Quantity Selector */}
           <div>
-            <Label className="text-sm sm:text-base font-semibold mb-2 sm:mb-3 lg:mb-4 block">Quantity:</Label>
+            <Label className="text-sm sm:text-base font-semibold mb-2 sm:mb-3 lg:mb-4 block">{t.quantity}</Label>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
               <div className="flex items-center border-2 border-gray-300 dark:border-gray-600 rounded-lg w-full sm:w-auto">
                 <Button
@@ -286,10 +291,10 @@ export function ProductDetailForm({ product, previewText = "", onPreviewChange }
             disabled={isAdding || (isCustomLetters && customConfig.characterCount === 0)}
           >
             {isAdding
-              ? "Adding..."
+              ? t.adding
               : isCustomLetters && customConfig.characterCount === 0
-              ? "Enter Text to Continue"
-              : "Add to Cart"}
+              ? t.enterTextToContinue
+              : t.addToCart}
           </Button>
         </>
       )}

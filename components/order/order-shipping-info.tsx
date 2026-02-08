@@ -1,17 +1,21 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
 import { OrderShippingInfoProps } from "@/types/order";
+import { useTranslations } from "@/components/locale-provider";
 
 export function OrderShippingInfo({
   shippingAddress,
   trackingNumber,
 }: OrderShippingInfoProps) {
+  const t = useTranslations().account;
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <MapPin className="h-5 w-5" />
-          Shipping Information
+          {t.shippingInfo}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -30,13 +34,13 @@ export function OrderShippingInfo({
           </p>
           {shippingAddress.phone && (
             <p className="text-sm text-muted-foreground mt-2">
-              Phone: {shippingAddress.phone}
+              {t.phone}: {shippingAddress.phone}
             </p>
           )}
         </div>
         {trackingNumber && (
           <div className="pt-4 border-t">
-            <p className="text-sm font-semibold mb-1">Tracking Number</p>
+            <p className="text-sm font-semibold mb-1">{t.trackingNumber}</p>
             <p className="text-sm text-muted-foreground">{trackingNumber}</p>
           </div>
         )}

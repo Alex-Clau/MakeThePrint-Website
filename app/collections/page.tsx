@@ -8,10 +8,18 @@ import { ProductCard } from "@/components/product/product-card";
 import { getDictionary, getLocaleFromCookie } from "@/lib/i18n";
 import type { Messages } from "@/lib/i18n";
 
-async function SeasonalCollections({ messages }: { messages: Messages }) {
+async function SeasonalCollections({
+  messages,
+  locale,
+}: {
+  messages: Messages;
+  locale: "en" | "ro";
+}) {
   const products = await getProducts({ seasonal: true, limit: 12 });
-  const transformedProducts = products.map(transformProductToCardData);
-  const t = messages.collections;
+  const transformedProducts = products.map((p) =>
+    transformProductToCardData(p, locale)
+  );
+  const t = messages.seasons;
 
   return (
     <div className="space-y-8">
@@ -34,7 +42,7 @@ async function SeasonalCollections({ messages }: { messages: Messages }) {
 export default async function CollectionsPage() {
   const locale = getLocaleFromCookie((await cookies()).get("locale")?.value);
   const messages = getDictionary(locale);
-  const t = messages.collections;
+  const t = messages.seasons;
 
   return (
     <main className="min-h-screen flex flex-col relative z-10 bg-background">
@@ -64,7 +72,7 @@ export default async function CollectionsPage() {
             </div>
           }
         >
-          <SeasonalCollections messages={messages} />
+          <SeasonalCollections messages={messages} locale={locale} />
         </Suspense>
       </div>
     </main>

@@ -3,18 +3,22 @@ import { Navigation } from "@/components/navigation";
 import { ProductsContent } from "@/components/product/products-content";
 import { getProducts } from "@/lib/supabase/products";
 import { transformProductToCardData } from "@/lib/utils/products";
+import {getDictionary, getLocaleFromCookie} from "@/lib/i18n";
+import {cookies} from "next/headers";
 
-async function ProductsList() {
-  // Get custom products (wall letters and keychains)
-  const products = await getProducts({
-    product_type: "custom"
-  });
-  const transformedProducts = products.map(transformProductToCardData);
-
+async function ProductsList({ locale }: { locale: "en" | "ro" }) {
+  const products = await getProducts({ product_type: "custom" });
+  const transformedProducts = products.map((p) =>
+    transformProductToCardData(p, locale)
+  );
   return <ProductsContent products={transformedProducts} />;
 }
 
-export default function ProductsPage() {
+export default async function ProductsPage() {
+  const locale = getLocaleFromCookie((await cookies()).get("locale")?.value);
+  const messages = getDictionary(locale);
+  const t = messages.products;
+
   return (
     <main className="min-h-screen flex flex-col">
       <Navigation />
@@ -23,10 +27,10 @@ export default function ProductsPage() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
             <div>
               <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 text-accent-primary-dark">
-                Custom Products
+                {t.title}
               </h1>
               <p className="text-sm sm:text-base text-muted-foreground">
-                Custom wall letters and keychains designed just for you
+                {t.subhead}
               </p>
             </div>
           </div>
@@ -44,7 +48,7 @@ export default function ProductsPage() {
             </div>
           }
         >
-          <ProductsList />
+          <ProductsList locale={locale} />
         </Suspense>
       </div>
     </main>

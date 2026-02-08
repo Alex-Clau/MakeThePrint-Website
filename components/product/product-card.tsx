@@ -22,6 +22,7 @@ export function ProductCard({
   const isKeychain = category === "keychains";
   const t = useTranslations().product;
   const c = useTranslations().common;
+  const r = useTranslations().reviews;
   return (
     <motion.div
       initial={{ opacity: 0, y: 30, scale: 0.9, rotateX: -15 }}
@@ -121,7 +122,7 @@ export function ProductCard({
               ))}
             </div>
             <span className="text-[10px] sm:text-xs text-muted-foreground">
-              {review_count !== undefined ? `${review_count} ${review_count === 1 ? 'review' : 'reviews'}` : ''}
+              {review_count !== undefined ? `${review_count} ${review_count === 1 ? r.review : r.reviews}` : ''}
             </span>
           </div>
         )}

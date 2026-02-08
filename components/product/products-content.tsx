@@ -5,17 +5,19 @@ import { ProductCard } from "@/components/product/product-card";
 import { ProductListItem } from "@/components/product/product-list-item";
 import { ViewToggle } from "@/components/product/view-toggle";
 import { ProductsContentProps } from "@/types/components";
-import {usePathname} from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useTranslations } from "@/components/locale-provider";
 
 export function ProductsContent({ products }: ProductsContentProps) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const pathName = usePathname();
+  const t = useTranslations().products;
 
   return (
     <>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <p className="text-xs sm:text-sm text-muted-foreground">
-          Showing {products.length} products
+          {t.showingCount.replace("{count}", String(products.length))}
         </p>
         <ViewToggle viewMode={viewMode} onViewChange={setViewMode} />
       </div>

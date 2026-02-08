@@ -6,8 +6,11 @@ import { Button } from "./ui/button";
 import { LogoutButton } from "./logout-button";
 import { User } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { useTranslations } from "@/components/locale-provider";
 
 export function AuthButtonClient() {
+  const c = useTranslations().common;
+  const a = useTranslations().auth;
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -56,7 +59,7 @@ export function AuthButtonClient() {
       <Button asChild size="sm" variant="ghost" className="flex items-center gap-2">
         <Link href="/account">
           <User className="h-4 w-4" />
-          <span className="sm:hidden">My Account</span>
+          <span className="sm:hidden">{c.myAccount}</span>
         </Link>
       </Button>
       <LogoutButton />
@@ -64,10 +67,10 @@ export function AuthButtonClient() {
   ) : (
     <div className="flex gap-2">
       <Button asChild size="sm" variant={"outline"}>
-        <Link href="/auth/login">Sign in</Link>
+        <Link href="/auth/login">{a.signIn}</Link>
       </Button>
       <Button asChild size="sm" variant={"default"}>
-        <Link href="/auth/sign-up">Sign up</Link>
+        <Link href="/auth/sign-up">{a.signUp}</Link>
       </Button>
     </div>
   );

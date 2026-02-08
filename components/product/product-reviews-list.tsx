@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, ChevronDown } from "lucide-react";
 import { CreateReviewForm } from "./create-review-form";
 import { createClient } from "@/lib/supabase/client";
-import { useEffect } from "react";
 import { ProductReviewsListProps } from "@/types/product-components";
+import { useTranslations } from "@/components/locale-provider";
 
 export function ProductReviewsList({
   reviews,
@@ -16,6 +16,7 @@ export function ProductReviewsList({
   totalReviews,
   productId,
 }: ProductReviewsListProps) {
+  const t = useTranslations().reviews;
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "highest" | "lowest">("newest");
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(false);
@@ -86,11 +87,11 @@ export function ProductReviewsList({
             <div className="flex items-center gap-3 mb-2">
               {renderStars(Math.round(averageRating), "lg")}
               <span className="text-2xl font-bold">
-                {averageRating.toFixed(2)} out of 5
+                {averageRating.toFixed(2)} {t.outOf5}
               </span>
             </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>Based on {totalReviews} {totalReviews === 1 ? "review" : "reviews"}</span>
+              <span>{t.basedOn} {totalReviews} {totalReviews === 1 ? t.review : t.reviews}</span>
               <CheckCircle2 className="h-4 w-4 text-green-500" />
             </div>
           </div>
@@ -118,20 +119,20 @@ export function ProductReviewsList({
         </div>
       ) : (
         <div className="text-center py-4 text-muted-foreground">
-          No reviews yet. Be the first to review this product!
+          {t.noReviewsYet}
         </div>
       )}
 
       {/* Write Review Button and Sort Options */}
       <div className="flex items-center justify-between border-t border-accent-primary/30 pt-4">
-        <h3 className="text-lg font-semibold">Customer Reviews</h3>
+        <h3 className="text-lg font-semibold">{t.customerReviews}</h3>
         <div className="flex items-center gap-4">
           {userId && !showReviewForm && (
             <Button
               onClick={() => setShowReviewForm(true)}
               className="bg-yellow-400 hover:bg-yellow-500 text-black"
             >
-              Write a Review
+              {t.writeReview}
             </Button>
           )}
           {reviews.length > 0 && (
@@ -142,10 +143,10 @@ export function ProductReviewsList({
                 onClick={() => setShowSortMenu(!showSortMenu)}
                 className="gap-2"
               >
-                {sortBy === "newest" && "Newest"}
-                {sortBy === "oldest" && "Oldest"}
-                {sortBy === "highest" && "Highest Rating"}
-                {sortBy === "lowest" && "Lowest Rating"}
+                {sortBy === "newest" && t.newest}
+                {sortBy === "oldest" && t.oldest}
+                {sortBy === "highest" && t.highestRating}
+                {sortBy === "lowest" && t.lowestRating}
                 <ChevronDown className={`h-4 w-4 transition-transform ${showSortMenu ? "rotate-180" : ""}`} />
               </Button>
               {showSortMenu && (
@@ -162,7 +163,7 @@ export function ProductReviewsList({
                       }}
                       className="w-full text-left px-4 py-2 hover:bg-accent-primary/10 transition-colors text-sm"
                     >
-                      Newest
+                      {t.newest}
                     </button>
                     <button
                       onClick={() => {
@@ -171,7 +172,7 @@ export function ProductReviewsList({
                       }}
                       className="w-full text-left px-4 py-2 hover:bg-accent-primary/10 transition-colors text-sm"
                     >
-                      Oldest
+                      {t.oldest}
                     </button>
                     <button
                       onClick={() => {
@@ -180,7 +181,7 @@ export function ProductReviewsList({
                       }}
                       className="w-full text-left px-4 py-2 hover:bg-accent-primary/10 transition-colors text-sm"
                     >
-                      Highest Rating
+                      {t.highestRating}
                     </button>
                     <button
                       onClick={() => {
@@ -189,7 +190,7 @@ export function ProductReviewsList({
                       }}
                       className="w-full text-left px-4 py-2 hover:bg-accent-primary/10 transition-colors text-sm"
                     >
-                      Lowest Rating
+                      {t.lowestRating}
                     </button>
                   </div>
                 </>

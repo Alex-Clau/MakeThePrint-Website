@@ -1,6 +1,11 @@
-/**
- * Order Item interface
- */
+export interface Order {
+  id: string;
+  total_amount: number;
+  shipping_address: OrderShippingAddress;
+  created_at: string;
+  order_items: OrderItem[];
+};
+
 export interface OrderItem {
   id: string;
   quantity: number;
@@ -29,6 +34,17 @@ export interface OrderDetailHeaderProps {
   createdAt: string;
   totalAmount: number;
 }
+export interface OrderShippingAddress {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+  country?: string;
+  phone?: string;
+};
 
 /**
  * Order Shipping Info component props
@@ -37,4 +53,5 @@ export interface OrderShippingInfoProps {
   shippingAddress: Record<string, any>;
   trackingNumber?: string;
 }
+
 

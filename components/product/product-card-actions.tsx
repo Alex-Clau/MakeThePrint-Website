@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { ProductCardActionsProps } from "@/types/product-components";
+import { useTranslations } from "@/components/locale-provider";
 
 export function ProductCardActions({
   productId,
@@ -17,6 +18,8 @@ export function ProductCardActions({
   showCartOnly = false,
 }: ProductCardActionsProps) {
   const router = useRouter();
+  const t = useTranslations().product;
+  const w = useTranslations().wishlist;
   const [isTogglingWishlist, setIsTogglingWishlist] = useState(false);
   const [inWishlist, setInWishlist] = useState(isInWishlist);
 
@@ -39,7 +42,7 @@ export function ProductCardActions({
       } = await supabase.auth.getUser();
 
       if (!user) {
-        toast.error("Please sign in to add items to your wishlist");
+        toast.error(w.signInToAdd);
         router.push("/auth/login");
         return;
       }
@@ -47,11 +50,11 @@ export function ProductCardActions({
       if (inWishlist) {
         await removeFromWishlistClient(user.id, productId);
         setInWishlist(false);
-        toast.success("Removed from wishlist");
+        toast.success(w.removedFromWishlist);
       } else {
         await addToWishlistClient(user.id, productId);
         setInWishlist(true);
-        toast.success("Added to wishlist");
+        toast.success(w.addedToWishlist);
       }
       router.refresh();
     } catch (error: any) {
@@ -85,8 +88,8 @@ export function ProductCardActions({
         onClick={handleAddToCart}
       >
         <ShoppingCart className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-        <span className="hidden min-[375px]:inline">Add to Cart</span>
-        <span className="min-[375px]:hidden">Add</span>
+        <span className="hidden min-[375px]:inline">{t.addToCart}</span>
+        <span className="min-[375px]:hidden">{t.addToCartShort}</span>
       </Button>
     );
   }
@@ -110,8 +113,8 @@ export function ProductCardActions({
         onClick={handleAddToCart}
       >
         <ShoppingCart className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-        <span className="hidden min-[375px]:inline">Add to Cart</span>
-        <span className="min-[375px]:hidden">Add</span>
+        <span className="hidden min-[375px]:inline">{t.addToCart}</span>
+        <span className="min-[375px]:hidden">{t.addToCartShort}</span>
       </Button>
     </>
   );

@@ -1,7 +1,9 @@
 import { Suspense } from "react";
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { AdminProductForm } from "@/components/admin/admin-product-form";
 import { notFound, redirect } from "next/navigation";
+import { getDictionary, getLocaleFromCookie } from "@/lib/i18n";
 
 interface EditProductPageProps {
   params: Promise<{ id: string }>;
@@ -10,7 +12,6 @@ interface EditProductPageProps {
 async function EditProductContent({ productId }: { productId: string }) {
   const supabase = await createClient();
 
-  // Check if user is authenticated and is admin
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -39,12 +40,15 @@ async function EditProductContent({ productId }: { productId: string }) {
     notFound();
   }
 
+  const locale = getLocaleFromCookie((await cookies()).get("locale")?.value);
+  const a = getDictionary(locale).admin;
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Edit Product</h1>
+        <h1 className="text-3xl font-bold">{a.editProduct}</h1>
         <p className="text-muted-foreground mt-1">
-          Update {product.name}
+          {a.updateProductName.replace("{name}", product.name)}
         </p>
       </div>
 

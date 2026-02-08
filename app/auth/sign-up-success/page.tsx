@@ -20,7 +20,7 @@ export default function Page() {
   const [isResending, setIsResending] = useState(false);
   
   // Get email from URL params
-  const [email, setEmail] = useState(() => {
+  const [email] = useState(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       return params.get("email") || "";

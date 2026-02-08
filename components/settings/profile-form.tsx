@@ -11,9 +11,12 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { ProfileFormProps } from "@/types/account";
+import { useTranslations } from "@/components/locale-provider";
 
 export function ProfileForm({ initialData, userId }: ProfileFormProps) {
   const router = useRouter();
+  const t = useTranslations().account;
+  const a = useTranslations().auth;
   const [formData, setFormData] = useState({
     email: initialData.email || "",
     full_name: initialData.full_name || "",
@@ -26,7 +29,7 @@ export function ProfileForm({ initialData, userId }: ProfileFormProps) {
     setIsSaving(true);
     try {
       await updateUserProfileClient(userId, formData);
-      toast.success("Profile updated successfully");
+      toast.success(t.profileUpdated);
       router.refresh();
     } catch (error: any) {
       toast.error(getUserFriendlyError(error));
@@ -40,13 +43,13 @@ export function ProfileForm({ initialData, userId }: ProfileFormProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <User className="h-5 w-5" />
-          Profile Information
+          {t.profileInfo}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{a.email}</Label>
             <Input
               id="email"
               type="email"
@@ -58,7 +61,7 @@ export function ProfileForm({ initialData, userId }: ProfileFormProps) {
             />
           </div>
           <div>
-            <Label htmlFor="full_name">Full Name</Label>
+            <Label htmlFor="full_name">{t.fullName}</Label>
             <Input
               id="full_name"
               value={formData.full_name}
@@ -68,7 +71,7 @@ export function ProfileForm({ initialData, userId }: ProfileFormProps) {
             />
           </div>
           <div>
-            <Label htmlFor="phone">Phone</Label>
+            <Label htmlFor="phone">{t.phone}</Label>
             <Input
               id="phone"
               type="tel"
@@ -79,7 +82,7 @@ export function ProfileForm({ initialData, userId }: ProfileFormProps) {
             />
           </div>
           <Button type="submit" disabled={isSaving}>
-            {isSaving ? "Saving..." : "Save Changes"}
+            {isSaving ? a.saving : t.saveChanges}
           </Button>
         </form>
       </CardContent>

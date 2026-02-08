@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { useRouter } from "next/navigation";
 import { CreateReviewFormProps } from "@/types/product-components";
+import { useTranslations } from "@/components/locale-provider";
 
 export function CreateReviewForm({
   productId,
@@ -18,6 +19,7 @@ export function CreateReviewForm({
   onClose,
 }: CreateReviewFormProps) {
   const router = useRouter();
+  const t = useTranslations().reviews;
   const existingReview = reviews.find((r) => r.user_id === userId);
   const [rating, setRating] = useState(existingReview?.rating || 0);
   const [comment, setComment] = useState(existingReview?.comment || "");
@@ -26,7 +28,7 @@ export function CreateReviewForm({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (rating === 0) {
-      toast.error("Please select a rating");
+      toast.error(t.pleaseSelectRating);
       return;
     }
 
@@ -37,7 +39,7 @@ export function CreateReviewForm({
           rating,
           comment: comment || undefined,
         }, productId);
-        toast.success("Review updated successfully");
+        toast.success(t.reviewUpdated);
       } else {
         await createReviewClient({
           user_id: userId,
@@ -45,7 +47,7 @@ export function CreateReviewForm({
           rating,
           comment: comment || undefined,
         });
-        toast.success("Review submitted successfully");
+        toast.success(t.reviewSubmitted);
       }
       if (onClose) onClose();
       router.refresh();
@@ -58,12 +60,12 @@ export function CreateReviewForm({
 
   const handleDelete = async () => {
     if (!existingReview) return;
-    if (!confirm("Are you sure you want to delete your review?")) return;
+    if (!confirm(t.confirmDeleteReview)) return;
 
     setIsSubmitting(true);
     try {
       await deleteReviewClient(existingReview.id, userId);
-      toast.success("Review deleted successfully");
+      toast.success(t.reviewDeleted);
       if (onClose) onClose();
       router.refresh();
     } catch (error: any) {
@@ -76,12 +78,12 @@ export function CreateReviewForm({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{existingReview ? "Update Your Review" : "Write a Review"}</CardTitle>
+        <CardTitle>{existingReview ? t.updateYourReview : t.writeReview}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label>Rating</Label>
+            <Label>{t.rating}</Label>
             <div className="flex items-center gap-2 mt-2">
               {[1, 2, 3, 4, 5].map((star) => (
                 <button
@@ -105,12 +107,12 @@ export function CreateReviewForm({
             </div>
           </div>
           <div>
-            <Label htmlFor="comment">Comment (Optional)</Label>
+            <Label htmlFor="comment">{t.commentOptional}</Label>
             <Textarea
               id="comment"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="Share your experience with this product..."
+              placeholder={t.shareExperience}
               className="mt-2"
               rows={4}
             />
@@ -118,10 +120,10 @@ export function CreateReviewForm({
           <div className="flex gap-2">
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting
-                ? "Submitting..."
+                ? t.submitting
                 : existingReview
-                ? "Update Review"
-                : "Submit Review"}
+                ? t.updateReview
+                : t.submitReview}
             </Button>
             {existingReview && (
               <Button
@@ -130,7 +132,7 @@ export function CreateReviewForm({
                 onClick={handleDelete}
                 disabled={isSubmitting}
               >
-                Delete Review
+                {t.deleteReview}
               </Button>
             )}
           </div>

@@ -6,9 +6,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
 import { AddressFields } from "./address-fields";
 import { AddressFormProps } from "@/types/address-components";
-import {AddressFormData} from "@/types";
+import { AddressFormData } from "@/types";
+import { useTranslations } from "@/components/locale-provider";
 
 export function AddressForm({ onSave, initialData, onCancel }: AddressFormProps) {
+  const t = useTranslations().account;
+  const a = useTranslations().admin;
   const [formData, setFormData] = useState<AddressFormData>({
     firstName: initialData?.firstName || "",
     lastName: initialData?.lastName || "",
@@ -30,17 +33,17 @@ export function AddressForm({ onSave, initialData, onCancel }: AddressFormProps)
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <MapPin className="h-5 w-5" />
-          {initialData ? "Edit Address" : "Add New Address"}
+          {initialData ? t.editAddress : t.addNewAddress}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <AddressFields formData={formData} onChange={setFormData} />
           <div className="flex gap-2">
-            <Button type="submit">Save Address</Button>
+            <Button type="submit">{t.saveAddress}</Button>
             {onCancel && (
               <Button type="button" variant="outline" onClick={onCancel}>
-                Cancel
+                {a.cancel}
               </Button>
             )}
           </div>

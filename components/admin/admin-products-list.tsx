@@ -10,10 +10,12 @@ import { Edit, Trash2, Eye } from "lucide-react";
 import { deleteProductAction } from "@/app/admin/actions";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useTranslations } from "@/components/locale-provider";
 
 interface Product {
   id: string;
   name: string;
+  name_ro?: string | null;
   description: string;
   price: number;
   images: string[];
@@ -25,11 +27,12 @@ interface Product {
 
 export function AdminProductsList({ products }: { products: Product[] }) {
   const router = useRouter();
+  const t = useTranslations().admin;
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [optimisticProducts, setOptimisticProducts] = useState(products);
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Are you sure you want to delete "${name}"?`)) {
+    if (!confirm(t.confirmDelete.replace("{name}", name))) {
       return;
     }
 
@@ -39,12 +42,11 @@ export function AdminProductsList({ products }: { products: Product[] }) {
 
     try {
       await deleteProductAction(id);
-      toast.success("Product deleted successfully");
+      toast.success(t.productDeleted);
       router.refresh();
     } catch (error) {
-      // Revert optimistic update on error
       setOptimisticProducts(products);
-      toast.error("Failed to delete product");
+      toast.error(t.deleteFailed);
       console.error(error);
     } finally {
       setDeletingId(null);
@@ -55,9 +57,9 @@ export function AdminProductsList({ products }: { products: Product[] }) {
     return (
       <Card>
         <CardContent className="py-12 text-center">
-          <p className="text-muted-foreground">No products found</p>
+          <p className="text-muted-foreground">{t.noProductsFound}</p>
           <Link href="/admin/products/new">
-            <Button className="mt-4">Add Your First Product</Button>
+            <Button className="mt-4">{t.addYourFirstProduct}</Button>
           </Link>
         </CardContent>
       </Card>
@@ -86,7 +88,7 @@ export function AdminProductsList({ products }: { products: Product[] }) {
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                    No Image
+                    {t.noImage}
                   </div>
                 )}
               </div>
@@ -99,7 +101,7 @@ export function AdminProductsList({ products }: { products: Product[] }) {
                       <h3 className="text-lg font-semibold">{product.name}</h3>
                       <div className="flex gap-2">
                         {product.featured && (
-                          <Badge variant="default">Featured</Badge>
+                          <Badge variant="default">{t.featured}</Badge>
                         )}
                         <Badge
                           variant={
@@ -109,8 +111,8 @@ export function AdminProductsList({ products }: { products: Product[] }) {
                           }
                         >
                           {product.product_type === "custom"
-                            ? "Custom"
-                            : "Seasonal"}
+                            ? t.custom
+                            : t.seasonal}
                         </Badge>
                         <Badge variant="outline">{product.category}</Badge>
                       </div>
@@ -133,13 +135,13 @@ export function AdminProductsList({ products }: { products: Product[] }) {
                     <Link href={`/products/${product.id}`} target="_blank">
                       <Button variant="outline" size="sm" className="w-full sm:w-auto">
                         <Eye className="h-4 w-4 sm:mr-2" />
-                        <span className="hidden sm:inline">View</span>
+                        <span className="hidden sm:inline">{t.view}</span>
                       </Button>
                     </Link>
                     <Link href={`/admin/products/${product.id}/edit`}>
                       <Button variant="outline" size="sm" className="w-full sm:w-auto">
                         <Edit className="h-4 w-4 sm:mr-2" />
-                        <span className="hidden sm:inline">Edit</span>
+                        <span className="hidden sm:inline">{t.edit}</span>
                       </Button>
                     </Link>
                     <Button
@@ -150,7 +152,7 @@ export function AdminProductsList({ products }: { products: Product[] }) {
                       className="w-full sm:w-auto"
                     >
                       <Trash2 className="h-4 w-4 sm:mr-2" />
-                      <span className="hidden sm:inline">Delete</span>
+                      <span className="hidden sm:inline">{t.delete}</span>
                     </Button>
                   </div>
                 </div>

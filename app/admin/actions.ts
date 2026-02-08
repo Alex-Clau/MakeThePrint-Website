@@ -37,6 +37,7 @@ async function requireAdmin() {
  */
 export async function createProductAction(product: {
   name: string;
+  name_ro?: string | null;
   description?: string;
   price: number;
   images?: string[];
@@ -74,6 +75,7 @@ export async function updateProductAction(
   id: string,
   updates: Partial<{
     name: string;
+    name_ro?: string | null;
     description: string;
     price: number;
     images: string[];

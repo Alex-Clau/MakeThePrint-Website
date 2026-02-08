@@ -6,10 +6,14 @@ import { ProductDetailForm } from "@/components/product/product-detail-form";
 import { ProductImageGallery } from "@/components/product/product-image-gallery";
 import { TextPreview } from "@/components/product/text-preview";
 import { AnimatedProductPageContentProps } from "@/types/components";
+import { getProductDisplayName } from "@/lib/utils/products";
+import { useLocale } from "@/components/locale-provider";
 
 export function AnimatedProductPageContent({
   product,
 }: AnimatedProductPageContentProps) {
+  const { locale } = useLocale();
+  const displayName = getProductDisplayName(product, locale);
   // Check category for keychains, then product_type for custom
   const isKeychains = product.category === "keychains";
   const isCustomLetters = product.product_type === "custom" && !isKeychains;
@@ -80,7 +84,7 @@ export function AnimatedProductPageContent({
         >
           <ProductImageGallery
             images={allImages.length > 1 ? allImages.slice(1) : []} // All images except the first
-            alt={product.name}
+            alt={displayName}
             defaultImage={allImages[0] || undefined} // First image as default
           />
         </motion.div>

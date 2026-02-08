@@ -1,13 +1,17 @@
 import { Suspense } from "react";
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package, ShoppingCart, Users, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { redirect } from "next/navigation";
+import { getDictionary, getLocaleFromCookie } from "@/lib/i18n";
 
 async function DashboardContent() {
   const supabase = await createClient();
+  const locale = getLocaleFromCookie((await cookies()).get("locale")?.value);
+  const a = getDictionary(locale).admin;
 
   // Check if user is authenticated and is admin
   const {
@@ -45,31 +49,31 @@ async function DashboardContent() {
 
   const stats = [
     {
-      title: "Total Products",
+      title: a.totalProducts,
       value: productsCount.count || 0,
       icon: Package,
-      description: "All products in catalog",
+      description: a.allProductsInCatalog,
       href: "/admin/products",
     },
     {
-      title: "Custom Products",
+      title: a.customProducts,
       value: customProductsCount.count || 0,
       icon: TrendingUp,
-      description: "Wall lettering & keychains",
+      description: a.wallLetteringKeychains,
       href: "/admin/products?type=custom",
     },
     {
-      title: "Seasonal Products",
+      title: a.seasonalProducts,
       value: seasonalProductsCount.count || 0,
       icon: ShoppingCart,
-      description: "Seasonal decor items",
+      description: a.seasonalDecorItems,
       href: "/admin/products?type=seasonal",
     },
     {
-      title: "Total Orders",
+      title: a.totalOrders,
       value: ordersCount.count || 0,
       icon: Users,
-      description: "Customer orders",
+      description: a.customerOrders,
       href: "/account/orders",
     },
   ];
@@ -79,15 +83,15 @@ async function DashboardContent() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Dashboard Overview</h1>
+          <h1 className="text-3xl font-bold">{a.dashboardOverview}</h1>
           <p className="text-muted-foreground mt-1">
-            Manage your wall lettering and seasonal decor products
+            {a.manageProducts}
           </p>
         </div>
         <Link href="/admin/products/new">
           <Button size="lg">
             <Package className="mr-2 h-5 w-5" />
-            Add New Product
+            {a.addNewProduct}
           </Button>
         </Link>
       </div>
@@ -121,22 +125,21 @@ async function DashboardContent() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Custom Products</CardTitle>
+            <CardTitle>{a.customProducts}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              Manage wall lettering and keychain products with custom
-              configuration options.
+              {a.manageWallLettering}
             </p>
             <div className="flex gap-2">
               <Link href="/admin/products/new?type=custom">
                 <Button variant="outline" size="sm">
-                  Add Custom Product
+                  {a.addCustomProduct}
                 </Button>
               </Link>
               <Link href="/admin/products?type=custom">
                 <Button variant="ghost" size="sm">
-                  View All
+                  {a.viewAll}
                 </Button>
               </Link>
             </div>
@@ -145,21 +148,21 @@ async function DashboardContent() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Seasonal Products</CardTitle>
+            <CardTitle>{a.seasonalProducts}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              Manage seasonal decor items with standard add-to-cart functionality.
+              {a.manageSeasonalDecor}
             </p>
             <div className="flex gap-2">
               <Link href="/admin/products/new?type=seasonal">
                 <Button variant="outline" size="sm">
-                  Add Seasonal Product
+                  {a.addSeasonalProduct}
                 </Button>
               </Link>
               <Link href="/admin/products?type=seasonal">
                 <Button variant="ghost" size="sm">
-                  View All
+                  {a.viewAll}
                 </Button>
               </Link>
             </div>

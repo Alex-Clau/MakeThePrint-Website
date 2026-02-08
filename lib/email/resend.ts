@@ -8,6 +8,6 @@ export function getResendClient(): Resend | null {
 }
 
 /** From address for transactional emails. Use a verified domain in production. */
-export function getFromEmail(): string {
-  return process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
+export function getFromEmail(): string | undefined {
+  return process.env.RESEND_FROM_EMAIL;
 }

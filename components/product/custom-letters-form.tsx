@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CustomLettersFormProps } from "@/types/product-components";
 import { getPricePerCharacter, calculateCustomLettersPrice, isOutdoorProduct } from "@/lib/utils/custom-letters-pricing";
+import { useTranslations } from "@/components/locale-provider";
 
 export function CustomLettersForm({
   pricePerCharacter, // This is now ignored, we use size-based pricing
@@ -14,6 +15,8 @@ export function CustomLettersForm({
   text, // Text now comes from the preview box
   onConfigChange,
 }: CustomLettersFormProps) {
+  const t = useTranslations().product;
+  const c = useTranslations().common;
   const [font, setFont] = useState(customConfig.defaultFont || availableFonts[0] || "");
   const [color, setColor] = useState(customConfig.colors?.[0] || "black");
   const [size, setSize] = useState<number>(20); // Default 20cm
@@ -53,14 +56,14 @@ export function CustomLettersForm({
       {/* Character count and pricing info */}
       {text && (
         <div className="flex items-center gap-2 text-xs text-muted-foreground p-3 bg-accent-primary/5 rounded-lg">
-          <span>{characterCount} {characterCount === 1 ? "character" : "characters"}</span>
+          <span>{characterCount} {characterCount === 1 ? t.character : t.characters}</span>
           <span>•</span>
-          <span>{currentPricePerCharacter.toFixed(2)} RON per character ({size} cm)</span>
+          <span>{currentPricePerCharacter.toFixed(2)} {t.ronPerChar} ({size} cm)</span>
         </div>
       )}
       {!text && (
         <p className="text-xs text-muted-foreground p-3 bg-accent-primary/5 rounded-lg">
-          Type your text in the preview box below. Each character (including spaces) is priced separately.
+          {t.typeTextBelow}
         </p>
       )}
 
@@ -68,11 +71,11 @@ export function CustomLettersForm({
       {availableFonts.length > 0 && (
         <div>
           <Label className="text-sm sm:text-base font-semibold mb-2 block">
-            Select a Font:
+            {t.selectFont}
           </Label>
           <Select value={font} onValueChange={handleFontChange}>
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select font" />
+              <SelectValue placeholder={t.selectFont} />
             </SelectTrigger>
             <SelectContent>
               {availableFonts.map((fontOption) => (
@@ -88,7 +91,7 @@ export function CustomLettersForm({
       {/* Color Selector */}
       <div>
         <Label className="text-sm sm:text-base font-semibold mb-2 block">
-          Select a Color:
+          {t.selectColor}
         </Label>
         <div className="flex gap-3 flex-wrap">
           {colors.map((colorOption) => (
@@ -117,17 +120,17 @@ export function CustomLettersForm({
             />
           ))}
         </div>
-        <p className="text-xs text-muted-foreground mt-2">Selected: {color}</p>
+        <p className="text-xs text-muted-foreground mt-2">{t.selected}: {color}</p>
       </div>
 
       {/* Size Selector */}
       <div>
         <Label className="text-sm sm:text-base font-semibold mb-2 block">
-          Letter Height:
+          {t.letterHeight}
         </Label>
         <Select value={size.toString()} onValueChange={(value) => setSize(Number(value))}>
           <SelectTrigger className="w-full">
-            <SelectValue placeholder="Select size" />
+            <SelectValue placeholder={t.letterHeight} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="5">5 cm - {getPricePerCharacter(5, isOutdoor).toFixed(2)} RON/char</SelectItem>
@@ -138,10 +141,10 @@ export function CustomLettersForm({
           </SelectContent>
         </Select>
         <p className="text-xs text-muted-foreground mt-1">
-          This is the height of each letter on your wall. Price per character varies by size.
+          {t.sizeNote}
           {isOutdoor && (
             <span className="block mt-1 font-medium text-accent-primary-dark">
-              Premium outdoor material - weather resistant
+              {t.outdoorNote}
             </span>
           )}
         </p>
@@ -150,14 +153,14 @@ export function CustomLettersForm({
       {/* Total Price Display */}
       <div className="pt-4 border-t border-accent-primary/20">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium">Total Price:</span>
+          <span className="text-sm font-medium">{t.totalPrice}</span>
           <span className="text-2xl font-bold">
-            {totalPrice.toFixed(2)} RON
+            {totalPrice.toFixed(2)} {c.ron}
           </span>
         </div>
         {characterCount > 0 && (
           <p className="text-xs text-muted-foreground mt-1">
-            {characterCount} characters × {currentPricePerCharacter.toFixed(2)} RON ({size} cm)
+            {characterCount} {t.characters} × {currentPricePerCharacter.toFixed(2)} {c.ron} ({size} cm)
           </p>
         )}
       </div>

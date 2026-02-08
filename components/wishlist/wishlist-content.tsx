@@ -10,14 +10,17 @@ import { WishlistItem } from "./wishlist-item";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { WishlistContentProps } from "@/types/wishlist";
+import { useTranslations } from "@/components/locale-provider";
 
 export function WishlistContent({ items, userId }: WishlistContentProps) {
   const router = useRouter();
+  const w = useTranslations().wishlist;
+  const c = useTranslations().common;
 
   const handleRemove = async (productId: string) => {
     try {
       await removeFromWishlistClient(userId, productId);
-      toast.success("Removed from wishlist");
+      toast.success(w.removedFromWishlist);
       router.refresh();
     } catch (error: any) {
       toast.error(getUserFriendlyError(error));
@@ -28,12 +31,12 @@ export function WishlistContent({ items, userId }: WishlistContentProps) {
     return (
       <Card className="p-12 text-center">
         <Heart className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-        <h2 className="text-2xl font-bold mb-2">Your wishlist is empty</h2>
+        <h2 className="text-2xl font-bold mb-2">{w.emptyTitle}</h2>
         <p className="text-muted-foreground mb-6">
-          Start adding items to your wishlist
+          {w.emptyHint}
         </p>
         <Button asChild>
-          <Link href="/products">Browse Products</Link>
+          <Link href="/products">{c.browseProducts}</Link>
         </Button>
       </Card>
     );

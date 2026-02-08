@@ -36,7 +36,7 @@ export async function getProducts(options?: {
 
   if (options?.search) {
     query = query.or(
-      `name.ilike.%${options.search}%,description.ilike.%${options.search}%`
+      `name.ilike.%${options.search}%,name_ro.ilike.%${options.search}%,description.ilike.%${options.search}%`
     );
   }
 
@@ -78,6 +78,7 @@ export async function getProductById(id: string) {
  */
 export async function createProduct(product: {
   name: string;
+  name_ro?: string | null;
   description?: string;
   price: number;
   images?: string[];
@@ -112,6 +113,7 @@ export async function updateProduct(
   id: string,
   updates: Partial<{
     name: string;
+    name_ro?: string | null;
     description: string;
     price: number;
     images: string[];
@@ -142,7 +144,7 @@ export async function updateProduct(
  */
 export async function deleteProduct(id: string) {
   const supabase = await createClient();
-  const { error } = await supabase.from("products").delete()    .eq("id", id);
+  const { error } = await supabase.from("products").delete().eq("id", id);
 
   if (error) {
     throw handleSupabaseError(error);

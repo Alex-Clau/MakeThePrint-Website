@@ -1,33 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getResendClient, getFromEmail } from "./resend";
-
-type ShippingAddress = {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  zip?: string;
-  country?: string;
-  phone?: string;
-};
-
-type OrderItem = {
-  id: string;
-  quantity: number;
-  price: number;
-  products: { id: string; name: string; price: number; images?: string[] } | null;
-};
-
-type Order = {
-  id: string;
-  total_amount: number;
-  shipping_address: ShippingAddress;
-  created_at: string;
-  order_items: OrderItem[];
-};
-
+import { OrderShippingAddress, Order} from "@/types";
 /**
  * Atomically claim "we send the confirmation email" for this order.
  * Returns true if we claimed it (should send), false if already sent.
@@ -127,7 +100,7 @@ function formatSellerNotificationHtml(order: Order, orderShortId: string): strin
     month: "long",
     day: "numeric",
   });
-  const addr = order.shipping_address as ShippingAddress;
+  const addr = order.shipping_address as OrderShippingAddress;
   const shipping = [
     addr?.firstName && addr?.lastName && `${addr.firstName} ${addr.lastName}`,
     addr?.email && `Email: ${addr.email}`,
@@ -188,7 +161,7 @@ export async function sendOrderConfirmationEmails(orderId: string): Promise<{ ok
     return { ok: false, error: "Order not found" };
   }
 
-  const buyerEmail = (order.shipping_address as ShippingAddress)?.email;
+  const buyerEmail = (order.shipping_address as OrderShippingAddress)?.email;
   if (!buyerEmail) {
     return { ok: false, error: "No buyer email in shipping address" };
   }

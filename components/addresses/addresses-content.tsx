@@ -13,12 +13,14 @@ import { AddressList } from "./address-list";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { AddressesContentProps } from "@/types/address-components";
+import { useTranslations } from "@/components/locale-provider";
 
 export function AddressesContent({
   addresses: initialAddresses,
   userId,
 }: AddressesContentProps) {
   const router = useRouter();
+  const t = useTranslations().account;
   const [addresses, setAddresses] = useState(initialAddresses || []);
   const [showForm, setShowForm] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -26,7 +28,6 @@ export function AddressesContent({
   const handleSave = async (addressData: any) => {
     try {
       if (editingIndex !== null) {
-        // Update existing address
         const updated = [...addresses];
         updated[editingIndex] = addressData;
         await updateUserProfileClient(userId, {
@@ -35,15 +36,14 @@ export function AddressesContent({
         setAddresses(updated);
         setEditingIndex(null);
       } else {
-        // Add new address
         await addShippingAddressClient(userId, addressData);
         setAddresses([...addresses, addressData]);
       }
       setShowForm(false);
-      toast.success(editingIndex !== null ? "Address updated successfully" : "Address added successfully");
+      toast.success(editingIndex !== null ? t.addressUpdated : t.addressAdded);
       router.refresh();
     } catch (error: any) {
-      toast.error(error?.message || "Failed to save address");
+      toast.error(error?.message || t.saveAddressFailed);
     }
   };
 
@@ -59,7 +59,7 @@ export function AddressesContent({
         shipping_addresses: updated,
       });
       setAddresses(updated);
-      toast.success("Address deleted successfully");
+      toast.success(t.addressDeleted);
       router.refresh();
     } catch (error: any) {
       toast.error(getUserFriendlyError(error));
@@ -69,11 +69,11 @@ export function AddressesContent({
   return (
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h2 className="text-xl sm:text-2xl font-bold">Shipping Addresses</h2>
+        <h2 className="text-xl sm:text-2xl font-bold">{t.shippingAddresses}</h2>
         {!showForm && (
           <Button onClick={() => setShowForm(true)} className="h-10 sm:h-10 w-full sm:w-auto">
             <Plus className="h-4 w-4 mr-2" />
-            Add Address
+            {t.addAddress}
           </Button>
         )}
       </div>

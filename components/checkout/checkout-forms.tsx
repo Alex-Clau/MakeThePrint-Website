@@ -6,9 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CheckoutFormsProps } from "@/types/checkout";
-import {AddressFormData} from "@/types";
+import { AddressFormData } from "@/types";
+import { useTranslations } from "@/components/locale-provider";
 
 export function CheckoutForms({ onFormDataChange }: CheckoutFormsProps) {
+  const t = useTranslations().checkout;
   const [shipping, setShipping] = useState<AddressFormData>({
     firstName: "",
     lastName: "",
@@ -47,12 +49,12 @@ export function CheckoutForms({ onFormDataChange }: CheckoutFormsProps) {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Shipping Address</CardTitle>
+          <CardTitle>{t.shippingAddress}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="firstName">First Name</Label>
+              <Label htmlFor="firstName">{t.firstName}</Label>
               <Input
                 id="firstName"
                 value={shipping.firstName}
@@ -63,7 +65,7 @@ export function CheckoutForms({ onFormDataChange }: CheckoutFormsProps) {
               />
             </div>
             <div>
-              <Label htmlFor="lastName">Last Name</Label>
+              <Label htmlFor="lastName">{t.lastName}</Label>
               <Input
                 id="lastName"
                 value={shipping.lastName}
@@ -75,7 +77,7 @@ export function CheckoutForms({ onFormDataChange }: CheckoutFormsProps) {
             </div>
           </div>
           <div>
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t.email}</Label>
               <Input
                 id="email"
                 type="email"
@@ -89,7 +91,7 @@ export function CheckoutForms({ onFormDataChange }: CheckoutFormsProps) {
               />
           </div>
           <div>
-            <Label htmlFor="phone">Phone (Optional)</Label>
+            <Label htmlFor="phone">{t.phoneOptional}</Label>
               <Input
                 id="phone"
                 type="tel"
@@ -100,7 +102,7 @@ export function CheckoutForms({ onFormDataChange }: CheckoutFormsProps) {
               />
           </div>
           <div>
-            <Label htmlFor="address">Address</Label>
+            <Label htmlFor="address">{t.address}</Label>
               <Input
                 id="address"
                 value={shipping.address}
@@ -112,7 +114,7 @@ export function CheckoutForms({ onFormDataChange }: CheckoutFormsProps) {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <Label htmlFor="city">City</Label>
+              <Label htmlFor="city">{t.city}</Label>
               <Input
                 id="city"
                 value={shipping.city}
@@ -123,7 +125,7 @@ export function CheckoutForms({ onFormDataChange }: CheckoutFormsProps) {
               />
             </div>
             <div>
-              <Label htmlFor="state">State</Label>
+              <Label htmlFor="state">{t.state}</Label>
               <Input
                 id="state"
                 value={shipping.state}
@@ -134,7 +136,7 @@ export function CheckoutForms({ onFormDataChange }: CheckoutFormsProps) {
               />
             </div>
             <div>
-              <Label htmlFor="zip">ZIP Code</Label>
+              <Label htmlFor="zip">{t.zip}</Label>
               <Input
                 id="zip"
                 value={shipping.zip}
@@ -146,7 +148,7 @@ export function CheckoutForms({ onFormDataChange }: CheckoutFormsProps) {
             </div>
           </div>
           <div>
-            <Label htmlFor="country">Country</Label>
+            <Label htmlFor="country">{t.country}</Label>
               <Input
                 id="country"
                 value={shipping.country}
@@ -163,7 +165,7 @@ export function CheckoutForms({ onFormDataChange }: CheckoutFormsProps) {
               onCheckedChange={(checked) => updateFormData(undefined, undefined, !!checked)}
             />
             <Label htmlFor="saveAddress" className="text-sm font-normal cursor-pointer">
-              Save this address for future orders
+              {t.saveAddressForFuture}
             </Label>
           </div>
         </CardContent>

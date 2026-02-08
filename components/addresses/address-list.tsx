@@ -4,19 +4,22 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trash2, Edit, MapPin } from "lucide-react";
 import { AddressListProps } from "@/types/address-components";
+import { useTranslations } from "@/components/locale-provider";
 
 export function AddressList({
   addresses,
   onEdit,
   onDelete,
 }: AddressListProps) {
+  const t = useTranslations().account;
+  const a = useTranslations().admin;
   if (addresses.length === 0) {
     return (
       <Card className="p-12 text-center">
         <MapPin className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-        <h2 className="text-2xl font-bold mb-2">No addresses saved</h2>
+        <h2 className="text-2xl font-bold mb-2">{t.noAddressesSaved}</h2>
         <p className="text-muted-foreground">
-          Add your first shipping address to get started
+          {t.addFirstAddress}
         </p>
       </Card>
     );
@@ -40,7 +43,7 @@ export function AddressList({
               <p className="text-sm text-muted-foreground">{address.country}</p>
               {address.phone && (
                 <p className="text-sm text-muted-foreground">
-                  Phone: {address.phone}
+                  {t.phone}: {address.phone}
                 </p>
               )}
             </div>
@@ -52,7 +55,7 @@ export function AddressList({
                 onClick={() => onEdit(index, address)}
               >
                 <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                Edit
+                {a.edit}
               </Button>
               <Button
                 variant="outline"
@@ -61,7 +64,7 @@ export function AddressList({
                 onClick={() => onDelete(index)}
               >
                 <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                Delete
+                {a.delete}
               </Button>
             </div>
           </CardContent>

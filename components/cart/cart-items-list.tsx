@@ -5,22 +5,29 @@ import { Button } from "@/components/ui/button";
 import { Trash2, Plus, Minus } from "lucide-react";
 import Image from "next/image";
 import { CartItemsListProps } from "@/types/cart-components";
+import { getProductDisplayName } from "@/lib/utils/products";
+import { useLocale, useTranslations } from "@/components/locale-provider";
 
 export function CartItemsList({
   items,
   onUpdateQuantity,
   onRemove,
 }: CartItemsListProps) {
+  const { locale } = useLocale();
+  const t = useTranslations().product;
+  const c = useTranslations().common;
   return (
     <div className="space-y-3 sm:space-y-4">
-      {items.map((item) => (
+      {items.map((item) => {
+        const displayName = getProductDisplayName(item.products, locale);
+        return (
         <Card key={item.id}>
           <CardContent className="p-3 sm:p-4 lg:p-6">
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <div className="relative w-full sm:w-20 lg:w-24 h-32 sm:h-20 lg:h-24 flex-shrink-0 overflow-hidden rounded-lg border bg-muted">
                 <Image
                   src={item.products.images?.[0] || ""}
-                  alt={item.products.name}
+                  alt={displayName}
                   fill
                   className="object-cover"
                   sizes="96px"
@@ -29,15 +36,15 @@ export function CartItemsList({
               <div className="flex-1 flex flex-col sm:flex-row sm:items-center gap-4">
                 <div className="flex-1">
                   <h3 className="font-semibold text-lg mb-1">
-                    {item.products.name}
+                    {displayName}
                   </h3>
                   {item.material && (
                     <p className="text-sm text-muted-foreground mb-2">
-                      Feature: {item.material}
+                      {t.feature} {item.material}
                     </p>
                   )}
                   <p className="text-lg font-bold">
-                    {parseFloat(item.products.price.toString()).toFixed(2)} RON
+                    {parseFloat(item.products.price.toString()).toFixed(2)} {c.ron}
                   </p>
                 </div>
                 <div className="flex items-center gap-3 sm:gap-4">
@@ -75,7 +82,8 @@ export function CartItemsList({
             </div>
           </CardContent>
         </Card>
-      ))}
+        );
+      })}
     </div>
   );
 }

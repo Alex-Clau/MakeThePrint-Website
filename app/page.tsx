@@ -29,7 +29,7 @@ export default async function Home() {
           </section>
         }
       >
-        <FeaturedProducts messages={messages} />
+        <FeaturedProducts messages={messages} locale={locale} />
       </Suspense>
       <CustomPrintingSection />
     </main>

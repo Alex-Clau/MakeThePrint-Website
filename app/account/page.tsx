@@ -1,10 +1,12 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { Navigation } from "@/components/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
 import { RecentOrders } from "@/components/account/recent-orders";
 import { AccountMenu } from "@/components/account/account-menu";
+import { getDictionary, getLocaleFromCookie } from "@/lib/i18n";
 
 async function AccountContent() {
   const supabase = await createClient();
@@ -34,12 +36,15 @@ async function AccountContent() {
   );
 }
 
-export default function AccountPage() {
+export default async function AccountPage() {
+  const locale = getLocaleFromCookie((await cookies()).get("locale")?.value);
+  const messages = getDictionary(locale);
+  const t = messages.account;
   return (
     <main className="min-h-screen flex flex-col">
       <Navigation />
       <div className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-6 sm:mb-8">My Account</h1>
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-6 sm:mb-8">{t.myAccount}</h1>
         <Suspense
           fallback={
             <div className="space-y-6">

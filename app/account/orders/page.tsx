@@ -8,6 +8,8 @@ import { Truck, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { getOrders } from "@/lib/supabase/orders";
 import { createClient } from "@/lib/supabase/server";
+import { getDictionary, getLocaleFromCookie } from "@/lib/i18n";
+import { cookies } from "next/headers";
 
 async function OrdersList() {
   const supabase = await createClient();
@@ -19,14 +21,19 @@ async function OrdersList() {
     redirect("/auth/login");
   }
 
+  const locale = getLocaleFromCookie((await cookies()).get("locale")?.value);
+  const messages = getDictionary(locale);
+  const t = messages.account;
+  const c = messages.common;
+
   const orders = await getOrders(user.id);
 
   if (orders.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground mb-4">No orders found</p>
+        <p className="text-muted-foreground mb-4">{t.noOrdersFound}</p>
         <Button asChild>
-          <Link href="/products">Start Shopping</Link>
+          <Link href="/products">{t.startShopping}</Link>
         </Button>
       </div>
     );
@@ -76,21 +83,21 @@ async function OrdersList() {
                       </Badge>
                     </div>
                     <p className="text-xs sm:text-sm text-muted-foreground">
-                      Placed on {orderDate}
+                      {t.placedOn} {orderDate}
                     </p>
                     <p className="text-sm sm:text-base font-semibold mt-1 sm:hidden">
-                      {order.total_amount.toFixed(2)} RON
+                      {order.total_amount.toFixed(2)} {c.ron}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center justify-between sm:justify-end gap-4 pt-2 border-t sm:border-0">
                   <div className="hidden sm:block text-right">
                     <p className="text-xl sm:text-2xl font-bold">
-                      {order.total_amount.toFixed(2)} RON
+                      {order.total_amount.toFixed(2)} {c.ron}
                     </p>
                   </div>
                   <Button variant="outline" size="sm" className="h-9 sm:h-10" asChild>
-                    <Link href={`/account/orders/${order.id}`}>View Details</Link>
+                    <Link href={`/account/orders/${order.id}`}>{t.viewDetails}</Link>
                   </Button>
                 </div>
               </div>
@@ -102,15 +109,19 @@ async function OrdersList() {
   );
 }
 
-export default function OrdersPage() {
+export default async function OrdersPage() {
+  const locale = getLocaleFromCookie((await cookies()).get("locale")?.value);
+  const messages = getDictionary(locale);
+  const c = messages.common;
+  const t = messages.account;
   return (
     <main className="min-h-screen flex flex-col">
       <Navigation />
       <div className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">Order History</h1>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">{c.orderHistory}</h1>
           <Button variant="outline" size="sm" className="h-9 sm:h-10 w-full sm:w-auto" asChild>
-            <Link href="/account">Back to Account</Link>
+            <Link href="/account">{t.backToAccount}</Link>
           </Button>
         </div>
 

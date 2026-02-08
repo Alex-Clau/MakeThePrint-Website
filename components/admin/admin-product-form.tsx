@@ -14,9 +14,11 @@ import { createProductAction, updateProductAction } from "@/app/admin/actions";
 import { toast } from "sonner";
 import { ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "@/components/locale-provider";
 
 interface ProductFormData {
   name: string;
+  name_ro: string;
   description: string;
   price: number;
   images: string[];
@@ -59,12 +61,14 @@ const getDefaultConfig = (category: string) => {
 
 export function AdminProductForm({ product, initialType = "seasonal" }: AdminProductFormProps) {
   const router = useRouter();
+  const t = useTranslations().admin;
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const initialCategory = product?.category || (initialType === "custom" ? "indoor_wall_letters" : "seasonal_decor");
   
   const [formData, setFormData] = useState<ProductFormData>({
     name: product?.name || "",
+    name_ro: product?.name_ro ?? "",
     description: product?.description || "",
     price: product?.price || 0,
     images: product?.images || [],
@@ -117,19 +121,19 @@ export function AdminProductForm({ product, initialType = "seasonal" }: AdminPro
     try {
       // Validation
       if (!formData.name.trim()) {
-        toast.error("Product name is required");
+        toast.error(t.productNameRequired);
         setIsSubmitting(false);
         return;
       }
 
       if (formData.price <= 0) {
-        toast.error("Price must be greater than 0");
+        toast.error(t.priceMustBePositive);
         setIsSubmitting(false);
         return;
       }
 
       if (formData.images.length === 0) {
-        toast.error("At least one image is required");
+        toast.error(t.atLeastOneImage);
         setIsSubmitting(false);
         return;
       }
@@ -164,18 +168,17 @@ export function AdminProductForm({ product, initialType = "seasonal" }: AdminPro
       if (product) {
         // Update existing product
         await updateProductAction(product.id, productData);
-        toast.success("Product updated successfully");
+        toast.success(t.productUpdated);
       } else {
-        // Create new product
         await createProductAction(productData);
-        toast.success("Product created successfully");
+        toast.success(t.productCreated);
       }
 
       router.push("/admin/products");
       router.refresh();
     } catch (error) {
       console.error("Error saving product:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to save product");
+      toast.error(error instanceof Error ? error.message : t.saveFailed);
     } finally {
       setIsSubmitting(false);
     }
@@ -236,7 +239,7 @@ export function AdminProductForm({ product, initialType = "seasonal" }: AdminPro
       <Link href="/admin/products">
         <Button variant="ghost" type="button">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Products
+          {t.back}
         </Button>
       </Link>
 
@@ -295,15 +298,26 @@ export function AdminProductForm({ product, initialType = "seasonal" }: AdminPro
             </Select>
           </div>
 
-          {/* Name */}
+          {/* Name (English) */}
           <div className="space-y-2">
-            <Label htmlFor="name">Product Name *</Label>
+            <Label htmlFor="name">{t.productNameEn}</Label>
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="e.g., Indoor Wall Letters - Premium Acrylic"
+              placeholder={t.productNameEnPlaceholder}
               required
+            />
+          </div>
+
+          {/* Name (Romanian) */}
+          <div className="space-y-2">
+            <Label htmlFor="name_ro">{t.productNameRo}</Label>
+            <Input
+              id="name_ro"
+              value={formData.name_ro}
+              onChange={(e) => setFormData({ ...formData, name_ro: e.target.value })}
+              placeholder={t.productNameRoPlaceholder}
             />
           </div>
 
@@ -430,7 +444,7 @@ export function AdminProductForm({ product, initialType = "seasonal" }: AdminPro
                     input.value = "";
                   }}
                 >
-                  Add
+                  {t.add}
                 </Button>
               </div>
             </div>
@@ -476,7 +490,7 @@ export function AdminProductForm({ product, initialType = "seasonal" }: AdminPro
                     input.value = "";
                   }}
                 >
-                  Add
+                  {t.add}
                 </Button>
               </div>
             </div>
@@ -593,11 +607,11 @@ export function AdminProductForm({ product, initialType = "seasonal" }: AdminPro
       <div className="flex gap-4">
         <Button type="submit" size="lg" disabled={isSubmitting}>
           <Save className="mr-2 h-5 w-5" />
-          {isSubmitting ? "Saving..." : product ? "Update Product" : "Create Product"}
+          {isSubmitting ? t.saving : product ? t.updateProduct : t.createProduct}
         </Button>
         <Link href="/admin/products">
           <Button type="button" variant="outline" size="lg">
-            Cancel
+            {t.cancel}
           </Button>
         </Link>
       </div>

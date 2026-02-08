@@ -1,13 +1,17 @@
+"use client";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AddressFieldsProps } from "@/types/address-components";
+import { useTranslations } from "@/components/locale-provider";
 
 export function AddressFields({ formData, onChange }: AddressFieldsProps) {
+  const t = useTranslations().checkout;
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="firstName">First Name</Label>
+          <Label htmlFor="firstName">{t.firstName}</Label>
           <Input
             id="firstName"
             value={formData.firstName}
@@ -16,7 +20,7 @@ export function AddressFields({ formData, onChange }: AddressFieldsProps) {
           />
         </div>
         <div>
-          <Label htmlFor="lastName">Last Name</Label>
+          <Label htmlFor="lastName">{t.lastName}</Label>
           <Input
             id="lastName"
             value={formData.lastName}
@@ -26,7 +30,7 @@ export function AddressFields({ formData, onChange }: AddressFieldsProps) {
         </div>
       </div>
       <div>
-        <Label htmlFor="address">Address</Label>
+        <Label htmlFor="address">{t.address}</Label>
         <Input
           id="address"
           value={formData.address}
@@ -36,7 +40,7 @@ export function AddressFields({ formData, onChange }: AddressFieldsProps) {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
-          <Label htmlFor="city">City</Label>
+          <Label htmlFor="city">{t.city}</Label>
           <Input
             id="city"
             value={formData.city}
@@ -45,7 +49,7 @@ export function AddressFields({ formData, onChange }: AddressFieldsProps) {
           />
         </div>
         <div>
-          <Label htmlFor="state">State</Label>
+          <Label htmlFor="state">{t.state}</Label>
           <Input
             id="state"
             value={formData.state}
@@ -54,7 +58,7 @@ export function AddressFields({ formData, onChange }: AddressFieldsProps) {
           />
         </div>
         <div>
-          <Label htmlFor="zip">ZIP Code</Label>
+          <Label htmlFor="zip">{t.zip}</Label>
           <Input
             id="zip"
             value={formData.zip}
@@ -65,7 +69,7 @@ export function AddressFields({ formData, onChange }: AddressFieldsProps) {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="country">Country</Label>
+          <Label htmlFor="country">{t.country}</Label>
           <Input
             id="country"
             value={formData.country}
@@ -74,7 +78,7 @@ export function AddressFields({ formData, onChange }: AddressFieldsProps) {
           />
         </div>
         <div>
-          <Label htmlFor="phone">Phone (Optional)</Label>
+          <Label htmlFor="phone">{t.phoneOptional}</Label>
           <Input
             id="phone"
             type="tel"
