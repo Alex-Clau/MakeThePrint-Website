@@ -5,9 +5,11 @@ import { ProductCard } from "@/components/product/product-card";
 import { ProductListItem } from "@/components/product/product-list-item";
 import { ViewToggle } from "@/components/product/view-toggle";
 import { ProductsContentProps } from "@/types/components";
+import {usePathname} from "next/navigation";
 
 export function ProductsContent({ products }: ProductsContentProps) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const pathName = usePathname();
 
   return (
     <>
@@ -21,7 +23,7 @@ export function ProductsContent({ products }: ProductsContentProps) {
       {viewMode === "grid" ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           {products.map((product) => (
-            <ProductCard key={product.id} {...product} />
+            <ProductCard key={`${product.id}-${pathName}-${viewMode}`} {...product} />
           ))}
         </div>
       ) : (

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import Link from "next/link";
 
 export function FooterAccountLinks() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -44,20 +45,20 @@ export function FooterAccountLinks() {
       <ul className="space-y-2 text-sm text-muted-foreground">
         {!isLoading && !isAuthenticated && (
           <li>
-            <a href="/auth/login" className="hover:text-accent-primary-dark transition-colors">
+            <Link href="/auth/login" className="hover:text-accent-primary-dark transition-colors">
               Sign In
-            </a>
+            </Link>
           </li>
         )}
         <li>
-          <a href="/account" className="hover:text-accent-primary-dark transition-colors">
+          <Link href="/account" className="hover:text-accent-primary-dark transition-colors">
             My Account
-          </a>
+          </Link>
         </li>
         <li>
-          <a href="/account/orders" className="hover:text-accent-primary-dark transition-colors">
+          <Link href="/account/orders" className="hover:text-accent-primary-dark transition-colors">
             Order History
-          </a>
+          </Link>
         </li>
       </ul>
     </div>

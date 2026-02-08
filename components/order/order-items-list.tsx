@@ -9,16 +9,11 @@ export function OrderItemsList({ items }: OrderItemsListProps) {
         <h2 className="text-xl font-bold mb-4">Order Items</h2>
         <div className="space-y-4">
           {items.map((item) => {
-            const imageUrl =
-              item.products.images && item.products.images.length > 0
-                ? item.products.images[0]
-                : "https://via.placeholder.com/80";
-
             return (
               <div key={item.id} className="flex flex-col sm:flex-row gap-3 sm:gap-4 pb-4 border-b last:border-0">
                 <div className="relative w-full sm:w-20 h-32 sm:h-20 flex-shrink-0 overflow-hidden rounded-lg border bg-muted">
                   <Image
-                    src={imageUrl}
+                    src="https://via.placeholder.com/80"
                     alt={item.products.name}
                     fill
                     className="object-cover"

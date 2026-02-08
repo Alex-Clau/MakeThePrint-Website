@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { amount, currency = "usd", metadata = {} } = body;
+    const { amount, currency = "ron", metadata = {} } = body;
 
     if (!amount || amount <= 0) {
       return NextResponse.json(

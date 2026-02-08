@@ -37,7 +37,7 @@ export function ProductCard({
       }}
       whileTap={{ scale: 0.95, rotateY: -5 }}
       style={{ perspective: 1000 }}
-      className="relative z-10"
+      className="relative z-10 mx-3 sm:mx-0"
     >
       <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-2 border-accent-primary-light/20 hover:border-accent-primary/60">
         <div className="relative">

@@ -12,17 +12,13 @@ export function StripePaymentWrapper({
   onPaymentError,
   isSubmitting = false,
 }: StripePaymentWrapperProps) {
-  if (!clientSecret) {
-    return null;
-  }
-
   // Convert CSS variables to actual HSL values for Stripe
   // Light mode: accent-primary-dark = 0 0% 15%, background = 0 0% 100%, foreground = 0 0% 5%, destructive = 0 84.2% 60.2%
   // Dark mode: accent-primary = 0 0% 70%, background = 0 0% 5%, foreground = 0 0% 98%, destructive = 0 62.8% 30.6%
   const appearance = useMemo(() => {
     // Check if dark mode is active
     const isDark = document.documentElement.classList.contains("dark");
-    
+
     return {
       theme: "stripe" as const,
       variables: {
@@ -36,6 +32,10 @@ export function StripePaymentWrapper({
       },
     };
   }, []);
+
+  if (!clientSecret) {
+    return null;
+  }
 
   return (
     <Elements

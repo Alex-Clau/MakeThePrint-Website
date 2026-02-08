@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { Navigation } from "@/components/navigation";
-import { Card, CardContent } from "@/components/ui/card";
 import { getOrderById } from "@/lib/supabase/orders";
 import { createClient } from "@/lib/supabase/server";
 import { OrderDetailHeader } from "@/components/order/order-detail-header";
