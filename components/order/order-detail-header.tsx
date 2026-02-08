@@ -36,6 +36,8 @@ export function OrderDetailHeader({
                   ? "default"
                   : status === "shipped"
                   ? "secondary"
+                  : status === "confirmed"
+                  ? "default"
                   : "outline"
               }
               className="text-xs"
@@ -51,6 +53,8 @@ export function OrderDetailHeader({
               <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
             ) : status === "shipped" ? (
               <Truck className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+            ) : status === "confirmed" ? (
+              <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
             ) : (
               <Package className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
             )}

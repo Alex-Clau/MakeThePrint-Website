@@ -1,8 +1,12 @@
+"use client";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Package, Settings, Heart, MapPin } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "@/components/locale-provider";
 
 export function AccountMenu() {
+  const t = useTranslations().account;
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
       <Link href="/account/orders">
@@ -13,8 +17,8 @@ export function AccountMenu() {
                 <Package className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
               </div>
               <div className="min-w-0">
-                <p className="font-semibold text-sm sm:text-base">Orders</p>
-                <p className="text-xs sm:text-sm text-muted-foreground">View order history</p>
+                <p className="font-semibold text-sm sm:text-base">{t.orders}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">{t.viewOrderHistory}</p>
               </div>
             </div>
           </CardContent>
@@ -29,8 +33,8 @@ export function AccountMenu() {
                 <Heart className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
               </div>
               <div className="min-w-0">
-                <p className="font-semibold text-sm sm:text-base">Wishlist</p>
-                <p className="text-xs sm:text-sm text-muted-foreground">Saved items</p>
+                <p className="font-semibold text-sm sm:text-base">{t.wishlist}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">{t.savedItems}</p>
               </div>
             </div>
           </CardContent>
@@ -45,8 +49,8 @@ export function AccountMenu() {
                 <MapPin className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
               </div>
               <div className="min-w-0">
-                <p className="font-semibold text-sm sm:text-base">Addresses</p>
-                <p className="text-xs sm:text-sm text-muted-foreground">Manage addresses</p>
+                <p className="font-semibold text-sm sm:text-base">{t.addresses}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">{t.manageAddresses}</p>
               </div>
             </div>
           </CardContent>
@@ -61,8 +65,8 @@ export function AccountMenu() {
                 <Settings className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
               </div>
               <div className="min-w-0">
-                <p className="font-semibold text-sm sm:text-base">Settings</p>
-                <p className="text-xs sm:text-sm text-muted-foreground">Account settings</p>
+                <p className="font-semibold text-sm sm:text-base">{t.settings}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">{t.accountSettings}</p>
               </div>
             </div>
           </CardContent>

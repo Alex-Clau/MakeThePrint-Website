@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
+import { useTranslations } from "@/components/locale-provider";
 
 export function FooterAccountLinks() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const c = useTranslations().common;
 
   useEffect(() => {
     async function checkAuth() {
@@ -41,23 +43,23 @@ export function FooterAccountLinks() {
 
   return (
     <div>
-      <h4 className="font-semibold mb-4">Account</h4>
+      <h4 className="font-semibold mb-4">{c.account}</h4>
       <ul className="space-y-2 text-sm text-muted-foreground">
         {!isLoading && !isAuthenticated && (
           <li>
             <Link href="/auth/login" className="hover:text-accent-primary-dark transition-colors">
-              Sign In
+              {c.signIn}
             </Link>
           </li>
         )}
         <li>
           <Link href="/account" className="hover:text-accent-primary-dark transition-colors">
-            My Account
+            {c.myAccount}
           </Link>
         </li>
         <li>
           <Link href="/account/orders" className="hover:text-accent-primary-dark transition-colors">
-            Order History
+            {c.orderHistory}
           </Link>
         </li>
       </ul>

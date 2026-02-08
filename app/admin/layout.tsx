@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Package, LogOut } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingBag, LogOut } from "lucide-react";
 
 export default function AdminLayout({
   children,
@@ -31,6 +31,13 @@ export default function AdminLayout({
                 >
                   <Package className="h-4 w-4" />
                   Products
+                </Link>
+                <Link
+                  href="/admin/orders"
+                  className="flex items-center gap-2 text-sm font-medium hover:text-accent-primary-dark transition-colors"
+                >
+                  <ShoppingBag className="h-4 w-4" />
+                  Orders
                 </Link>
               </div>
             </div>

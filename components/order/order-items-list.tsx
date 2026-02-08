@@ -13,7 +13,7 @@ export function OrderItemsList({ items }: OrderItemsListProps) {
               <div key={item.id} className="flex flex-col sm:flex-row gap-3 sm:gap-4 pb-4 border-b last:border-0">
                 <div className="relative w-full sm:w-20 h-32 sm:h-20 flex-shrink-0 overflow-hidden rounded-lg border bg-muted">
                   <Image
-                    src="https://via.placeholder.com/80"
+                    src="/package.png"
                     alt={item.products.name}
                     fill
                     className="object-cover"

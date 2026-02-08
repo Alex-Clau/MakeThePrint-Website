@@ -1,0 +1,193 @@
+{
+  "nav": {
+    "brand": "Make The Print",
+    "customProducts": "Custom Products",
+    "seasonalProducts": "Seasonal Products",
+    "about": "About"
+  },
+  "footer": {
+    "brand": "Make The Print",
+    "tagline": "Premium 3D printed products for your home, office, and creative projects.",
+    "shop": "Shop",
+    "allProducts": "All Products",
+    "aboutUs": "About Us",
+    "support": "Support",
+    "faq": "FAQ",
+    "shipping": "Shipping",
+    "refunds": "Refunds & Returns",
+    "legal": "Legal",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "copyright": "© 2024 Make The Print. All rights reserved."
+  },
+  "common": {
+    "shopNow": "Shop Now",
+    "learnMore": "Learn More",
+    "goHome": "Go Home",
+    "browseProducts": "Browse Products",
+    "tryAgain": "Try Again",
+    "signIn": "Sign In",
+    "myAccount": "My Account",
+    "orderHistory": "Order History",
+    "account": "Account",
+    "loading": "Loading…",
+    "ron": "RON"
+  },
+  "home": {
+    "badge": "Premium 3D Printed Products",
+    "headline": "Bring Your Ideas to",
+    "headlineHighlight": "Life in 3D",
+    "subhead": "Discover our collection of high-quality 3D printed items.",
+    "featuredTitle": "Featured Products",
+    "featuredSubhead": "Handpicked designs showcasing the best of 3D printing innovation",
+    "noFeatured": "No featured products available",
+    "customTitle": "Custom Printing Services",
+    "customSubhead": "Have a unique idea? We specialize in bringing your custom designs to life with precision 3D printing. From prototypes to personalized gifts, we're here to make your vision a reality.",
+    "emailUs": "Email Us",
+    "emailUsDesc": "Send us your design files or describe your project, and we'll provide a custom quote tailored to your needs.",
+    "whatsapp": "WhatsApp",
+    "whatsappDesc": "Quick questions? Reach out to us on WhatsApp for fast responses and instant support.",
+    "messageOnWhatsApp": "Message on WhatsApp",
+    "customFooter": "We can discuss pricing, materials, models, and turnaround time based on your specific project needs."
+  },
+  "about": {
+    "heroWelcome": "Hey, welcome.",
+    "heroName": "I'm MakeThePrint.",
+    "heroIntro": "My dad and I started this because we love beautiful prints. Now we're here to share that with you.",
+    "exploreProducts": "Explore Our Products",
+    "ourStory": "Our Story",
+    "storyTitle": "Our Story",
+    "storyP1": "Honestly? My dad and I just really wanted to make cool printed stuff. We weren't trying to build some massive company—we just got tired of seeing mediocre prints out there. So we invested in some gear, learned the craft, and decided to do it our way.",
+    "storyP2": "Right now, we've got a collection we're genuinely proud of. These are designs we've chosen because we think they look incredible when printed. But here's the thing—if you've got something specific in mind, just reach out. We love a challenge, and we'll do our best to make it happen.",
+    "storyP3": "The plan? We want to keep growing. More printers, more products, a real online store. Every single person who orders from us is helping us get there. We're not some faceless company—it's literally my dad and me packing these boxes, making sure everything's perfect. When you support us, you're supporting two people who actually care about what they're doing.",
+    "whyTitle": "Why Work With Us",
+    "qualityPrints": "Quality Prints",
+    "qualityPrintsDesc": "We print what we'd be proud to own",
+    "madeWithCare": "Made With Care",
+    "madeWithCareDesc": "Every order matters to us",
+    "customWelcome": "Custom Requests Welcome",
+    "customWelcomeDesc": "Just ask—we'll figure it out",
+    "growingEveryDay": "Growing Every Day",
+    "growingEveryDayDesc": "Your support helps us expand",
+    "whatsComingTitle": "What's Coming Next",
+    "whatsComingIntro": "We're just getting started. Here's what we're working on to make MakeThePrint even better for you:",
+    "newProductTypes": "New Product Types",
+    "newProductTypesDesc": "Expanding beyond our current lineup into new categories you've been asking for",
+    "fasterTurnaround": "Faster Turnaround",
+    "fasterTurnaroundDesc": "Adding more printers so we can ship your orders even quicker",
+    "adventSpecials": "Advent Specials",
+    "adventSpecialsDesc": "Special advent collections for christmas, holidays, and seasonal moments",
+    "whatsComingThankYou": "Every order, every customer, every moment of support gets us closer to these goals. Thank you for being part of our journey."
+  },
+  "account": {
+    "orders": "Orders",
+    "viewOrderHistory": "View order history",
+    "wishlist": "Wishlist",
+    "savedItems": "Saved items",
+    "addresses": "Addresses",
+    "manageAddresses": "Manage addresses",
+    "settings": "Settings",
+    "accountSettings": "Account settings"
+  },
+  "cart": {
+    "title": "Your Cart",
+    "empty": "Your cart is empty",
+    "emptyHint": "Start adding items to your cart",
+    "continueShopping": "Continue shopping",
+    "itemRemoved": "Item removed from cart",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "total": "Total",
+    "free": "Free",
+    "freeShippingNote": "Add {amount} RON more for free shipping",
+    "orderSummary": "Order Summary",
+    "checkout": "Proceed to Checkout"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "shippingAddress": "Shipping address",
+    "completeAddress": "Please complete the shipping address form above to proceed with payment.",
+    "orderSummary": "Order Summary",
+    "payNow": "Pay now",
+    "loadingPayment": "Loading payment form…",
+    "securePayment": "Your payment information is secure and encrypted",
+    "tax": "Tax"
+  },
+  "product": {
+    "featured": "Featured",
+    "customInquiry": "Custom Inquiry",
+    "contactForPricing": "Contact for pricing",
+    "addToCart": "Add to cart",
+    "addToWishlist": "Add to wishlist",
+    "reviews": "Reviews",
+    "writeReview": "Write a review"
+  },
+  "auth": {
+    "login": "Login",
+    "loginDesc": "Enter your email below to login to your account",
+    "email": "Email",
+    "password": "Password",
+    "signIn": "Sign In",
+    "signUp": "Sign up",
+    "loggingIn": "Logging in…",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "forgotPassword": "Forgot your password?",
+    "errorOccurred": "An error occurred"
+  },
+  "notFound": {
+    "title": "Page Not Found",
+    "description": "The page you're looking for doesn't exist or has been moved."
+  },
+  "error": {
+    "title": "Something went wrong!",
+    "description": "We encountered an unexpected error. Please try again or return to the home page."
+  },
+  "collections": {
+    "title": "Seasonal Collections",
+    "subhead": "Discover our exclusive holiday and seasonal collections. Limited edition designs perfect for gifting and special occasions.",
+    "noSeasonal": "No seasonal collections available yet"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "q1": "How long does shipping take?",
+    "a1": "We typically ship within 2–3 business days. Delivery is 3–7 business days depending on your location.",
+    "q2": "What materials do you use?",
+    "a2": "We use quality PLA and PETG filaments. Custom orders can discuss other materials.",
+    "q3": "Can I cancel or change my order?",
+    "a3": "Contact us as soon as possible. We can modify or cancel orders that have not yet been shipped.",
+    "q4": "Do you offer refunds?",
+    "a4": "Yes. See our Refunds & Returns page for details.",
+    "refundsLink": "Refunds & Returns"
+  },
+  "shipping": {
+    "title": "Shipping",
+    "intro": "We ship within Romania and internationally. Orders are processed within 2–3 business days.",
+    "romania": "Romania",
+    "romaniaDesc": "Standard delivery: 3–5 business days. Free shipping on orders over 50 RON.",
+    "international": "International",
+    "internationalDesc": "Delivery times and costs depend on destination. We will confirm shipping cost at checkout where applicable.",
+    "tracking": "Tracking",
+    "trackingDesc": "Once your order ships, we will send a confirmation email with tracking information. You can also check your order status in your account."
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "lastUpdated": "Last updated: 2024.",
+    "body1": "By using Make The Print you agree to these terms. We sell 3D printed products; by placing an order you agree to pay the stated price and accept our shipping and refund policies.",
+    "body2": "You may not use our site for any illegal purpose or to infringe others' rights. We reserve the right to refuse or cancel orders and to change these terms; continued use after changes means you accept the new terms.",
+    "body3": "For questions, contact us via the details on our website."
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: 2024.",
+    "body1": "We collect information you provide when ordering (name, address, email, phone) and use it to process orders, send confirmations, and provide support. We do not sell your data to third parties.",
+    "body2": "We use cookies and similar tech for session and preferences. Payment data is handled by Stripe; we do not store full card details.",
+    "body3": "You can request access to or deletion of your data by contacting us. By using our site you consent to this policy."
+  },
+  "refunds": {
+    "title": "Refunds & Returns",
+    "body1": "We want you to be satisfied. If an item arrives damaged or is not as described, contact us within 14 days of delivery with photos. We will arrange a replacement or refund.",
+    "body2": "Refunds are issued to the original payment method within 5–10 business days after we approve the return. Custom or personalized items may not be eligible for return unless defective.",
+    "body3": "To start a return, contact us with your order number and reason. Do not send items back until we confirm."
+  }
+}

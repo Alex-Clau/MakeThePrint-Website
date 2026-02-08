@@ -7,6 +7,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ProductCardProps } from "@/types/components";
 import { ProductCardActions } from "./product-card-actions";
+import { useTranslations } from "@/components/locale-provider";
 
 export function ProductCard({
   id,
@@ -19,6 +20,8 @@ export function ProductCard({
   review_count,
 }: ProductCardProps) {
   const isKeychain = category === "keychains";
+  const t = useTranslations().product;
+  const c = useTranslations().common;
   return (
     <motion.div
       initial={{ opacity: 0, y: 30, scale: 0.9, rotateX: -15 }}
@@ -66,12 +69,12 @@ export function ProductCard({
           <div className="absolute top-2 left-2 z-20 flex flex-col gap-2">
             {featured && (
               <Badge className="bg-accent-primary-dark text-white">
-                Featured
+                {t.featured}
               </Badge>
             )}
             {isKeychain && (
               <Badge className="bg-green-600 text-white">
-                Custom Inquiry
+                {t.customInquiry}
               </Badge>
             )}
           </div>
@@ -90,9 +93,9 @@ export function ProductCard({
         <div className="w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-0">
           <div>
             {isKeychain ? (
-              <p className="text-sm sm:text-base font-medium text-muted-foreground">Contact for pricing</p>
+              <p className="text-sm sm:text-base font-medium text-muted-foreground">{t.contactForPricing}</p>
             ) : (
-              <p className="text-lg sm:text-lg font-bold">{price.toFixed(2)} RON</p>
+              <p className="text-lg sm:text-lg font-bold">{price.toFixed(2)} {c.ron}</p>
             )}
           </div>
           {!isKeychain && (

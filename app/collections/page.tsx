@@ -1,16 +1,17 @@
 import { Suspense } from "react";
+import { cookies } from "next/headers";
 import { Navigation } from "@/components/navigation";
-import { Card, CardContent } from "@/components/ui/card";
 import { Sparkles, Gift } from "lucide-react";
-import Link from "next/link";
 import { getProducts } from "@/lib/supabase/products";
 import { transformProductToCardData } from "@/lib/utils/products";
 import { ProductCard } from "@/components/product/product-card";
+import { getDictionary, getLocaleFromCookie } from "@/lib/i18n";
+import type { Messages } from "@/lib/i18n";
 
-async function SeasonalCollections() {
-  // Get products marked as seasonal
+async function SeasonalCollections({ messages }: { messages: Messages }) {
   const products = await getProducts({ seasonal: true, limit: 12 });
   const transformedProducts = products.map(transformProductToCardData);
+  const t = messages.collections;
 
   return (
     <div className="space-y-8">
@@ -23,14 +24,18 @@ async function SeasonalCollections() {
       ) : (
         <div className="text-center py-12">
           <Gift className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground">No seasonal collections available yet</p>
+          <p className="text-muted-foreground">{t.noSeasonal}</p>
         </div>
       )}
     </div>
   );
 }
 
-export default function CollectionsPage() {
+export default async function CollectionsPage() {
+  const locale = getLocaleFromCookie((await cookies()).get("locale")?.value);
+  const messages = getDictionary(locale);
+  const t = messages.collections;
+
   return (
     <main className="min-h-screen flex flex-col relative z-10 bg-background">
       <Navigation />
@@ -39,12 +44,11 @@ export default function CollectionsPage() {
           <div className="flex items-center gap-2 mb-4">
             <Sparkles className="h-6 w-6 text-accent-primary-dark" />
             <h1 className="text-3xl sm:text-4xl font-bold text-accent-primary-dark">
-              Seasonal Collections
+              {t.title}
             </h1>
           </div>
           <p className="text-base sm:text-lg text-muted-foreground max-w-2xl">
-            Discover our exclusive holiday and seasonal collections. Limited edition designs
-            perfect for gifting and special occasions.
+            {t.subhead}
           </p>
         </div>
 
@@ -60,7 +64,7 @@ export default function CollectionsPage() {
             </div>
           }
         >
-          <SeasonalCollections />
+          <SeasonalCollections messages={messages} />
         </Suspense>
       </div>
     </main>

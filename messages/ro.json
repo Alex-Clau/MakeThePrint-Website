@@ -1,0 +1,193 @@
+{
+  "nav": {
+    "brand": "Make The Print",
+    "customProducts": "Produse personalizate",
+    "seasonalProducts": "Produse sezoniere",
+    "about": "Despre noi"
+  },
+  "footer": {
+    "brand": "Make The Print",
+    "tagline": "Produse printate 3D de calitate pentru casă, birou și proiecte creative.",
+    "shop": "Magazin",
+    "allProducts": "Toate produsele",
+    "aboutUs": "Despre noi",
+    "support": "Suport",
+    "faq": "Întrebări frecvente",
+    "shipping": "Livrare",
+    "refunds": "Rambursări și returnări",
+    "legal": "Legal",
+    "terms": "Termeni și condiții",
+    "privacy": "Politica de confidențialitate",
+    "copyright": "© 2024 Make The Print. Toate drepturile rezervate."
+  },
+  "common": {
+    "shopNow": "Cumpără acum",
+    "learnMore": "Află mai mult",
+    "goHome": "Acasă",
+    "browseProducts": "Vezi produsele",
+    "tryAgain": "Încearcă din nou",
+    "signIn": "Conectare",
+    "myAccount": "Contul meu",
+    "orderHistory": "Istoric comenzi",
+    "account": "Cont",
+    "loading": "Se încarcă…",
+    "ron": "RON"
+  },
+  "home": {
+    "badge": "Produse printate 3D de calitate",
+    "headline": "Dă viață ideilor tale",
+    "headlineHighlight": "în 3D",
+    "subhead": "Descoperă colecția noastră de produse printate 3D de calitate.",
+    "featuredTitle": "Produse recomandate",
+    "featuredSubhead": "Modele alese care pun în valoare inovația printării 3D",
+    "noFeatured": "Niciun produs recomandat disponibil",
+    "customTitle": "Servicii de printare personalizată",
+    "customSubhead": "Ai o idee unică? Ne specializăm în realizarea designurilor tale personalizate prin printare 3D de precizie. De la prototipuri la cadouri personalizate, suntem aici să dăm viață viziunii tale.",
+    "emailUs": "Scrie-ne pe email",
+    "emailUsDesc": "Trimite-ne fișierele de design sau descrie proiectul, și îți vom oferi un deviz personalizat.",
+    "whatsapp": "WhatsApp",
+    "whatsappDesc": "Întrebări rapide? Contactează-ne pe WhatsApp pentru răspunsuri rapide.",
+    "messageOnWhatsApp": "Scrie pe WhatsApp",
+    "customFooter": "Putem discuta prețuri, materiale, modele și termene în funcție de nevoile proiectului tău."
+  },
+  "about": {
+    "heroWelcome": "Bun venit.",
+    "heroName": "Sunt MakeThePrint.",
+    "heroIntro": "Tata și cu mine am început pentru că iubim printurile frumoase. Acum suntem aici să împărtășim asta cu tine.",
+    "exploreProducts": "Descoperă produsele",
+    "ourStory": "Povestea noastră",
+    "storyTitle": "Povestea noastră",
+    "storyP1": "Sincer? Tata și cu mine voiam să facem lucruri printate mișto. Nu încercam să construim o companie uriașă—pur și simplu ne-a săturat să vedem printuri mediocre. Așa că am investit în echipament, am învățat meseria și am decis să o facem în felul nostru.",
+    "storyP2": "Acum avem o colecție de care suntem mândri. Sunt modele pe care le-am ales pentru că arată incredibil când sunt printate. Dar dacă ai ceva anume în minte, contactează-ne. Ne place provocarea și vom face tot posibilul să realizăm.",
+    "storyP3": "Planul? Vrem să creștem. Mai multe imprimante, mai multe produse, un magazin online real. Fiecare persoană care comandă de la noi ne ajută să ajungem acolo. Nu suntem o companie anonimă—literalmente tata și cu mine împachetăm cutiile și ne asigurăm că totul e perfect. Când ne susții, susții două persoane cărora le pasă cu adevărat de ceea ce fac.",
+    "whyTitle": "De ce să lucrezi cu noi",
+    "qualityPrints": "Printuri de calitate",
+    "qualityPrintsDesc": "Printăm ce am fi mândri să posedăm",
+    "madeWithCare": "Făcut cu grijă",
+    "madeWithCareDesc": "Fiecare comandă contează pentru noi",
+    "customWelcome": "Comenzi personalizate bine-venite",
+    "customWelcomeDesc": "Spune-ne ce vrei—găsim o soluție",
+    "growingEveryDay": "Creștem în fiecare zi",
+    "growingEveryDayDesc": "Sprijinul tău ne ajută să ne extindem",
+    "whatsComingTitle": "Ce urmează",
+    "whatsComingIntro": "Tocmai am început. Iată la ce lucrăm pentru a face MakeThePrint și mai bun pentru tine:",
+    "newProductTypes": "Tipuri noi de produse",
+    "newProductTypesDesc": "Ne extindem cu categorii noi pe care le-ai cerut",
+    "fasterTurnaround": "Livrări mai rapide",
+    "fasterTurnaroundDesc": "Mai multe imprimante pentru a expedia și mai repede",
+    "adventSpecials": "Oferte de advent",
+    "adventSpecialsDesc": "Colecții speciale de sărbători și sezon",
+    "whatsComingThankYou": "Fiecare comandă, fiecare client, fiecare sprijin ne aproprie de aceste obiective. Mulțumim că ești alături de noi."
+  },
+  "account": {
+    "orders": "Comenzi",
+    "viewOrderHistory": "Vezi istoricul comenzilor",
+    "wishlist": "Lista de dorințe",
+    "savedItems": "Produse salvate",
+    "addresses": "Adrese",
+    "manageAddresses": "Gestionează adresele",
+    "settings": "Setări",
+    "accountSettings": "Setări cont"
+  },
+  "cart": {
+    "title": "Coșul tău",
+    "empty": "Coșul tău este gol",
+    "emptyHint": "Adaugă produse în coș",
+    "continueShopping": "Continuă cumpărăturile",
+    "itemRemoved": "Produs scos din coș",
+    "subtotal": "Subtotal",
+    "shipping": "Livrare",
+    "total": "Total",
+    "free": "Gratuit",
+    "freeShippingNote": "Adaugă încă {amount} RON pentru livrare gratuită",
+    "orderSummary": "Rezumat comandă",
+    "checkout": "Finalizează comanda"
+  },
+  "checkout": {
+    "title": "Finalizare comandă",
+    "shippingAddress": "Adresa de livrare",
+    "completeAddress": "Completează formularul de adresă mai sus pentru a continua cu plata.",
+    "orderSummary": "Rezumat comandă",
+    "payNow": "Plătește acum",
+    "loadingPayment": "Se încarcă formularul de plată…",
+    "securePayment": "Informațiile tale de plată sunt securizate și criptate",
+    "tax": "TVA"
+  },
+  "product": {
+    "featured": "Recomandat",
+    "customInquiry": "Cere ofertă",
+    "contactForPricing": "Contactează pentru preț",
+    "addToCart": "Adaugă în coș",
+    "addToWishlist": "Adaugă la favorite",
+    "reviews": "Recenzii",
+    "writeReview": "Scrie o recenzie"
+  },
+  "auth": {
+    "login": "Conectare",
+    "loginDesc": "Introdu emailul pentru a te conecta la cont",
+    "email": "Email",
+    "password": "Parolă",
+    "signIn": "Conectare",
+    "signUp": "Înregistrare",
+    "loggingIn": "Se conectează…",
+    "noAccount": "Nu ai cont?",
+    "hasAccount": "Ai deja cont?",
+    "forgotPassword": "Ai uitat parola?",
+    "errorOccurred": "A apărut o eroare"
+  },
+  "notFound": {
+    "title": "Pagina nu a fost găsită",
+    "description": "Pagina pe care o cauți nu există sau a fost mutată."
+  },
+  "error": {
+    "title": "Ceva nu a mers bine!",
+    "description": "A apărut o eroare neașteptată. Te rugăm să încerci din nou sau să revii la pagina principală."
+  },
+  "collections": {
+    "title": "Colecții sezoniere",
+    "subhead": "Descoperă colecțiile noastre exclusive de sărbători și sezon. Designuri în ediție limitată, perfecte pentru cadouri.",
+    "noSeasonal": "Nicio colecție sezonieră disponibilă momentan"
+  },
+  "faq": {
+    "title": "Întrebări frecvente",
+    "q1": "Cât durează livrarea?",
+    "a1": "Expediem de obicei în 2–3 zile lucrătoare. Livrarea durează 3–7 zile lucrătoare, în funcție de locație.",
+    "q2": "Ce materiale folosiți?",
+    "a2": "Folosim filament PLA și PETG de calitate. Pentru comenzi personalizate putem discuta alte materiale.",
+    "q3": "Pot anula sau modifica comanda?",
+    "a3": "Contactați-ne cât mai curând. Putem modifica sau anula comenzi care nu au fost încă expediate.",
+    "q4": "Oferiți rambursări?",
+    "a4": "Da. Consultați pagina Rambursări și returnări pentru detalii.",
+    "refundsLink": "Rambursări și returnări"
+  },
+  "shipping": {
+    "title": "Livrare",
+    "intro": "Livrăm în România și internațional. Comenzile sunt procesate în 2–3 zile lucrătoare.",
+    "romania": "România",
+    "romaniaDesc": "Livrare standard: 3–5 zile lucrătoare. Livrare gratuită la comenzi peste 50 RON.",
+    "international": "Internațional",
+    "internationalDesc": "Termenele și costurile depind de destinație. Vom confirma costul la finalizarea comenzii unde se aplică.",
+    "tracking": "Urmărire",
+    "trackingDesc": "După expedierea comenzii, trimitem un email de confirmare cu informațiile de urmărire. Puteți verifica și statusul comenzii în cont."
+  },
+  "terms": {
+    "title": "Termeni și condiții",
+    "lastUpdated": "Ultima actualizare: 2024.",
+    "body1": "Utilizând Make The Print acceptați acești termeni. Vindem produse printate 3D; prin plasarea unei comenzi acceptați prețul afișat și politicile noastre de livrare și rambursare.",
+    "body2": "Nu aveți voie să folosiți site-ul în scopuri ilegale sau pentru a încălca drepturile altora. Ne rezervăm dreptul de a refuza sau anula comenzi și de a modifica acești termeni; continuarea utilizării după modificări înseamnă acceptarea noilor termeni.",
+    "body3": "Pentru întrebări, contactați-ne prin detaliile de pe site."
+  },
+  "privacy": {
+    "title": "Politica de confidențialitate",
+    "lastUpdated": "Ultima actualizare: 2024.",
+    "body1": "Colectăm informațiile pe care le furnizați la comandă (nume, adresă, email, telefon) și le folosim pentru a procesa comenzile, trimite confirmări și oferi suport. Nu vindem datele dvs. terților.",
+    "body2": "Folosim cookie-uri și tehnologii similare pentru sesiune și preferințe. Plățile sunt procesate de Stripe; nu stocăm detaliile complete ale cardului.",
+    "body3": "Puteți solicita acces la sau ștergerea datelor dvs. contactându-ne. Utilizând site-ul, acceptați această politică."
+  },
+  "refunds": {
+    "title": "Rambursări și returnări",
+    "body1": "Dorim să fii mulțumit. Dacă un produs sosește deteriorat sau nu corespunde descrierii, contactați-ne în 14 zile de la livrare cu poze. Vom aranja înlocuirea sau rambursarea.",
+    "body2": "Rambursările se fac pe metoda de plată originală în 5–10 zile lucrătoare după aprobarea returnării. Produsele personalizate pot să nu fie returnabile, cu excepția cazurilor defecte.",
+    "body3": "Pentru a iniția o returnare, contactați-ne cu numărul comenzii și motivul. Nu trimiteți produsele înapoi până nu confirmăm."
+  }
+}

@@ -61,7 +61,8 @@ export async function updateSession(request: NextRequest) {
   const isPublicPath = publicPaths.some(path => 
     request.nextUrl.pathname === path || 
     request.nextUrl.pathname.startsWith(path + "/")
-  ) || request.nextUrl.pathname.startsWith("/auth");
+  ) || request.nextUrl.pathname.startsWith("/auth")
+  || request.nextUrl.pathname === "/api/stripe/webhook";
 
   if (!isPublicPath && !user) {
     // Redirect to login only for protected routes

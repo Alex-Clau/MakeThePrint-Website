@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { amount, currency = "ron", metadata = {} } = body;
+    const { amount, currency = "ron", metadata = {}, orderId } = body;
 
     if (!amount || amount <= 0) {
       return NextResponse.json(
@@ -23,12 +23,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create payment intent
+    if (!orderId || typeof orderId !== "string") {
+      return NextResponse.json(
+        { error: "orderId is required for payment" },
+        { status: 400 }
+      );
+    }
+
+    // Create payment intent (orderId in metadata for webhook)
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100), // Convert to cents
+      amount: Math.round(amount * 100), // Convert to bani/cents
       currency,
       metadata: {
         userId: user.id,
+        orderId,
         ...metadata,
       },
       automatic_payment_methods: {
@@ -41,7 +49,6 @@ export async function POST(request: NextRequest) {
       paymentIntentId: paymentIntent.id,
     });
   } catch (error: any) {
-    console.error("Error creating payment intent:", error);
     return NextResponse.json(
       { error: error.message || "Failed to create payment intent" },
       { status: 500 }

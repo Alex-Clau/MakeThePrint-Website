@@ -49,6 +49,8 @@ async function OrdersList() {
                   <div className="p-2 sm:p-3 rounded-lg bg-primary/10 flex-shrink-0">
                     {order.status === "delivered" ? (
                       <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                    ) : order.status === "confirmed" ? (
+                      <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                     ) : (
                       <Truck className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                     )}
@@ -64,6 +66,8 @@ async function OrdersList() {
                             ? "default"
                             : order.status === "shipped"
                             ? "secondary"
+                            : order.status === "confirmed"
+                            ? "default"
                             : "outline"
                         }
                         className="w-fit text-xs"

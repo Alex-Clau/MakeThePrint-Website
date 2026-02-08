@@ -9,21 +9,12 @@ import { transformProductToCardData } from "@/lib/utils/products";
 import { WishlistItemProps } from "@/types/wishlist";
 
 export function WishlistItem({ product, onRemove }: WishlistItemProps) {
-  const imageUrl =
-    product.images && product.images.length > 0
-      ? product.images[0]
-      : "https://via.placeholder.com/400";
-  const productCardData = transformProductToCardData({
-    ...product,
-    images: product.images || [],
-  });
-
   return (
     <Card className="group overflow-hidden hover:shadow-lg transition-all">
       <Link href={`/products/${product.id}`}>
         <div className="relative aspect-square overflow-hidden bg-muted">
           <Image
-            src={imageUrl}
+            src="/package.png"
             alt={product.name}
             fill
             className="object-cover"

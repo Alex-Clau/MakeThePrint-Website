@@ -1,13 +1,19 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
+import { useTranslations } from "@/components/locale-provider";
 
 export function HeroSection() {
+  const t = useTranslations();
+  const h = t.home;
+  const c = t.common;
   return (
     <section className="relative w-full overflow-hidden min-h-[700px] lg:h-[850px] flex items-center">
-      {/* Background Image */}
-      <div className="hidden md:block">
+      {/* Background Image - absolute so it sits behind the text, not beside it */}
+      <div className="hidden md:block absolute inset-0">
         <Image
           src="/hero.png"
           alt="3D Printers"
@@ -18,32 +24,32 @@ export function HeroSection() {
           sizes="100vw"
           unoptimized
         />
-      {/* Overlay for better text readability */}
+        {/* Overlay for better text readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background" />
       </div>
-      <div className="relative max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 w-full">
+      <div className="relative z-10 max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 w-full">
         <div className="text-center flex flex-col justify-around min-h-[calc(100vh-3.5rem)] sm:min-h-0 sm:justify-center sm:items-center lg:block">
           <div>
             <div className="flex items-center justify-center gap-2 mb-6">
               <Sparkles className="h-6 w-6 text-accent-primary-dark" />
               <span className="text-sm font-medium text-accent-primary-dark uppercase tracking-wide">
-                Premium 3D Printed Products
+                {h.badge}
               </span>
             </div>
             <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-4 sm:mb-6">
-              Bring Your Ideas to
+              {h.headline}
               <span className="block bg-gradient-to-r from-accent-primary-dark to-accent-primary bg-clip-text text-transparent">
-                Life in 3D
+                {h.headlineHighlight}
               </span>
             </h1>
             <p className="text-sm sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-6 sm:mb-8 px-4 sm:px-0">
-              Discover our collection of high-quality 3D printed items.
+              {h.subhead}
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 lg:gap-2 justify-center items-center px-8 sm:px-0">
             <Button size="lg" className="bg-accent-primary-dark hover:bg-accent-primary-dark/90 text-white w-full sm:w-auto max-w-xs sm:max-w-none" asChild>
               <Link href="/products">
-                Shop Now
+                {c.shopNow}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
@@ -53,7 +59,7 @@ export function HeroSection() {
               className="bg-accent-secondary-light/10 hover:bg-accent-secondary/20 border-accent-secondary-dark/30 text-accent-secondary hover:text-accent-secondary w-full sm:w-auto max-w-xs sm:max-w-none"
               asChild
             >
-              <Link href="/about">Learn More</Link>
+              <Link href="/about">{c.learnMore}</Link>
             </Button>
           </div>
         </div>
@@ -61,4 +67,3 @@ export function HeroSection() {
     </section>
   );
 }
-

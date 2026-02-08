@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
-import { ToastProvider } from "@/components/providers/toast-provider";
-import { SnowEffect } from "@/components/snow-effect";
-import { Footer } from "@/components/footer/footer";
+import { LocaleContent } from "@/components/locale-content";
+import { LocaleFallback } from "@/components/locale-fallback";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -36,11 +36,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ToastProvider />
-          <div className="min-h-screen flex flex-col">
-            {children}
-            <Footer />
-          </div>
+          <Suspense fallback={<LocaleFallback />}>
+            <LocaleContent>{children}</LocaleContent>
+          </Suspense>
         </ThemeProvider>
       </body>
     </html>

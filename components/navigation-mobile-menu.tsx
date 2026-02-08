@@ -5,10 +5,11 @@ import Link from "next/link";
 import { Button } from "./ui/button";
 import { Menu, X } from "lucide-react";
 import { NavigationMobileAuth } from "./navigation-mobile-auth";
+import { useTranslations } from "./locale-provider";
 
 export function NavigationMobileMenu() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+  const n = useTranslations().nav;
   const closeMenu = () => setMobileMenuOpen(false);
 
   // Prevent body scroll when menu is open
@@ -53,21 +54,21 @@ export function NavigationMobileMenu() {
                 className="block py-3 text-base font-medium hover:text-accent-primary-dark transition-colors border-b border-border/40 touch-manipulation"
                 onClick={closeMenu}
               >
-                Custom Products
+                {n.customProducts}
               </Link>
               <Link
                 href="/collections"
                 className="block py-3 text-base font-medium hover:text-accent-primary-dark transition-colors border-b border-border/40 touch-manipulation"
                 onClick={closeMenu}
               >
-                Seasonal Products
+                {n.seasonalProducts}
               </Link>
               <Link
                 href="/about"
                 className="block py-3 text-base font-medium hover:text-accent-primary-dark transition-colors border-b border-border/40 touch-manipulation"
                 onClick={closeMenu}
               >
-                About
+                {n.about}
               </Link>
               <div className="border-t border-border/40 mt-2 pt-2">
                 <NavigationMobileAuth onLinkClick={closeMenu} />

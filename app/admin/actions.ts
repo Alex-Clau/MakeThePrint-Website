@@ -139,3 +139,30 @@ export async function deleteProductAction(productId: string) {
   revalidatePath("/admin/products");
   return { success: true };
 }
+
+/**
+ * Admin-only: update order status and optional tracking
+ */
+export async function updateOrderStatusAction(
+  orderId: string,
+  status: string,
+  trackingNumber?: string | null
+) {
+  await requireAdmin();
+  const { updateOrderStatusAdmin } = await import("@/lib/supabase/orders-admin");
+  await updateOrderStatusAdmin(orderId, status, trackingNumber);
+  revalidatePath("/admin/orders");
+  revalidatePath(`/admin/orders/${orderId}`);
+}
+
+/**
+ * Form action for admin order status update
+ */
+export async function updateOrderStatusFormAction(formData: FormData) {
+  const orderId = formData.get("orderId") as string;
+  const status = formData.get("status") as string;
+  const raw = formData.get("trackingNumber");
+  const trackingNumber =
+    raw === null || raw === undefined || raw === "" ? null : String(raw).trim() || null;
+  await updateOrderStatusAction(orderId, status, trackingNumber);
+}

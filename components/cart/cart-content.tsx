@@ -14,9 +14,12 @@ import { CartItemsList } from "./cart-items-list";
 import { CartSummary } from "./cart-summary";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
+import { useTranslations } from "@/components/locale-provider";
 
 export function CartContent({ items }: CartContentProps) {
   const router = useRouter();
+  const t = useTranslations().cart;
+  const c = useTranslations().common;
 
   const handleUpdateQuantity = async (cartItemId: string, newQuantity: number) => {
     if (newQuantity < 1) return;
@@ -33,7 +36,7 @@ export function CartContent({ items }: CartContentProps) {
     try {
       await removeFromCartClient(cartItemId);
       window.dispatchEvent(new CustomEvent("cart-updated"));
-      toast.success("Item removed from cart");
+      toast.success(t.itemRemoved);
       router.refresh();
     } catch (error: any) {
       toast.error(getUserFriendlyError(error));
@@ -51,12 +54,10 @@ export function CartContent({ items }: CartContentProps) {
     return (
       <Card className="p-12 text-center">
         <ShoppingBag className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-        <h2 className="text-2xl font-bold mb-2">Your cart is empty</h2>
-        <p className="text-muted-foreground mb-6">
-          Start adding items to your cart
-        </p>
+        <h2 className="text-2xl font-bold mb-2">{t.empty}</h2>
+        <p className="text-muted-foreground mb-6">{t.emptyHint}</p>
         <Button asChild>
-          <Link href="/products">Browse Products</Link>
+          <Link href="/products">{c.browseProducts}</Link>
         </Button>
       </Card>
     );
