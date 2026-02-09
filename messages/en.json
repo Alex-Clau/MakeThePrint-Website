@@ -249,6 +249,7 @@
     "errorOccurred": "An error occurred",
     "emailAlreadyRegistered": "This email is already linked to an account. Please sign in instead.",
     "passwordsDoNotMatch": "Passwords do not match",
+    "confirmingEmail": "Confirming your email…",
     "creatingAccount": "Creating an account…",
     "signUpTitle": "Sign up",
     "signUpDesc": "Create a new account",

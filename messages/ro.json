@@ -249,6 +249,7 @@
     "errorOccurred": "A apărut o eroare",
     "emailAlreadyRegistered": "Acest email este deja asociat unui cont. Te rugăm să te conectezi.",
     "passwordsDoNotMatch": "Parolele nu coincid",
+    "confirmingEmail": "Se confirmă emailul…",
     "creatingAccount": "Se creează contul…",
     "signUpTitle": "Înregistrare",
     "signUpDesc": "Creează un cont nou",
