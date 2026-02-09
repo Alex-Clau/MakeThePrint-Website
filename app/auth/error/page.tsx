@@ -1,32 +1,24 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AuthErrorMessage } from "@/components/auth-error-message";
 import { Suspense } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 async function ErrorContent({
   searchParams,
 }: {
-  searchParams: Promise<{ error: string }>;
+  searchParams: Promise<{ error?: string; error_code?: string }>;
 }) {
   const params = await searchParams;
-
   return (
-    <>
-      {params?.error ? (
-        <p className="text-sm text-muted-foreground">
-          Code error: {params.error}
-        </p>
-      ) : (
-        <p className="text-sm text-muted-foreground">
-          An unspecified error occurred.
-        </p>
-      )}
-    </>
+    <AuthErrorMessage error={params?.error} error_code={params?.error_code} />
   );
 }
 
 export default function Page({
   searchParams,
 }: {
-  searchParams: Promise<{ error: string }>;
+  searchParams: Promise<{ error?: string; error_code?: string }>;
 }) {
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
@@ -38,10 +30,13 @@ export default function Page({
                 Sorry, something went wrong.
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
               <Suspense>
                 <ErrorContent searchParams={searchParams} />
               </Suspense>
+              <Button asChild variant="outline" className="w-full">
+                <Link href="/auth/sign-up">Try signing up again</Link>
+              </Button>
             </CardContent>
           </Card>
         </div>

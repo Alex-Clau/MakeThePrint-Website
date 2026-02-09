@@ -250,6 +250,9 @@
     "emailAlreadyRegistered": "Acest email este deja asociat unui cont. Te rugăm să te conectezi.",
     "passwordsDoNotMatch": "Parolele nu coincid",
     "confirmingEmail": "Se confirmă emailul…",
+    "confirmEmailTitle": "Confirmă emailul",
+    "confirmEmailClick": "Apasă butonul de mai jos pentru a-ți confirma adresa de email. Astfel linkul nu este folosit înainte să îl deschizi.",
+    "confirmEmailButton": "Confirmă emailul",
     "creatingAccount": "Se creează contul…",
     "signUpTitle": "Înregistrare",
     "signUpDesc": "Creează un cont nou",
@@ -268,7 +271,10 @@
     "saveNewPassword": "Salvează parola nouă",
     "saving": "Se salvează...",
     "logout": "Deconectare",
-    "login": "Conectare"
+    "login": "Conectare",
+    "linkExpired": "Linkul de confirmare a expirat. Te rugăm să te înregistrezi din nou sau să soliciți un email de confirmare nou.",
+    "accessDenied": "Acces refuzat. Linkul poate fi invalid sau deja folosit.",
+    "noToken": "Link de confirmare invalid sau lipsă. Te rugăm să folosești linkul din email sau să soliciți unul nou."
   },
   "notFound": {
     "title": "Pagina nu a fost găsită",

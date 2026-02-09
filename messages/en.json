@@ -250,6 +250,9 @@
     "emailAlreadyRegistered": "This email is already linked to an account. Please sign in instead.",
     "passwordsDoNotMatch": "Passwords do not match",
     "confirmingEmail": "Confirming your email…",
+    "confirmEmailTitle": "Confirm your email",
+    "confirmEmailClick": "Click the button below to confirm your email address. This helps prevent the link from being used before you open it.",
+    "confirmEmailButton": "Confirm my email",
     "creatingAccount": "Creating an account…",
     "signUpTitle": "Sign up",
     "signUpDesc": "Create a new account",
@@ -267,7 +270,10 @@
     "newPassword": "New password",
     "saveNewPassword": "Save new password",
     "saving": "Saving...",
-    "logout": "Logout"
+    "logout": "Logout",
+    "linkExpired": "This confirmation link has expired. Please sign up again or request a new confirmation email.",
+    "accessDenied": "Access denied. The link may be invalid or already used.",
+    "noToken": "Invalid or missing confirmation link. Please use the link from your email or request a new one."
   },
   "notFound": {
     "title": "Page Not Found",
