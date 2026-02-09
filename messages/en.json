@@ -191,6 +191,7 @@
     "selected": "Selected:",
     "letterHeight": "Letter Height:",
     "totalPrice": "Total Price:",
+    "yourText": "Your text",
     "typeTextBelow": "Type your text in the preview box below. Each character (including spaces) is priced separately.",
     "ronPerChar": "RON per character",
     "sizeNote": "This is the height of each letter on your wall. Price per character varies by size.",
@@ -277,7 +278,7 @@
   },
   "products": {
     "title": "Custom Products",
-    "subhead": "Custom wall letters and keychains designed just for you",
+    "subhead": "Wall letters and custom products designed just for you",
     "showingCount": "Showing {count} products"
   },
   "seasons": {
@@ -331,8 +332,8 @@
     "productNameRequired": "Product name is required",
     "productNameEn": "Product Name (English) *",
     "productNameRo": "Product Name (Romanian)",
-    "productNameEnPlaceholder": "e.g., Indoor Wall Letters - Premium Acrylic",
-    "productNameRoPlaceholder": "e.g., Litere pereți interior - Acrilic premium",
+    "productNameEnPlaceholder": "e.g., Wall Letters - Premium Acrylic",
+    "productNameRoPlaceholder": "e.g., Litere pereți - Acrilic premium",
     "saving": "Saving…",
     "updateProduct": "Update Product",
     "createProduct": "Create Product",

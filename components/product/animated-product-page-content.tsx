@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { ProductDetailForm } from "@/components/product/product-detail-form";
 import { ProductImageGallery } from "@/components/product/product-image-gallery";
-import { TextPreview } from "@/components/product/text-preview";
 import { AnimatedProductPageContentProps } from "@/types/components";
 import { getProductDisplayName } from "@/lib/utils/products";
 import { useLocale } from "@/components/locale-provider";
@@ -14,19 +13,18 @@ export function AnimatedProductPageContent({
 }: AnimatedProductPageContentProps) {
   const { locale } = useLocale();
   const displayName = getProductDisplayName(product, locale);
-  // Check category for keychains, then product_type for custom
-  const isKeychains = product.category === "keychains";
-  const isCustomLetters = product.product_type === "custom" && !isKeychains;
+  const isPreset = product.category === "preset";
+  const customConfig = isPreset && product.custom_config && "fonts" in product.custom_config ? product.custom_config : null;
   const [preview, setPreview] = useState<{
     text: string;
     font: string;
     color: string;
-    size: number; // Size in cm
+    size: string;
   }>({
     text: "",
-    font: product.material_options[0] || "",
-    color: "black",
-    size: 20, // Default 20cm
+    font: customConfig?.fonts?.[0] || customConfig?.defaultFont || product.material_options[0] || "",
+    color: customConfig?.colors?.[0] || "black",
+    size: "",
   });
   // Get all images, using image as fallback if images array is empty
   const allImages = product.images && product.images.length > 0 
@@ -135,24 +133,6 @@ export function AnimatedProductPageContent({
         </motion.div>
       </motion.div>
       </div>
-
-      {/* Text Preview Section for Custom Letters */}
-      {isCustomLetters && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-        >
-          <TextPreview
-            text={preview.text}
-            font={preview.font}
-            color={preview.color}
-            size={preview.size}
-            onTextChange={(text) => setPreview((prev) => ({ ...prev, text }))}
-          />
-        </motion.div>
-      )}
-
     </div>
   );
 }

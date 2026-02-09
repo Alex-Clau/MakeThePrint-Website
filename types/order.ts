@@ -11,6 +11,7 @@ export interface OrderItem {
   quantity: number;
   price: number;
   material?: string;
+  customizations?: Record<string, unknown>;
   products: {
     id: string;
     name: string;

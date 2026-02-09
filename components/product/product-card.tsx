@@ -19,7 +19,7 @@ export function ProductCard({
   rating,
   review_count,
 }: ProductCardProps) {
-  const isKeychain = category === "keychains";
+  const isInquire = category === "inquire";
   const t = useTranslations().product;
   const c = useTranslations().common;
   const r = useTranslations().reviews;
@@ -73,7 +73,7 @@ export function ProductCard({
                 {t.featured}
               </Badge>
             )}
-            {isKeychain && (
+            {isInquire && (
               <Badge className="bg-green-600 text-white">
                 {t.customInquiry}
               </Badge>
@@ -93,13 +93,13 @@ export function ProductCard({
       <CardFooter className="p-4 sm:p-4 pt-0 flex flex-col gap-3">
         <div className="w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-0">
           <div>
-            {isKeychain ? (
+            {isInquire ? (
               <p className="text-sm sm:text-base font-medium text-muted-foreground">{t.contactForPricing}</p>
             ) : (
               <p className="text-lg sm:text-lg font-bold">{price.toFixed(2)} {c.ron}</p>
             )}
           </div>
-          {!isKeychain && (
+          {!isInquire && (
             <div className="w-full sm:w-auto">
               <ProductCardActions productId={id} showCartOnly />
             </div>

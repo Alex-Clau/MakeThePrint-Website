@@ -15,7 +15,10 @@ export function OrderItem({ item }: OrderItemProps) {
     product?.images && product.images.length > 0
       ? product.images[0]
       : "https://via.placeholder.com/64";
-  const itemPrice = product?.price || 0;
+  const lineTotal =
+    item.customizations?.totalPrice != null
+      ? item.customizations.totalPrice
+      : (product?.price || 0) * item.quantity;
 
   return (
     <div className="flex gap-3">
@@ -32,12 +35,27 @@ export function OrderItem({ item }: OrderItemProps) {
         <p className="font-medium text-sm truncate">
           {displayName}
         </p>
-        {item.material && (
+        {item.customizations?.text != null && String(item.customizations.text).trim() !== "" && (
+          <p className="text-xs text-muted-foreground">Text: &ldquo;{String(item.customizations.text)}&rdquo;</p>
+        )}
+        {item.customizations?.size != null && (
+          <p className="text-xs text-muted-foreground">
+            Size: {String(item.customizations.size)}
+            {item.customizations.font != null && ` • Font: ${String(item.customizations.font)}`}
+            {item.customizations.color != null && ` • Color: ${String(item.customizations.color)}`}
+          </p>
+        )}
+        {((item.customizations?.isOutdoor === true) || (item.customizations?.isLedStrip === true) || (item.customizations?.isColor === true)) && (
+          <p className="text-xs text-muted-foreground">
+            Options: {[item.customizations.isOutdoor && "Outdoor", item.customizations.isLedStrip && "LED strip", item.customizations.isColor && "Color"].filter(Boolean).join(", ")}
+          </p>
+        )}
+        {item.material && item.customizations?.text == null && (
           <p className="text-xs text-muted-foreground">Feature: {item.material}</p>
         )}
         <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
         <p className="text-sm font-semibold">
-          {(itemPrice * item.quantity).toFixed(2)} RON
+          {lineTotal.toFixed(2)} RON
         </p>
       </div>
     </div>

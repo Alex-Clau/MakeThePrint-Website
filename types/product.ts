@@ -1,9 +1,30 @@
 /**
- * Custom product configuration
+ * Size–price entry defined by admin for preset products
+ */
+export interface SizePriceEntry {
+  size: string;
+  price: number;
+}
+
+/**
+ * Custom product configuration (preset category)
  */
 export interface CustomProductConfig {
   colors?: string[];
+  fonts?: string[];
   defaultFont?: string;
+  sizePrices?: SizePriceEntry[] | Record<string, number>;
+  isOutdoor?: boolean;
+  isLedStrip?: boolean;
+  isColor?: boolean;
+  /** Add-on price (RON) when customer selects Outdoor */
+  outdoorPrice?: number;
+  /** Add-on price (RON) when customer selects LED strip */
+  ledStripPrice?: number;
+  /** Add-on price (RON) when customer selects Color */
+  colorPrice?: number;
+  /** Price per character (RON); total ramps up as customer types. 0 = no per-character pricing. */
+  pricePerCharacter?: number;
   [key: string]: any;
 }
 
@@ -27,7 +48,7 @@ export interface Product {
   price: number;
   material_options: string[];
   product_type?: "custom" | "seasonal";
-  category?: string; // 'indoor_wall_letters', 'outdoor_wall_letters', 'keychains', 'seasonal_decor'
+  category?: "preset" | "inquire" | "finished";
   custom_config?: CustomProductConfig | KeychainConfig;
   featured?: boolean;
   seasonal?: boolean;

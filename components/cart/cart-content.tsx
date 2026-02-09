@@ -43,10 +43,13 @@ export function CartContent({ items }: CartContentProps) {
     }
   };
 
-  const subtotal = items.reduce(
-    (sum, item) => sum + parseFloat(item.products.price.toString()) * item.quantity,
-    0
-  );
+  const subtotal = items.reduce((sum, item) => {
+    // Preset (configurable): line total is totalPrice from customizations
+    if (item.customizations?.totalPrice != null) {
+      return sum + item.customizations.totalPrice;
+    }
+    return sum + (item.products?.price ?? 0) * item.quantity;
+  }, 0);
   const shipping = subtotal > 50 ? 0 : 9.99;
   const total = subtotal + shipping;
 

@@ -24,7 +24,7 @@ export interface ProductDetailFormProps {
     text: string;
     font: string;
     color: string;
-    size: number; // Size in cm
+    size: string; // Admin-defined size label (e.g. "10cm")
   }) => void;
 }
 

@@ -38,13 +38,39 @@ export function CartItemsList({
                   <h3 className="font-semibold text-lg mb-1">
                     {displayName}
                   </h3>
-                  {item.material && (
+                  {item.customizations?.text != null && String(item.customizations.text).trim() !== "" && (
+                    <p className="text-sm text-muted-foreground mb-1">
+                      Text: &ldquo;{String(item.customizations.text)}&rdquo;
+                    </p>
+                  )}
+                  {item.customizations?.size != null && (
+                    <p className="text-xs text-muted-foreground mb-1">
+                      Size: {String(item.customizations.size)}
+                      {item.customizations.font != null && ` • Font: ${String(item.customizations.font)}`}
+                      {item.customizations.color != null && ` • Color: ${String(item.customizations.color)}`}
+                    </p>
+                  )}
+                  {((item.customizations?.isOutdoor === true) || (item.customizations?.isLedStrip === true) || (item.customizations?.isColor === true)) && (
+                    <p className="text-xs text-muted-foreground mb-1">
+                      Options: {[item.customizations.isOutdoor && "Outdoor", item.customizations.isLedStrip && "LED strip", item.customizations.isColor && "Color"].filter(Boolean).join(", ")}
+                    </p>
+                  )}
+                  {item.material && item.customizations?.text == null && (
                     <p className="text-sm text-muted-foreground mb-2">
                       {t.feature} {item.material}
                     </p>
                   )}
                   <p className="text-lg font-bold">
-                    {parseFloat(item.products.price.toString()).toFixed(2)} {c.ron}
+                    {(item.customizations?.totalPrice != null
+                      ? item.customizations.totalPrice
+                      : (item.products?.price ?? 0) * item.quantity
+                    ).toFixed(2)}{" "}
+                    {c.ron}
+                    {item.customizations?.totalPrice == null && item.quantity > 1 && (
+                      <span className="text-sm font-normal text-muted-foreground ml-1">
+                        ({parseFloat((item.products?.price ?? 0).toString()).toFixed(2)} {c.ron} × {item.quantity})
+                      </span>
+                    )}
                   </p>
                 </div>
                 <div className="flex items-center gap-3 sm:gap-4">

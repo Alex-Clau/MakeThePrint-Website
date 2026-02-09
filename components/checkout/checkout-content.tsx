@@ -48,12 +48,11 @@ export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
   }
 
   const subtotal = cartItems.reduce((sum, item) => {
-    // For custom letters, use the price from customizations if available
-    // Otherwise use the product base price
-    const itemPrice = item.customizations?.totalPrice 
-      ? item.customizations.totalPrice 
-      : (item.products?.price || 0);
-    return sum + itemPrice * item.quantity;
+    // Preset (configurable): line total is totalPrice from customizations
+    if (item.customizations?.totalPrice != null) {
+      return sum + item.customizations.totalPrice;
+    }
+    return sum + (item.products?.price || 0) * item.quantity;
   }, 0);
   const shipping = subtotal > 50 ? 0 : 9.99;
   const tax = subtotal * 0.1;

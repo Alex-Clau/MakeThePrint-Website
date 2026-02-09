@@ -15,12 +15,15 @@ const getFontFamily = (fontName: string) => {
   return fontMap[fontName] || `"${fontName}", serif`;
 };
 
+// Parse admin-defined size label (e.g. "10cm", "20") to number for display
+const parseSizeToCm = (sizeLabel: string): number => {
+  const match = sizeLabel.match(/\d+(\.\d+)?/);
+  return match ? parseFloat(match[0]) : 20;
+};
+
 // Convert CM to CSS font size
-// Approximate conversion: 1cm ≈ 37.8px at 96dpi
-// We'll use a scale factor for better on-screen display
 const getFontSize = (sizeCm: number) => {
-  // Convert cm to pixels (1cm ≈ 37.8px, but scaled for better visual representation)
-  const pixels = sizeCm * 3.78; // Approximate conversion
+  const pixels = sizeCm * 3.78;
   return `${pixels}px`;
 };
 
@@ -52,7 +55,8 @@ export function TextPreview({ text, font, color, size, maxLength = MAX_TEXT_LENG
 
   const isEditable = !!onTextChange;
   const colorValue = getColorValue(color);
-  const fontSize = getFontSize(size);
+  const sizeCm = parseSizeToCm(size);
+  const fontSize = getFontSize(sizeCm);
   const fontFamily = getFontFamily(font);
   const remainingChars = maxLength - text.length;
   const isNearLimit = remainingChars <= 10;
@@ -104,7 +108,7 @@ export function TextPreview({ text, font, color, size, maxLength = MAX_TEXT_LENG
             <span>•</span>
             <span>Color: {color}</span>
             <span>•</span>
-            <span>Height: {size} cm</span>
+            <span>Height: {size}</span>
           </div>
         </div>
       </CardContent>

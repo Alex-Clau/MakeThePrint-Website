@@ -7,13 +7,12 @@ import { Plus } from "lucide-react";
 import { redirect } from "next/navigation";
 
 interface AdminProductsPageProps {
-  searchParams: Promise<{ type?: string }>;
+  searchParams: Promise<{ type?: string; category?: string }>;
 }
 
-async function ProductsContent({ type }: { type?: string }) {
+async function ProductsContent({ type, category }: { type?: string; category?: string }) {
   const supabase = await createClient();
 
-  // Check if user is authenticated and is admin
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -32,11 +31,13 @@ async function ProductsContent({ type }: { type?: string }) {
     redirect("/?error=unauthorized");
   }
 
-  // Build query based on filters
   let query = supabase.from("products").select("*").order("created_at", { ascending: false });
 
   if (type) {
     query = query.eq("product_type", type);
+  }
+  if (category) {
+    query = query.eq("category", category);
   }
 
   const { data: products, error } = await query;
@@ -53,35 +54,42 @@ async function ProductsContent({ type }: { type?: string }) {
 }
 
 async function ProductsWrapper({ searchParams }: AdminProductsPageProps) {
-  const { type } = await searchParams;
-  return <ProductsContent type={type} />;
+  const { type, category } = await searchParams;
+  return <ProductsContent type={type} category={category} />;
 }
 
-function FilterButtons({ type }: { type?: string }) {
+function FilterButtons({ type, category }: { type?: string; category?: string }) {
   return (
     <div className="flex flex-wrap gap-2">
       <Link href="/admin/products">
-        <Button
-          variant={!type ? "default" : "outline"}
-          size="sm"
-        >
-          All Products
+        <Button variant={!type && !category ? "default" : "outline"} size="sm">
+          All
         </Button>
       </Link>
       <Link href="/admin/products?type=custom">
-        <Button
-          variant={type === "custom" ? "default" : "outline"}
-          size="sm"
-        >
-          Custom Products
+        <Button variant={type === "custom" ? "default" : "outline"} size="sm">
+          Custom
         </Button>
       </Link>
       <Link href="/admin/products?type=seasonal">
-        <Button
-          variant={type === "seasonal" ? "default" : "outline"}
-          size="sm"
-        >
+        <Button variant={type === "seasonal" ? "default" : "outline"} size="sm">
           Seasonal
+        </Button>
+      </Link>
+      <span className="inline-flex items-center text-muted-foreground px-1">|</span>
+      <Link href={type ? `/admin/products?type=${type}&category=preset` : "/admin/products?category=preset"}>
+        <Button variant={category === "preset" ? "default" : "outline"} size="sm">
+          Preset
+        </Button>
+      </Link>
+      <Link href={type ? `/admin/products?type=${type}&category=inquire` : "/admin/products?category=inquire"}>
+        <Button variant={category === "inquire" ? "default" : "outline"} size="sm">
+          Inquire
+        </Button>
+      </Link>
+      <Link href={type ? `/admin/products?type=${type}&category=finished` : "/admin/products?category=finished"}>
+        <Button variant={category === "finished" ? "default" : "outline"} size="sm">
+          Finished
         </Button>
       </Link>
     </div>
@@ -89,8 +97,8 @@ function FilterButtons({ type }: { type?: string }) {
 }
 
 async function FilterButtonsWrapper({ searchParams }: AdminProductsPageProps) {
-  const { type } = await searchParams;
-  return <FilterButtons type={type} />;
+  const { type, category } = await searchParams;
+  return <FilterButtons type={type} category={category} />;
 }
 
 export default function AdminProductsPage({ searchParams }: AdminProductsPageProps) {

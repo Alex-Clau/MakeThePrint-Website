@@ -14,14 +14,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { amount, currency = "ron", metadata = {}, orderId } = body;
-
-    if (!amount || amount <= 0) {
-      return NextResponse.json(
-        { error: "Invalid amount" },
-        { status: 400 }
-      );
-    }
+    const { currency = "ron", metadata = {}, orderId } = body;
 
     if (!orderId || typeof orderId !== "string") {
       return NextResponse.json(
@@ -30,7 +23,37 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create payment intent (orderId in metadata for webhook)
+    // Load order and use server-side total (don't trust client amount)
+    const { data: order, error: orderError } = await supabase
+      .from("orders")
+      .select("id, total_amount, payment_status")
+      .eq("id", orderId)
+      .eq("user_id", user.id)
+      .single();
+
+    if (orderError || !order) {
+      return NextResponse.json(
+        { error: "Order not found" },
+        { status: 404 }
+      );
+    }
+
+    if (order.payment_status === "paid") {
+      return NextResponse.json(
+        { error: "Order already paid" },
+        { status: 400 }
+      );
+    }
+
+    const amount = Number(order.total_amount);
+    if (!amount || amount <= 0) {
+      return NextResponse.json(
+        { error: "Invalid order amount" },
+        { status: 400 }
+      );
+    }
+
+    // Create payment intent using order total (orderId in metadata for webhook)
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(amount * 100), // Convert to bani/cents
       currency,

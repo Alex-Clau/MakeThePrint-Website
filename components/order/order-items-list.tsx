@@ -32,7 +32,24 @@ export function OrderItemsList({ items }: OrderItemsListProps) {
                     <h3 className="font-semibold text-base sm:text-lg mb-1 line-clamp-2">
                       {displayName}
                     </h3>
-                    {item.material && (
+                    {item.customizations?.text != null && String(item.customizations.text).trim() !== "" && (
+                      <p className="text-xs sm:text-sm text-muted-foreground mb-1">
+                        Text: &ldquo;{String(item.customizations.text)}&rdquo;
+                      </p>
+                    )}
+                    {item.customizations?.size != null && (
+                      <p className="text-xs sm:text-sm text-muted-foreground mb-1">
+                        Size: {String(item.customizations.size)}
+                        {item.customizations.font != null && ` • Font: ${String(item.customizations.font)}`}
+                        {item.customizations.color != null && ` • Color: ${String(item.customizations.color)}`}
+                      </p>
+                    )}
+                    {((item.customizations?.isOutdoor === true) || (item.customizations?.isLedStrip === true) || (item.customizations?.isColor === true)) && (
+                      <p className="text-xs sm:text-sm text-muted-foreground mb-1">
+                        Options: {[item.customizations.isOutdoor && "Outdoor", item.customizations.isLedStrip && "LED strip", item.customizations.isColor && "Color"].filter(Boolean).join(", ")}
+                      </p>
+                    )}
+                    {item.material && item.customizations?.text == null && (
                       <p className="text-xs sm:text-sm text-muted-foreground mb-1">
                         Feature: {item.material}
                       </p>
@@ -45,9 +62,11 @@ export function OrderItemsList({ items }: OrderItemsListProps) {
                     <p className="font-semibold text-base sm:text-lg">
                       {(item.price * item.quantity).toFixed(2)} RON
                     </p>
-                    <p className="text-xs sm:text-sm text-muted-foreground">
-                      {item.price.toFixed(2)} RON each
-                    </p>
+                    {item.quantity > 1 && (
+                      <p className="text-xs sm:text-sm text-muted-foreground">
+                        {item.price.toFixed(2)} RON each
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

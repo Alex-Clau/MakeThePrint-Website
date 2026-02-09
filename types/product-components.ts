@@ -2,20 +2,23 @@ import { CustomProductConfig } from "./product";
 
 /**
  * Custom Letters Form component props
+ * Sizes and prices come from product customConfig.sizePrices (admin-defined).
  */
 export interface CustomLettersFormProps {
-  pricePerCharacter: number;
   availableFonts: string[];
   customConfig: CustomProductConfig;
-  productName?: string; // Used to determine if indoor or outdoor
-  text: string; // Text input comes from the preview box
+  text: string; // Text input (controlled by parent; can be typed in form or in preview)
+  onTextChange?: (text: string) => void; // Called when user types so parent can update preview and price recalculates
   onConfigChange: (config: {
     text: string;
     characterCount: number;
     font: string;
     color: string;
-    size: number; // Size in cm
+    size: string; // Admin-defined size label (e.g. "10cm")
     totalPrice: number;
+    isOutdoor?: boolean;
+    isLedStrip?: boolean;
+    isColor?: boolean;
   }) => void;
 }
 
@@ -91,7 +94,7 @@ export interface TextPreviewProps {
   text: string;
   font: string;
   color: string;
-  size: number; // Size in cm
+  size: string; // Admin-defined size label (e.g. "10cm")
   maxLength?: number; // Maximum characters allowed
   onTextChange?: (text: string) => void;
 }
