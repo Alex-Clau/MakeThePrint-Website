@@ -18,7 +18,17 @@
     "legal": "Legal",
     "terms": "Termeni și condiții",
     "privacy": "Politica de confidențialitate",
-    "copyright": "© 2025 Make The Print. Toate drepturile rezervate."
+    "anpc": "ANPC",
+    "copyright": "© 2025 Make The Print. Toate drepturile rezervate.",
+    "companyDetails": "Date firmă",
+    "legalNameLabel": "Denumire legală",
+    "legalName": "IGNAT D. SILVIU PERSOANA FIZICA AUTORIZATĂ",
+    "tradeRegistryLabel": "Nr. registrul comerțului",
+    "tradeRegistry": "F2022000553335",
+    "fiscalCodeLabel": "Cod fiscal (CUI)",
+    "fiscalCode": "46621537",
+    "registeredAddressLabel": "Sediul social",
+    "registeredAddress": "Strada Sfântul Gavril Nr. 44, Oraș Gura Humorului, Județ Suceava"
   },
   "common": {
     "shopNow": "Cumpără acum",
@@ -318,14 +328,14 @@
   },
   "terms": {
     "title": "Termeni și condiții",
-    "lastUpdated": "Ultima actualizare: 2024.",
+    "lastUpdated": "Ultima actualizare: 2026.",
     "body1": "Utilizând Make The Print acceptați acești termeni. Vindem produse printate 3D; prin plasarea unei comenzi acceptați prețul afișat și politicile noastre de livrare și rambursare.",
     "body2": "Nu aveți voie să folosiți site-ul în scopuri ilegale sau pentru a încălca drepturile altora. Ne rezervăm dreptul de a refuza sau anula comenzi și de a modifica acești termeni; continuarea utilizării după modificări înseamnă acceptarea noilor termeni.",
     "body3": "Pentru întrebări, contactați-ne prin detaliile de pe site."
   },
   "privacy": {
     "title": "Politica de confidențialitate",
-    "lastUpdated": "Ultima actualizare: 2024.",
+    "lastUpdated": "Ultima actualizare: 2026.",
     "body1": "Colectăm informațiile pe care le furnizați la comandă (nume, adresă, email, telefon) și le folosim pentru a procesa comenzile, trimite confirmări și oferi suport. Nu vindem datele dvs. terților.",
     "body2": "Folosim cookie-uri și tehnologii similare pentru sesiune și preferințe. Plățile sunt procesate de Stripe; nu stocăm detaliile complete ale cardului.",
     "body3": "Puteți solicita acces la sau ștergerea datelor dvs. contactându-ne. Utilizând site-ul, acceptați această politică."

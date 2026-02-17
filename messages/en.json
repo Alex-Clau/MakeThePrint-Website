@@ -18,7 +18,17 @@
     "legal": "Legal",
     "terms": "Terms of Service",
     "privacy": "Privacy Policy",
-    "copyright": "© 2025 Make The Print. All rights reserved."
+    "anpc": "ANPC",
+    "copyright": "© 2025 Make The Print. All rights reserved.",
+    "companyDetails": "Company details",
+    "legalNameLabel": "Legal name",
+    "legalName": "IGNAT D. SILVIU PERSOANA FIZICA AUTORIZATĂ",
+    "tradeRegistryLabel": "Trade registry no.",
+    "tradeRegistry": "F2022000553335",
+    "fiscalCodeLabel": "Fiscal code (CUI)",
+    "fiscalCode": "46621537",
+    "registeredAddressLabel": "Registered address",
+    "registeredAddress": "Strada Sfântul Gavril Nr. 44, Oraș Gura Humorului, Județ Suceava"
   },
   "common": {
     "shopNow": "Shop Now",
@@ -317,14 +327,14 @@
   },
   "terms": {
     "title": "Terms of Service",
-    "lastUpdated": "Last updated: 2024.",
+    "lastUpdated": "Last updated: 2026.",
     "body1": "By using Make The Print you agree to these terms. We sell 3D printed products; by placing an order you agree to pay the stated price and accept our shipping and refund policies.",
     "body2": "You may not use our site for any illegal purpose or to infringe others' rights. We reserve the right to refuse or cancel orders and to change these terms; continued use after changes means you accept the new terms.",
     "body3": "For questions, contact us via the details on our website."
   },
   "privacy": {
     "title": "Privacy Policy",
-    "lastUpdated": "Last updated: 2024.",
+    "lastUpdated": "Last updated: 2026.",
     "body1": "We collect information you provide when ordering (name, address, email, phone) and use it to process orders, send confirmations, and provide support. We do not sell your data to third parties.",
     "body2": "We use cookies and similar tech for session and preferences. Payment data is handled by Stripe; we do not store full card details.",
     "body3": "You can request access to or deletion of your data by contacting us. By using our site you consent to this policy."

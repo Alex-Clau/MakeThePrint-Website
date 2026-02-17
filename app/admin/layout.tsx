@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { LayoutDashboard, Package, ShoppingBag, LogOut } from "lucide-react";
-import {requireAdmin} from "@/app/admin/actions";
+import { requireAdmin } from "@/app/admin/actions";
 
 export default async function AdminLayout({
   children,
