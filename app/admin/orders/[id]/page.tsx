@@ -1,6 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
 import { getOrderByIdAdmin } from "@/lib/supabase/orders-admin";
-import { redirect, notFound } from "next/navigation";
+import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OrderItemsList } from "@/components/order/order-items-list";
@@ -13,17 +12,6 @@ interface PageProps {
 
 export default async function AdminOrderDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/auth/login?redirect=/admin/orders");
-  const { data: profile } = await supabase
-    .from("user_profiles")
-    .select("is_admin")
-    .eq("id", user.id)
-    .single();
-  if (!profile?.is_admin) redirect("/?error=unauthorized");
 
   let order: Awaited<ReturnType<typeof getOrderByIdAdmin>>;
   try {

@@ -1,12 +1,15 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { LayoutDashboard, Package, ShoppingBag, LogOut } from "lucide-react";
+import {requireAdmin} from "@/app/admin/actions";
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  await requireAdmin();
+
   return (
     <div className="min-h-screen bg-background">
       {/* Admin Navigation */}

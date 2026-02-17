@@ -4,7 +4,7 @@ import { AdminProductsList } from "@/components/admin/admin-products-list";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { redirect } from "next/navigation";
+import {requireAdmin} from "@/app/admin/actions";
 
 interface AdminProductsPageProps {
   searchParams: Promise<{ type?: string; category?: string }>;
@@ -12,24 +12,6 @@ interface AdminProductsPageProps {
 
 async function ProductsContent({ type, category }: { type?: string; category?: string }) {
   const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/auth/login?redirect=/admin/products");
-  }
-
-  const { data: profile } = await supabase
-    .from("user_profiles")
-    .select("is_admin")
-    .eq("id", user.id)
-    .single();
-
-  if (!profile?.is_admin) {
-    redirect("/?error=unauthorized");
-  }
 
   let query = supabase.from("products").select("*").order("created_at", { ascending: false });
 
@@ -51,11 +33,6 @@ async function ProductsContent({ type, category }: { type?: string; category?: s
   }
 
   return <AdminProductsList products={products || []} />;
-}
-
-async function ProductsWrapper({ searchParams }: AdminProductsPageProps) {
-  const { type, category } = await searchParams;
-  return <ProductsContent type={type} category={category} />;
 }
 
 function FilterButtons({ type, category }: { type?: string; category?: string }) {
@@ -96,46 +73,31 @@ function FilterButtons({ type, category }: { type?: string; category?: string })
   );
 }
 
-async function FilterButtonsWrapper({ searchParams }: AdminProductsPageProps) {
+export default async function AdminProductsPage({ searchParams }: AdminProductsPageProps) {
   const { type, category } = await searchParams;
-  return <FilterButtons type={type} category={category} />;
-}
 
-export default function AdminProductsPage({ searchParams }: AdminProductsPageProps) {
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <header className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Products</h1>
-          <p className="text-muted-foreground mt-1">
-            Manage your product catalog
-          </p>
+          <p className="text-muted-foreground">Manage your product catalog</p>
         </div>
         <Link href="/admin/products/new">
-          <Button size="lg">
-            <Plus className="mr-2 h-5 w-5" />
-            Add Product
-          </Button>
+          <Button size="lg"><Plus className="mr-2 h-5 w-5" /> Add Product</Button>
         </Link>
-      </div>
+      </header>
 
-      {/* Filters */}
-      <Suspense fallback={<div className="h-9 w-96 bg-muted animate-pulse rounded" />}>
-        <FilterButtonsWrapper searchParams={searchParams} />
-      </Suspense>
+      <FilterButtons type={type} category={category} />
 
-      {/* Products List */}
-      <Suspense
-        fallback={
-          <div className="space-y-4">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="h-20 bg-muted animate-pulse rounded-lg" />
-            ))}
-          </div>
-        }
-      >
-        <ProductsWrapper searchParams={searchParams} />
+      <Suspense key={`${type}-${category}`} fallback={
+        <div className="space-y-4">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="h-20 bg-muted animate-pulse rounded-lg" />
+          ))}
+        </div>
+      }>
+        <ProductsContent type={type} category={category} />
       </Suspense>
     </div>
   );

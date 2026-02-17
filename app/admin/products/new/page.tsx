@@ -1,35 +1,12 @@
 import { Suspense } from "react";
 import { AdminProductForm } from "@/components/admin/admin-product-form";
-import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
 
 interface NewProductPageProps {
   searchParams: Promise<{ type?: string }>;
 }
 
 async function NewProductContent({ type }: { type?: string }) {
-  const supabase = await createClient();
-
-  // Check if user is authenticated and is admin
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/auth/login?redirect=/admin/products/new");
-  }
-
-  const { data: profile } = await supabase
-    .from("user_profiles")
-    .select("is_admin")
-    .eq("id", user.id)
-    .single();
-
-  if (!profile?.is_admin) {
-    redirect("/?error=unauthorized");
-  }
-
-  const productType = type || "seasonal";
+  const productType = type;
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">

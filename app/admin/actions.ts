@@ -8,7 +8,7 @@ import { handleSupabaseError } from "@/lib/utils/supabase-errors";
 /**
  * Check if current user is admin
  */
-async function requireAdmin() {
+export async function requireAdmin() {
   const supabase = await createClient();
   
   const {

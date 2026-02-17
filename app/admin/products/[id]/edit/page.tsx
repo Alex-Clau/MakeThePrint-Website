@@ -12,24 +12,6 @@ interface EditProductPageProps {
 async function EditProductContent({ productId }: { productId: string }) {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/auth/login?redirect=/admin/products");
-  }
-
-  const { data: profile } = await supabase
-    .from("user_profiles")
-    .select("is_admin")
-    .eq("id", user.id)
-    .single();
-
-  if (!profile?.is_admin) {
-    redirect("/?error=unauthorized");
-  }
-
   const { data: product, error } = await supabase
     .from("products")
     .select("*")

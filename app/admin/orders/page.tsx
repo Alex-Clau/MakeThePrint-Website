@@ -12,22 +12,7 @@ export default function AdminOrdersPage() {
 
 
 async function AdminOrdersContent() {
-  const { createClient } = await import("@/lib/supabase/server");
   const { getAllOrdersAdmin } = await import("@/lib/supabase/orders-admin");
-  const { redirect } = await import("next/navigation");
-
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/auth/login?redirect=/admin/orders");
-
-  const { data: profile } = await supabase
-    .from("user_profiles")
-    .select("is_admin")
-    .eq("id", user?.id)
-    .single();
-  if (!profile?.is_admin) redirect("/?error=unauthorized");
 
   const orders = await getAllOrdersAdmin();
 
