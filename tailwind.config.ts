@@ -58,6 +58,10 @@ export default {
           "secondary-dark": "hsl(var(--accent-secondary-dark))",
           "secondary-light": "hsl(var(--accent-secondary-light))",
         },
+        hero: {
+          title: "hsl(var(--hero-title))",
+          subhead: "hsl(var(--hero-subhead))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

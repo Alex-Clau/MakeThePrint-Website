@@ -9,6 +9,7 @@ import { NavigationMobileMenu } from "./navigation-mobile-menu";
 import { ShoppingCart } from "lucide-react";
 import { CartCount } from "./navigation/cart-count";
 import { useTranslations } from "./locale-provider";
+import Image from "next/image";
 
 export function Navigation() {
   const t = useTranslations();
@@ -18,7 +19,12 @@ export function Navigation() {
       <div className="w-full max-w-7xl mx-auto flex justify-between items-center h-14 sm:h-16 px-3 sm:px-4 lg:px-8">
         <div className="flex items-center gap-2 sm:gap-4 lg:gap-8">
           <Link href="/" className="font-bold text-base sm:text-lg lg:text-xl hover:text-accent-primary-dark">
-            {n.brand}
+            <Image src="/logoColor.png" alt="logo image" width={240} height={80}
+                   priority
+                   quality={75}
+                   className="object-contain h-10 w-auto sm:h-12 -translate-y-1"
+                   sizes="100vw"
+                   unoptimized />
           </Link>
           <div className="hidden md:flex items-center gap-4 lg:gap-6">
             <Link
