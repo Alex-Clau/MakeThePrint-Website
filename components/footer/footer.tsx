@@ -72,37 +72,6 @@ export function Footer({ messages }: { messages: Messages }) {
           </div>
           <FooterAccountLinks />
         </div>
-        {(f.legalName || f.tradeRegistry || f.fiscalCode || f.registeredAddress) && (
-          <div className="mb-6 sm:mb-8 pt-6 sm:pt-8 border-t border-accent-primary/30">
-            <h4 className="text-sm font-semibold text-accent-primary-dark mb-3">{f.companyDetails}</h4>
-            <dl className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-2 text-xs text-muted-foreground">
-              {f.legalName ? (
-                <div>
-                  <dt className="font-medium text-foreground/80">{f.legalNameLabel}</dt>
-                  <dd>{f.legalName}</dd>
-                </div>
-              ) : null}
-              {f.tradeRegistry ? (
-                <div>
-                  <dt className="font-medium text-foreground/80">{f.tradeRegistryLabel}</dt>
-                  <dd>{f.tradeRegistry}</dd>
-                </div>
-              ) : null}
-              {f.fiscalCode ? (
-                <div>
-                  <dt className="font-medium text-foreground/80">{f.fiscalCodeLabel}</dt>
-                  <dd>{f.fiscalCode}</dd>
-                </div>
-              ) : null}
-              {f.registeredAddress ? (
-                <div>
-                  <dt className="font-medium text-foreground/80">{f.registeredAddressLabel}</dt>
-                  <dd className="max-w-xs">{f.registeredAddress}</dd>
-                </div>
-              ) : null}
-            </dl>
-          </div>
-        )}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 pt-3 sm:pt-4 border-t border-accent-primary/30">
           <div className="flex flex-col items-center sm:items-start gap-2">
             <p className="text-xs text-muted-foreground text-center sm:text-left">{f.copyright}</p>
