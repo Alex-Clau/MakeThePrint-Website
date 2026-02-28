@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { AdminProductForm } from "@/components/admin/admin-product-form";
 import { notFound, redirect } from "next/navigation";
@@ -37,25 +36,7 @@ async function EditProductContent({ productId }: { productId: string }) {
   );
 }
 
-async function EditProductWrapper({ params }: EditProductPageProps) {
+export default async function EditProductPage({ params }: EditProductPageProps) {
   const { id } = await params;
   return <EditProductContent productId={id} />;
-}
-
-export default function EditProductPage({ params }: EditProductPageProps) {
-  return (
-    <Suspense
-      fallback={
-        <div className="max-w-4xl mx-auto space-y-6">
-          <div>
-            <div className="h-9 w-48 bg-muted animate-pulse rounded" />
-            <div className="h-5 w-32 bg-muted animate-pulse rounded mt-1" />
-          </div>
-          <div className="h-[600px] bg-muted animate-pulse rounded-lg" />
-        </div>
-      }
-    >
-      <EditProductWrapper params={params} />
-    </Suspense>
-  );
 }

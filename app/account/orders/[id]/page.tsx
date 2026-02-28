@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { Navigation } from "@/components/navigation";
 import { getOrderById } from "@/lib/supabase/orders";
@@ -60,19 +59,7 @@ export default function OrderDetailPage({ params }: OrderDetailPageParams) {
     <main className="min-h-screen flex flex-col">
       <Navigation />
       <div className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <Suspense
-          fallback={
-            <div className="space-y-6">
-              <div className="h-32 bg-muted animate-pulse rounded-lg" />
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 h-64 bg-muted animate-pulse rounded-lg" />
-                <div className="h-64 bg-muted animate-pulse rounded-lg" />
-              </div>
-            </div>
-          }
-        >
-          <OrderDetailWrapper params={params} />
-        </Suspense>
+        <OrderDetailWrapper params={params} />
       </div>
     </main>
   );

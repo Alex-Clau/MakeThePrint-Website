@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Navigation } from "@/components/navigation";
 import { AlertCircle, Home } from "lucide-react";
 import { messages } from "@/lib/messages";
@@ -19,12 +20,12 @@ export default function Error({
     <main className="min-h-screen flex flex-col">
       <Navigation />
       <div className="flex-1 flex items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/20 mb-4">
-            <AlertCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-semibold mb-4">{t.title}</h1>
-          <p className="text-muted-foreground mb-8">{t.description}</p>
+        <div className="text-center max-w-md w-full space-y-6">
+          <Alert variant="destructive" className="text-left">
+            <AlertCircle className="size-4" />
+            <AlertTitle>{t.title}</AlertTitle>
+            <AlertDescription>{t.description}</AlertDescription>
+          </Alert>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button onClick={reset} size="lg">
               {c.tryAgain}

@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ProductCardProps } from "@/types/components";
@@ -24,40 +23,11 @@ export function ProductCard({
   const c = messages.common;
   const r = messages.reviews;
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30, scale: 0.9, rotateX: -15 }}
-      animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
-      transition={{ 
-        duration: 0.5,
-        type: "spring",
-        stiffness: 150,
-        damping: 15,
-      }}
-      whileHover={{ 
-        y: -12,
-        scale: 1.02,
-        rotateY: 5,
-        transition: { duration: 0.3, ease: "easeOut" }
-      }}
-      whileTap={{ scale: 0.95, rotateY: -5 }}
-      style={{ perspective: 1000 }}
-      className="relative z-10 mx-3 sm:mx-0"
-    >
-      <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-2 border-accent-primary-light/20 hover:border-accent-primary/60">
-        <div className="relative">
+    <div className="relative z-10 mx-3 sm:mx-0">
+      <Card className="group overflow-hidden transition-shadow duration-200 border-2 border-accent-primary-light/20 hover:border-accent-primary/60 hover:shadow-lg">
+        <div className="relative overflow-hidden">
           <Link href={`/products/${id}`}>
-            <motion.div
-              className="relative aspect-[4/3] sm:aspect-square overflow-hidden bg-muted"
-              whileHover={{ 
-                scale: 1.1,
-                rotateZ: 2,
-              }}
-              transition={{ 
-                type: "spring", 
-                stiffness: 400, 
-                damping: 25,
-              }}
-            >
+            <div className="relative aspect-[4/3] sm:aspect-square overflow-hidden bg-muted transition-transform duration-200 ease-out group-hover:scale-[1.03]">
               <Image
                 src={image}
                 alt={name}
@@ -65,7 +35,7 @@ export function ProductCard({
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
-            </motion.div>
+            </div>
           </Link>
           <div className="absolute top-2 left-2 z-20 flex flex-col gap-2">
             {featured && (
@@ -128,7 +98,7 @@ export function ProductCard({
         )}
       </CardFooter>
     </Card>
-    </motion.div>
+    </div>
   );
 }
 

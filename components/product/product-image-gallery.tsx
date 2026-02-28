@@ -1,18 +1,18 @@
 "use client";
 
-import { motion, AnimatePresence, PanInfo } from "framer-motion";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { ProductImageGalleryProps } from "@/types/product-components";
+
+const SWIPE_THRESHOLD = 50;
 
 export function ProductImageGallery({
   images,
   alt,
   defaultImage,
 }: ProductImageGalleryProps) {
-  // Combine default image with additional images
   const allImages = defaultImage
     ? [defaultImage, ...(images || []).filter((img) => img && img !== defaultImage)]
     : images && images.length > 0
@@ -22,92 +22,63 @@ export function ProductImageGallery({
     : [];
 
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [direction, setDirection] = useState(0);
+  const touchStartX = useRef<number | null>(null);
 
   if (allImages.length === 0) {
     return null;
   }
 
-  const currentImage = allImages[selectedIndex];
-
   const nextImage = useCallback(() => {
-    setDirection(1);
     setSelectedIndex((prev) => (prev + 1) % allImages.length);
   }, [allImages.length]);
 
   const prevImage = useCallback(() => {
-    setDirection(-1);
     setSelectedIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
   }, [allImages.length]);
 
   const goToImage = (index: number) => {
-    setDirection(index > selectedIndex ? 1 : -1);
     setSelectedIndex(index);
   };
 
-  // Handle drag/swipe
-  const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-    const swipeThreshold = 50;
-    const velocityThreshold = 500;
-
-    if (info.offset.x < -swipeThreshold || info.velocity.x < -velocityThreshold) {
-      // Swiped left - go to next
-      nextImage();
-    } else if (info.offset.x > swipeThreshold || info.velocity.x > velocityThreshold) {
-      // Swiped right - go to previous
-      prevImage();
-    }
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
   };
 
-  // Slide variants for animation
-  const slideVariants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? 300 : -300,
-      opacity: 0,
-    }),
-    center: {
-      x: 0,
-      opacity: 1,
-    },
-    exit: (direction: number) => ({
-      x: direction < 0 ? 300 : -300,
-      opacity: 0,
-    }),
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const endX = e.changedTouches[0].clientX;
+    const delta = touchStartX.current - endX;
+    touchStartX.current = null;
+    if (delta > SWIPE_THRESHOLD) nextImage();
+    else if (delta < -SWIPE_THRESHOLD) prevImage();
   };
 
   return (
     <div className="relative w-full">
       {/* Main Image Display */}
-      <div className="relative w-full aspect-square max-w-md mx-auto min-h-[300px] overflow-hidden rounded-lg bg-muted/30 shadow-2xl">
-        <AnimatePresence initial={false} custom={direction} mode="wait">
-          <motion.div
-            key={selectedIndex}
-            custom={direction}
-            variants={slideVariants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{
-              x: { type: "spring", stiffness: 300, damping: 30 },
-              opacity: { duration: 0.2 },
-            }}
-            drag={allImages.length > 1 ? "x" : false}
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.2}
-            onDragEnd={handleDragEnd}
-            className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"
+      <div
+        className="relative w-full aspect-square max-w-md mx-auto min-h-[300px] overflow-hidden rounded-lg bg-muted/30 shadow-2xl"
+        onTouchStart={allImages.length > 1 ? handleTouchStart : undefined}
+        onTouchEnd={allImages.length > 1 ? handleTouchEnd : undefined}
+      >
+        {allImages.map((src, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 w-full h-full transition-opacity duration-200 ease-out ${
+              index === selectedIndex ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+            }`}
           >
             <Image
-              src={currentImage}
-              alt={`${alt} - Image ${selectedIndex + 1}`}
+              src={src}
+              alt={`${alt} - Image ${index + 1}`}
               fill
               className="object-contain pointer-events-none select-none"
               sizes="(max-width: 768px) 100vw, 50vw"
-              priority={selectedIndex === 0}
+              priority={index === 0}
               draggable={false}
             />
-          </motion.div>
-        </AnimatePresence>
+          </div>
+        ))}
 
         {/* Navigation Arrows */}
         {allImages.length > 1 && (
@@ -162,16 +133,15 @@ export function ProductImageGallery({
         <div className="mt-4">
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide justify-center">
             {allImages.map((image, index) => (
-              <motion.button
+              <button
                 key={index}
+                type="button"
                 onClick={() => goToImage(index)}
-                className={`relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
+                className={`relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 hover:scale-105 active:scale-95 ${
                   selectedIndex === index
                     ? "border-accent-primary-dark scale-105 shadow-lg"
                     : "border-transparent hover:border-accent-primary/50 opacity-70 hover:opacity-100"
                 }`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
               >
                 <Image
                   src={image}
@@ -182,13 +152,9 @@ export function ProductImageGallery({
                   draggable={false}
                 />
                 {selectedIndex === index && (
-                  <motion.div
-                    className="absolute inset-0 bg-accent-primary/20"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                  />
+                  <div className="absolute inset-0 bg-accent-primary/20" />
                 )}
-              </motion.button>
+              </button>
             ))}
           </div>
         </div>

@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { Navigation } from "@/components/navigation";
 import { getWishlist } from "@/lib/supabase/wishlist";
@@ -28,17 +27,7 @@ export default async function WishlistPage() {
       <div className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-3xl sm:text-4xl font-bold mb-8">{t.myWishlist}</h1>
 
-        <Suspense
-          fallback={
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-96 bg-muted animate-pulse rounded-lg" />
-              ))}
-            </div>
-          }
-        >
-          <WishlistItems />
-        </Suspense>
+        <WishlistItems />
       </div>
     </main>
   );

@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { Navigation } from "@/components/navigation";
 import { CartContent } from "@/components/cart/cart-content";
@@ -28,17 +27,7 @@ export default function CartPage() {
           Shopping Cart
         </h1>
 
-        <Suspense
-          fallback={
-            <div className="space-y-4">
-              {[...Array(2)].map((_, i) => (
-                <div key={i} className="h-32 bg-muted animate-pulse rounded-lg" />
-              ))}
-            </div>
-          }
-        >
-          <CartItems />
-        </Suspense>
+        <CartItems />
       </div>
     </main>
   );

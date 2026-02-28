@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { Navigation } from "@/components/navigation";
 import { Card, CardContent } from "@/components/ui/card";
@@ -120,17 +119,7 @@ export default async function OrdersPage() {
           </Button>
         </div>
 
-        <Suspense
-          fallback={
-            <div className="space-y-4">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-32 bg-muted animate-pulse rounded-lg" />
-              ))}
-            </div>
-          }
-        >
-          <OrdersList />
-        </Suspense>
+        <OrdersList />
       </div>
     </main>
   );

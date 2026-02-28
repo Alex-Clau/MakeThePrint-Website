@@ -1,21 +1,8 @@
 import Link from "next/link";
-import {Suspense} from "react";
+import { Navigation } from "@/components/navigation";
+import { messages } from "@/lib/messages";
 
-export default function FAQPage() {
-  return (
-    <main className="min-h-screen flex flex-col">
-      <Suspense fallback={<div className="flex-1 max-w-3xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">Loading...</div>}>
-        <FAQContent />
-      </Suspense>
-    </main>
-  );
-}
-
-
-async function FAQContent() {
-  const { messages } = await import("@/lib/messages");
-  const { Navigation } = await import("@/components/navigation");
-
+export default async function FAQPage() {
   const f = messages.faq;
 
   return (

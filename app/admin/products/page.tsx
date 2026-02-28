@@ -1,4 +1,3 @@
-import {Suspense} from "react";
 import {createClient} from "@/lib/supabase/server";
 import {AdminProductsList} from "@/components/admin/admin-products-list";
 import Link from "next/link";
@@ -112,24 +111,10 @@ export default async function AdminProductsPage({searchParams}: AdminProductsPag
         category={category}
       />
 
-      <Suspense
-        key={`${type}-${category}`}
-        fallback={
-          <div className="space-y-4">
-            {[...Array(5)].map((_, i) => (
-              <div
-                key={i}
-                className="h-20 bg-muted animate-pulse rounded-lg"
-              />
-            ))}
-          </div>
-        }
-      >
-        <ProductsContent
-          type={type}
-          category={category}
-        />
-      </Suspense>
+      <ProductsContent
+        type={type}
+        category={category}
+      />
     </div>
   );
 }

@@ -1,13 +1,16 @@
 import Link from "next/link";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {Suspense} from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export default function AdminOrdersPage() {
-  return (
-    <Suspense fallback={<div className="space-y-6">Loading orders...</div>}>
-      <AdminOrdersContent/>
-    </Suspense>
-  );
+  return <AdminOrdersContent />;
 }
 
 
@@ -27,27 +30,23 @@ async function AdminOrdersContent() {
           {orders.length === 0 ? (
             <p className="text-muted-foreground">No orders yet.</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                <tr className="border-b">
-                  <th className="text-left py-2">Order</th>
-                  <th className="text-left py-2">Date</th>
-                  <th className="text-left py-2">Status</th>
-                  <th className="text-left py-2">Payment</th>
-                  <th className="text-right py-2">Total</th>
-                </tr>
-                </thead>
-                <tbody>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Order</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Payment</TableHead>
+                  <TableHead className="text-right">Total</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {orders.map((order) => {
                   const addr = (order.shipping_address as Record<string, unknown>) || {};
                   const email = (addr.email as string) || "—";
                   return (
-                    <tr
-                      key={order.id}
-                      className="border-b"
-                    >
-                      <td className="py-2">
+                    <TableRow key={order.id}>
+                      <TableCell>
                         <Link
                           href={`/admin/orders/${order.id}`}
                           className="text-accent-primary-dark hover:underline"
@@ -55,19 +54,16 @@ async function AdminOrdersContent() {
                           {order.id.slice(0, 8)}
                         </Link>
                         <span className="block text-xs text-muted-foreground">{email}</span>
-                      </td>
-                      <td className="py-2">
-                        {new Date(order.created_at).toLocaleDateString()}
-                      </td>
-                      <td className="py-2 capitalize">{order.status}</td>
-                      <td className="py-2 capitalize">{order.payment_status}</td>
-                      <td className="py-2 text-right">{order.total_amount.toFixed(2)} RON</td>
-                    </tr>
+                      </TableCell>
+                      <TableCell>{new Date(order.created_at).toLocaleDateString()}</TableCell>
+                      <TableCell className="capitalize">{order.status}</TableCell>
+                      <TableCell className="capitalize">{order.payment_status}</TableCell>
+                      <TableCell className="text-right">{order.total_amount.toFixed(2)} RON</TableCell>
+                    </TableRow>
                   );
                 })}
-                </tbody>
-              </table>
-            </div>
+              </TableBody>
+            </Table>
           )}
         </CardContent>
       </Card>

@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { Navigation } from "@/components/navigation";
 import { ProductsContent } from "@/components/product/products-content";
 import { getProducts } from "@/lib/supabase/products";
@@ -31,20 +30,7 @@ export default async function ProductsPage() {
           </div>
         </div>
 
-        <Suspense
-          fallback={
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-              {[...Array(8)].map((_, i) => (
-                <div
-                  key={i}
-                  className="h-64 bg-muted animate-pulse rounded-lg"
-                />
-              ))}
-            </div>
-          }
-        >
-          <ProductsList />
-        </Suspense>
+        <ProductsList />
       </div>
     </main>
   );

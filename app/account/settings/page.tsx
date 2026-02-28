@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { Navigation } from "@/components/navigation";
 import { getUserProfile } from "@/lib/supabase/user-profiles";
@@ -42,16 +41,7 @@ export default function SettingsPage() {
     <main className="min-h-screen flex flex-col">
       <Navigation />
       <div className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
-        <Suspense
-          fallback={
-            <div className="space-y-6">
-              <div className="h-12 bg-muted animate-pulse rounded-lg" />
-              <div className="h-64 bg-muted animate-pulse rounded-lg" />
-            </div>
-          }
-        >
-          <SettingsContent />
-        </Suspense>
+        <SettingsContent />
       </div>
     </main>
   );

@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { Navigation } from "@/components/navigation";
 import { Card, CardContent } from "@/components/ui/card";
@@ -120,17 +119,7 @@ export default function OrderConfirmationPage({
     <main className="min-h-screen flex flex-col">
       <Navigation />
       <div className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
-        <Suspense
-          fallback={
-            <Card className="max-w-2xl mx-auto">
-              <CardContent className="p-8">
-                <div className="h-64 bg-muted animate-pulse rounded-lg" />
-              </CardContent>
-            </Card>
-          }
-        >
-          <OrderConfirmationWrapper params={params} />
-        </Suspense>
+        <OrderConfirmationWrapper params={params} />
       </div>
     </main>
   );

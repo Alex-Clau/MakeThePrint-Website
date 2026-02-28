@@ -3,6 +3,13 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { CheckCircle2, ChevronDown } from "lucide-react";
 import { CreateReviewForm } from "./create-review-form";
 import { createClient } from "@/lib/supabase/client";
@@ -18,7 +25,6 @@ export function ProductReviewsList({
 }: ProductReviewsListProps) {
   const t = messages.reviews;
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "highest" | "lowest">("newest");
-  const [showSortMenu, setShowSortMenu] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [userId, setUserId] = useState<string | undefined>(currentUserId);
 
@@ -136,66 +142,25 @@ export function ProductReviewsList({
             </Button>
           )}
           {reviews.length > 0 && (
-            <div className="relative">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowSortMenu(!showSortMenu)}
-                className="gap-2"
-              >
-                {sortBy === "newest" && t.newest}
-                {sortBy === "oldest" && t.oldest}
-                {sortBy === "highest" && t.highestRating}
-                {sortBy === "lowest" && t.lowestRating}
-                <ChevronDown className={`h-4 w-4 transition-transform ${showSortMenu ? "rotate-180" : ""}`} />
-              </Button>
-              {showSortMenu && (
-                <>
-                  <div
-                    className="fixed inset-0 z-10"
-                    onClick={() => setShowSortMenu(false)}
-                  />
-                  <div className="absolute right-0 mt-2 w-48 bg-card border border-accent-primary/20 rounded-lg shadow-lg z-20">
-                    <button
-                      onClick={() => {
-                        setSortBy("newest");
-                        setShowSortMenu(false);
-                      }}
-                      className="w-full text-left px-4 py-2 hover:bg-accent-primary/10 transition-colors text-sm"
-                    >
-                      {t.newest}
-                    </button>
-                    <button
-                      onClick={() => {
-                        setSortBy("oldest");
-                        setShowSortMenu(false);
-                      }}
-                      className="w-full text-left px-4 py-2 hover:bg-accent-primary/10 transition-colors text-sm"
-                    >
-                      {t.oldest}
-                    </button>
-                    <button
-                      onClick={() => {
-                        setSortBy("highest");
-                        setShowSortMenu(false);
-                      }}
-                      className="w-full text-left px-4 py-2 hover:bg-accent-primary/10 transition-colors text-sm"
-                    >
-                      {t.highestRating}
-                    </button>
-                    <button
-                      onClick={() => {
-                        setSortBy("lowest");
-                        setShowSortMenu(false);
-                      }}
-                      className="w-full text-left px-4 py-2 hover:bg-accent-primary/10 transition-colors text-sm"
-                    >
-                      {t.lowestRating}
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-2">
+                  {sortBy === "newest" && t.newest}
+                  {sortBy === "oldest" && t.oldest}
+                  {sortBy === "highest" && t.highestRating}
+                  {sortBy === "lowest" && t.lowestRating}
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuRadioGroup value={sortBy} onValueChange={(v) => setSortBy(v as typeof sortBy)}>
+                  <DropdownMenuRadioItem value="newest">{t.newest}</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="oldest">{t.oldest}</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="highest">{t.highestRating}</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="lowest">{t.lowestRating}</DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
       </div>

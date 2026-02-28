@@ -1,85 +1,51 @@
-import { Suspense } from "react";
 import { Navigation } from "@/components/navigation";
 import { AnimatedProductPageContent } from "@/components/product/animated-product-page-content";
-import { ProductReviews } from "@/components/product/product-reviews";
+import { ProductReviewsList } from "@/components/product/product-reviews-list";
 import { getProductById } from "@/lib/supabase/products";
+import { getProductReviews } from "@/lib/supabase/reviews";
 import { transformProductToFull } from "@/lib/utils/products";
 import { ProductPageParams } from "@/types/pages";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-async function ProductContent({ productId }: { productId: string }) {
+async function ProductMainContent({ productId }: { productId: string }) {
   const product = await getProductById(productId);
   if (!product) notFound();
-
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
   const transformedProduct = transformProductToFull(product);
+  return <AnimatedProductPageContent product={transformedProduct} />;
+}
+
+async function ReviewsContent({ productId }: { productId: string }) {
+  const [reviews, { data: { user } }] = await Promise.all([
+    getProductReviews(productId),
+    createClient().then((c) => c.auth.getUser()),
+  ]);
+  const averageRating =
+    reviews.length > 0
+      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+      : 0;
+  const totalReviews = reviews.length;
   return (
-    <>
-      <AnimatedProductPageContent product={transformedProduct} />
-      <Suspense
-        fallback={
-          <div className="space-y-6 border-t pt-8 sm:pt-12">
-            <div className="h-8 bg-muted animate-pulse rounded w-48" />
-            <div className="space-y-4">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-32 bg-muted animate-pulse rounded-lg" />
-              ))}
-            </div>
-          </div>
-        }
-      >
-        <ProductReviews productId={productId} userId={user?.id} />
-      </Suspense>
-    </>
+    <div className="space-y-6 border-t border-accent-primary/30 pt-4 sm:pt-6 lg:pt-8 relative z-10">
+      <ProductReviewsList
+        reviews={reviews}
+        currentUserId={user?.id}
+        averageRating={averageRating}
+        totalReviews={totalReviews}
+        productId={productId}
+      />
+    </div>
   );
 }
 
-async function ProductPageContent({ params }: ProductPageParams) {
+export default async function ProductDetailPage({ params }: ProductPageParams) {
   const { id } = await params;
-
-  return (
-    <Suspense
-      fallback={
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
-          <div className="space-y-4">
-            <div className="h-8 bg-muted animate-pulse rounded w-3/4" />
-            <div className="h-4 bg-muted animate-pulse rounded w-full" />
-            <div className="h-4 bg-muted animate-pulse rounded w-2/3" />
-          </div>
-          <div className="h-96 bg-muted animate-pulse rounded-lg" />
-        </div>
-      }
-    >
-      <ProductContent productId={id} />
-    </Suspense>
-  );
-}
-
-export default function ProductDetailPage({ params }: ProductPageParams) {
   return (
     <main className="min-h-screen flex flex-col">
       <Navigation />
-      
       <div className="flex-1 max-w-7xl mx-auto w-full px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-12">
-        <Suspense
-          fallback={
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12">
-              <div className="space-y-4">
-                <div className="h-8 bg-muted animate-pulse rounded w-3/4" />
-                <div className="h-4 bg-muted animate-pulse rounded w-full" />
-                <div className="h-4 bg-muted animate-pulse rounded w-2/3" />
-              </div>
-              <div className="h-96 bg-muted animate-pulse rounded-lg" />
-            </div>
-          }
-        >
-          <ProductPageContent params={params} />
-        </Suspense>
+        <ProductMainContent productId={id} />
+        <ReviewsContent productId={id} />
       </div>
     </main>
   );

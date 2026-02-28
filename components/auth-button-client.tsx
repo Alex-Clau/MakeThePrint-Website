@@ -7,6 +7,7 @@ import { LogoutButton } from "./logout-button";
 import { User } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { messages } from "@/lib/messages";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function AuthButtonClient() {
   const c = messages.common;
@@ -48,8 +49,8 @@ export function AuthButtonClient() {
   if (isLoading) {
     return (
       <div className="flex gap-2">
-        <div className="h-9 w-16 bg-muted animate-pulse rounded" />
-        <div className="h-9 w-16 bg-muted animate-pulse rounded" />
+        <Skeleton className="h-9 w-16 rounded" />
+        <Skeleton className="h-9 w-16 rounded" />
       </div>
     );
   }

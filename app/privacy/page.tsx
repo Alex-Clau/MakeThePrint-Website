@@ -1,17 +1,7 @@
-import { Suspense } from "react";
+import { Navigation } from "@/components/navigation";
+import { messages } from "@/lib/messages";
 
-export default function PrivacyPage() {
-  return (
-    <Suspense fallback={<div className="min-h-screen flex flex-col">Loading...</div>}>
-      <PrivacyContent />
-    </Suspense>
-  );
-}
-
-async function PrivacyContent() {
-  const { Navigation } = await import("@/components/navigation");
-  const { messages } = await import("@/lib/messages");
-
+export default async function PrivacyPage() {
   const p = messages.privacy;
 
   return (
