@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe/server";
 import { createClient } from "@/lib/supabase/server";
+import { setOrderPaid, getOrderForPayment } from "@/lib/supabase/orders";
+import { clearCart } from "@/lib/supabase/cart";
 import { sendOrderConfirmationEmails } from "@/lib/email/send-order-confirmation";
 
 export async function POST(request: NextRequest) {
@@ -47,51 +49,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data: order, error: fetchError } = await supabase
-      .from("orders")
-      .select("id, payment_status")
-      .eq("id", orderId)
-      .eq("user_id", user.id)
-      .single();
-
-    if (fetchError || !order) {
-      return NextResponse.json(
-        { error: "Order not found" },
-        { status: 404 }
-      );
-    }
-
+    const order = await getOrderForPayment(orderId, user.id);
     if (order.payment_status === "paid") {
       return NextResponse.json({ orderId, alreadyPaid: true });
     }
 
-    const { error: updateError } = await supabase
-      .from("orders")
-      .update({
-        payment_status: "paid",
-        status: "confirmed",
-        payment_intent_id: paymentIntentId,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", orderId)
-      .eq("user_id", user.id);
-
-    if (updateError) {
-      return NextResponse.json(
-        { error: "Failed to update order" },
-        { status: 500 }
-      );
-    }
-
-    await supabase.from("cart").delete().eq("user_id", user.id);
-
+    await setOrderPaid(orderId, user.id, paymentIntentId);
+    await clearCart(user.id);
     await sendOrderConfirmationEmails(orderId);
 
     return NextResponse.json({ orderId });
-  } catch {
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "Internal server error";
     return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
+      { error: message },
+      { status: message === "Order not found" ? 404 : 500 }
     );
   }
 }

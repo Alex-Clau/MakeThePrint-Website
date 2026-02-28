@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { ProductCardProps } from "@/types/components";
 import { ProductCardActions } from "./product-card-actions";
 import { messages } from "@/lib/messages";
@@ -17,6 +16,7 @@ export function ProductCard({
   featured,
   rating,
   review_count,
+  isInWishlist = false,
 }: ProductCardProps) {
   const isInquire = category === "inquire";
   const t = messages.product;
@@ -37,66 +37,56 @@ export function ProductCard({
               />
             </div>
           </Link>
-          <div className="absolute top-2 left-2 z-20 flex flex-col gap-2">
-            {featured && (
-              <Badge className="bg-accent-primary-dark text-white">
-                {t.featured}
-              </Badge>
-            )}
-            {isInquire && (
-              <Badge className="bg-green-600 text-white">
-                {t.customInquiry}
-              </Badge>
-            )}
-          </div>
           <div className="absolute top-2 right-2 z-20">
-            <ProductCardActions productId={id} showWishlistOnly />
+            <ProductCardActions productId={id} showWishlistOnly isInWishlist={isInWishlist} />
           </div>
         </div>
-      <CardContent className="p-3 sm:p-4">
+      <CardContent className="p-4 flex flex-col gap-3">
         <Link href={`/products/${id}`}>
           <h3 className="font-semibold text-base sm:text-lg group-hover:text-accent-primary-dark transition-colors line-clamp-2">
             {name}
           </h3>
         </Link>
-      </CardContent>
-      <CardFooter className="p-4 sm:p-4 pt-0 flex flex-col gap-3">
-        <div className="w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-0">
-          <div>
+        <div className="w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-2 min-h-9">
+          <div className="flex items-center min-w-0">
             {isInquire ? (
-              <p className="text-sm sm:text-base font-medium text-muted-foreground">{t.contactForPricing}</p>
+              <p className="text-sm font-medium text-muted-foreground">{t.contactForPricing}</p>
             ) : (
-              <p className="text-lg sm:text-lg font-bold">{price.toFixed(2)} {c.ron}</p>
+              <p className="text-sm font-bold">{price.toFixed(2)} {c.ron}</p>
             )}
           </div>
-          {!isInquire && (
-            <div className="w-full sm:w-auto">
-              <ProductCardActions productId={id} showCartOnly />
-            </div>
+          <div className="w-full sm:w-auto flex-shrink-0">
+            {!isInquire && (
+              <ProductCardActions productId={id} showCartOnly isInWishlist={isInWishlist} />
+            )}
+          </div>
+        </div>
+        <div className="w-full flex items-center gap-1.5 pt-2 border-t border-border/50 min-h-6">
+          {rating !== undefined && rating > 0 ? (
+            <>
+              <div className="flex items-center">
+                {[...Array(5)].map((_, i) => (
+                  <span
+                    key={i}
+                    className={`text-xs sm:text-sm ${
+                      i < Math.floor(rating)
+                        ? "text-yellow-400"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    ★
+                  </span>
+                ))}
+              </div>
+              <span className="text-[10px] sm:text-xs text-muted-foreground">
+                {review_count !== undefined ? `${review_count} ${review_count === 1 ? r.review : r.reviews}` : ""}
+              </span>
+            </>
+          ) : (
+            <span className="text-xs text-muted-foreground/70">{r.noReviewsYet}</span>
           )}
         </div>
-        {rating !== undefined && rating > 0 && (
-          <div className="w-full flex items-center gap-1.5 border-t border-accent-primary/10 pt-3">
-            <div className="flex items-center">
-              {[...Array(5)].map((_, i) => (
-                <span
-                  key={i}
-                  className={`text-xs sm:text-sm ${
-                    i < Math.floor(rating)
-                      ? "text-yellow-400"
-                      : "text-muted-foreground"
-                  }`}
-                >
-                  ★
-                </span>
-              ))}
-            </div>
-            <span className="text-[10px] sm:text-xs text-muted-foreground">
-              {review_count !== undefined ? `${review_count} ${review_count === 1 ? r.review : r.reviews}` : ''}
-            </span>
-          </div>
-        )}
-      </CardFooter>
+      </CardContent>
     </Card>
     </div>
   );

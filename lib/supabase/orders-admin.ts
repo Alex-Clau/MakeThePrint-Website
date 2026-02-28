@@ -78,3 +78,26 @@ export async function updateOrderStatusAdmin(
   if (error) throw error;
   return data;
 }
+
+/**
+ * Mark order as paid (webhook / admin). Uses service role client.
+ */
+export async function setOrderPaidAdmin(
+  orderId: string,
+  userId: string,
+  paymentIntentId: string
+) {
+  const supabase = createAdminClient();
+  const { error } = await supabase
+    .from("orders")
+    .update({
+      payment_status: "paid",
+      status: "confirmed",
+      payment_intent_id: paymentIntentId,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", orderId)
+    .eq("user_id", userId);
+
+  if (error) throw error;
+}

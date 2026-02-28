@@ -2,6 +2,41 @@ import { createClient } from "./server";
 import { handleSupabaseError } from "../utils/supabase-errors";
 
 /**
+ * Get aggregate rating and review count for multiple products (for listing cards).
+ */
+export async function getProductReviewStats(productIds: string[]): Promise<
+  Map<string, { rating: number; review_count: number }>
+> {
+  if (productIds.length === 0) return new Map();
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("product_reviews")
+    .select("product_id, rating")
+    .in("product_id", productIds);
+
+  if (error) {
+    throw handleSupabaseError(error);
+  }
+
+  const map = new Map<string, { sum: number; count: number }>();
+  for (const row of data ?? []) {
+    const cur = map.get(row.product_id) ?? { sum: 0, count: 0 };
+    cur.sum += row.rating;
+    cur.count += 1;
+    map.set(row.product_id, cur);
+  }
+
+  const result = new Map<string, { rating: number; review_count: number }>();
+  map.forEach(({ sum, count }, productId) => {
+    result.set(productId, {
+      rating: Math.round((sum / count) * 100) / 100,
+      review_count: count,
+    });
+  });
+  return result;
+}
+
+/**
  * Get reviews for a product
  */
 export async function getProductReviews(productId: string) {

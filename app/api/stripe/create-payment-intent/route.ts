@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe/server";
 import { createClient } from "@/lib/supabase/server";
+import { getOrderForPayment } from "@/lib/supabase/orders";
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,19 +24,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Load order and use server-side total (don't trust client amount)
-    const { data: order, error: orderError } = await supabase
-      .from("orders")
-      .select("id, total_amount, payment_status")
-      .eq("id", orderId)
-      .eq("user_id", user.id)
-      .single();
-
-    if (orderError || !order) {
-      return NextResponse.json(
-        { error: "Order not found" },
-        { status: 404 }
-      );
+    let order: { id: string; total_amount: number; payment_status: string };
+    try {
+      order = await getOrderForPayment(orderId, user.id);
+    } catch {
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
     if (order.payment_status === "paid") {
@@ -53,9 +46,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create payment intent using order total (orderId in metadata for webhook)
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100), // Convert to bani/cents
+      amount: Math.round(amount * 100),
       currency,
       metadata: {
         userId: user.id,
@@ -71,11 +63,9 @@ export async function POST(request: NextRequest) {
       clientSecret: paymentIntent.client_secret,
       paymentIntentId: paymentIntent.id,
     });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Failed to create payment intent" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Failed to create payment intent";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
-

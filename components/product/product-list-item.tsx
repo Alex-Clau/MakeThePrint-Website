@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { ProductListItemProps } from "@/types/components";
 import { ProductCardActions } from "./product-card-actions";
 
-export function ProductListItem({ product }: ProductListItemProps) {
+export function ProductListItem({ product, isInWishlist = false }: ProductListItemProps) {
   return (
     <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-2 border-accent-primary-light/20 hover:border-accent-primary/60 relative z-10">
       <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 p-3 sm:p-4">
@@ -33,7 +33,7 @@ export function ProductListItem({ product }: ProductListItemProps) {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
               <p className="text-xl sm:text-2xl font-bold">{product.price.toFixed(2)} RON</p>
               <div className="flex items-center gap-2 w-full sm:w-auto">
-                <ProductCardActions productId={product.id} />
+                <ProductCardActions productId={product.id} isInWishlist={isInWishlist} />
               </div>
             </div>
             {product.rating !== undefined && product.rating > 0 && (

@@ -11,7 +11,16 @@ export function Footer({ messages }: { messages: Messages }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-5 gap-6 sm:gap-8 mb-6 sm:mb-8">
           <div>
-            <h3 className="font-bold text-lg mb-4 text-accent-primary-dark">{f.brand}</h3>
+            <Link href="/" className="inline-block focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded mb-4">
+              <Image
+                src="/logoColor.png"
+                alt={f.brand}
+                width={240}
+                height={80}
+                className="object-contain h-12 w-auto sm:h-16"
+                unoptimized
+              />
+            </Link>
             <p className="text-sm text-muted-foreground">{f.tagline}</p>
           </div>
           <div>

@@ -12,6 +12,7 @@ export interface ProductCardProps {
   featured?: boolean;
   rating?: number;
   review_count?: number;
+  isInWishlist?: boolean;
 }
 
 /**
@@ -48,6 +49,7 @@ export interface AnimatedProductImageProps {
  */
 export interface ProductListItemProps {
   product: ProductCardData;
+  isInWishlist?: boolean;
 }
 
 /**
@@ -55,6 +57,7 @@ export interface ProductListItemProps {
  */
 export interface ProductsContentProps {
   products: ProductCardData[];
+  wishlistProductIds?: string[];
 }
 
 /**

@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import Stripe from "stripe";
 import { stripe } from "@/lib/stripe/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { setOrderPaidAdmin } from "@/lib/supabase/orders-admin";
+import { clearCartAdmin } from "@/lib/supabase/cart";
 import { sendOrderConfirmationEmails } from "@/lib/email/send-order-confirmation";
 
 export async function POST(request: NextRequest) {
@@ -44,47 +45,17 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const supabase = createAdminClient();
-
-  const { data: order, error: fetchError } = await supabase
-    .from("orders")
-    .select("id, payment_status")
-    .eq("id", orderId)
-    .eq("user_id", userId)
-    .single();
-
-  if (fetchError || !order) {
-    return NextResponse.json(
-      { error: "Order not found" },
-      { status: 404 }
-    );
-  }
-
-  if (order.payment_status === "paid") {
+  try {
+    await setOrderPaidAdmin(orderId, userId, paymentIntent.id);
+    const { error: cartError } = await clearCartAdmin(userId);
+    if (cartError) throw cartError;
+    await sendOrderConfirmationEmails(orderId);
     return NextResponse.json({ received: true });
-  }
-
-  const { error: updateError } = await supabase
-    .from("orders")
-    .update({
-      payment_status: "paid",
-      status: "confirmed",
-      payment_intent_id: paymentIntent.id,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", orderId)
-    .eq("user_id", userId);
-
-  if (updateError) {
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Webhook handler error";
     return NextResponse.json(
-      { error: "Failed to update order" },
+      { error: message },
       { status: 500 }
     );
   }
-
-  await supabase.from("cart").delete().eq("user_id", userId);
-
-  await sendOrderConfirmationEmails(orderId);
-
-  return NextResponse.json({ received: true });
 }

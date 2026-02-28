@@ -3,14 +3,19 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { handleSupabaseError } from "@/lib/utils/supabase-errors";
+import {
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  getProductById,
+} from "@/lib/supabase/products";
 
 /**
  * Check if current user is admin
  */
 export async function requireAdmin() {
   const supabase = await createClient();
-  
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -47,22 +52,12 @@ export async function createProductAction(product: {
   custom_config?: Record<string, any>;
 }) {
   await requireAdmin();
-  
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("products")
-    .insert({
-      ...product,
-      images: product.images || [],
-    })
-    .select();
-
-  if (error) {
-    throw new Error(error.message || "Failed to create product");
-  }
-
+  const data = await createProduct({
+    ...product,
+    images: product.images || [],
+  });
   revalidatePath("/admin/products");
-  return data?.[0] || null;
+  return data ?? null;
 }
 
 /**
@@ -83,38 +78,11 @@ export async function updateProductAction(
   }>
 ) {
   await requireAdmin();
-  
-  const supabase = await createClient();
-  
-  // First verify the product exists
-  const { data: existing, error: fetchError } = await supabase
-    .from("products")
-    .select("id")
-    .eq("id", id)
-    .maybeSingle();
-  
-  if (fetchError) {
-    throw handleSupabaseError(fetchError);
-  }
-  
-  if (!existing) {
-    throw new Error("Product not found");
-  }
-  
-  // Perform the update
-  const { data, error } = await supabase
-    .from("products")
-    .update({ ...updates, updated_at: new Date().toISOString() })
-    .eq("id", id)
-    .select();
-
-  if (error) {
-    throw handleSupabaseError(error);
-  }
-
+  await getProductById(id);
+  const data = await updateProduct(id, updates);
   revalidatePath("/admin/products");
   revalidatePath(`/products/${id}`);
-  return data?.[0] || null;
+  return data ?? null;
 }
 
 /**
@@ -122,17 +90,7 @@ export async function updateProductAction(
  */
 export async function deleteProductAction(productId: string) {
   await requireAdmin();
-  
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from("products")
-    .delete()
-    .eq("id", productId);
-
-  if (error) {
-    throw handleSupabaseError(error);
-  }
-
+  await deleteProduct(productId);
   revalidatePath("/admin/products");
   return { success: true };
 }
@@ -150,6 +108,16 @@ export async function updateOrderStatusAction(
   await updateOrderStatusAdmin(orderId, status, trackingNumber);
   revalidatePath("/admin/orders");
   revalidatePath(`/admin/orders/${orderId}`);
+}
+
+/**
+ * Revalidate pages that display product cards (and wishlist state).
+ * Call after client-side wishlist add/remove so navigation to those routes shows fresh data.
+ */
+export async function revalidateWishlistPaths() {
+  revalidatePath("/");
+  revalidatePath("/products");
+  revalidatePath("/collections");
 }
 
 /**

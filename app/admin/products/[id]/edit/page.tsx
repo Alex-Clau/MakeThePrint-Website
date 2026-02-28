@@ -1,19 +1,14 @@
-import { createClient } from "@/lib/supabase/server";
+import { getProductById } from "@/lib/supabase/products";
 import { AdminProductForm } from "@/components/admin/admin-product-form";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { messages } from "@/lib/messages";
 import type { EditProductPageProps } from "@/types/admin";
 
 async function EditProductContent({ productId }: { productId: string }) {
-  const supabase = await createClient();
-
-  const { data: product, error } = await supabase
-    .from("products")
-    .select("*")
-    .eq("id", productId)
-    .single();
-
-  if (error || !product) {
+  let product;
+  try {
+    product = await getProductById(productId);
+  } catch {
     notFound();
   }
 

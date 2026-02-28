@@ -43,7 +43,7 @@ export function HeroSection() {
           aria-hidden
         />
       </div>
-      <div className="relative z-10 max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 w-full">
+      <div className="relative z-10 max-w-7xl mx-auto px-5 sm:px-4 lg:px-8 w-full">
         <div className="text-center flex flex-col justify-around min-h-[calc(100vh-3.5rem)] sm:min-h-0 sm:justify-center sm:items-center lg:block">
           <div>
             <div className="flex items-center justify-center gap-2 mb-6">

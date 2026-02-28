@@ -9,9 +9,9 @@ const maxWidthClasses = {
 } as const;
 
 const paddingClasses = {
-  default: "px-4 sm:px-6 lg:px-8 py-6 sm:py-8",
-  tight: "px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8",
-  relaxed: "px-4 sm:px-6 lg:px-8 py-8 sm:py-12",
+  default: "px-5 sm:px-6 lg:px-8 py-6 sm:py-8",
+  tight: "px-5 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-8",
+  relaxed: "px-5 sm:px-6 lg:px-8 py-8 sm:py-12",
 } as const;
 
 export interface PageLayoutProps {

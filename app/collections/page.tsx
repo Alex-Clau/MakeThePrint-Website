@@ -1,24 +1,45 @@
 import { PageLayout } from "@/components/layout/page-layout";
 import { Sparkles, Gift } from "lucide-react";
 import { getProducts } from "@/lib/supabase/products";
+import { getWishlist } from "@/lib/supabase/wishlist";
+import { getProductReviewStats } from "@/lib/supabase/reviews";
+import { createClient } from "@/lib/supabase/server";
 import { transformProductToCardData } from "@/lib/utils/products";
 import { ProductCard } from "@/components/product/product-card";
 import { messages } from "@/lib/messages";
 import type { Messages } from "@/lib/messages";
 
 async function SeasonalCollections({ messages }: { messages: Messages }) {
-  const products = await getProducts({ seasonal: true, limit: 12 });
-  const transformedProducts = products.map((p) =>
-    transformProductToCardData(p)
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const [products, wishlistItems] = await Promise.all([
+    getProducts({ seasonal: true, limit: 12 }),
+    user != null ? getWishlist(user.id) : Promise.resolve([]),
+  ]);
+  const reviewStats = await getProductReviewStats(products.map((p) => p.id));
+  const transformedProducts = products.map((p) => {
+    const stats = reviewStats.get(p.id);
+    return transformProductToCardData({ ...p, rating: stats?.rating, review_count: stats?.review_count });
+  });
+  const wishlistProductIds = new Set(
+    wishlistItems.map((item) =>
+      typeof item.products === "object" && item.products != null && "id" in item.products
+        ? String((item.products as { id: string }).id)
+        : (item as { product_id: string }).product_id
+    )
   );
   const t = messages.seasons;
 
   return (
     <div className="space-y-8">
       {transformedProducts.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-6">
           {transformedProducts.map((product) => (
-            <ProductCard key={product.id} {...product} />
+            <ProductCard
+              key={product.id}
+              {...product}
+              isInWishlist={wishlistProductIds.has(product.id)}
+            />
           ))}
         </div>
       ) : (

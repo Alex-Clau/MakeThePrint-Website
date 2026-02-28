@@ -8,10 +8,11 @@ import { ProductsContentProps } from "@/types/components";
 import { usePathname } from "next/navigation";
 import { messages } from "@/lib/messages";
 
-export function ProductsContent({ products }: ProductsContentProps) {
+export function ProductsContent({ products, wishlistProductIds = [] }: ProductsContentProps) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const pathName = usePathname();
   const t = messages.products;
+  const wishlistSet = new Set(wishlistProductIds);
 
   return (
     <>
@@ -23,15 +24,23 @@ export function ProductsContent({ products }: ProductsContentProps) {
       </div>
 
       {viewMode === "grid" ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-6">
           {products.map((product) => (
-            <ProductCard key={`${product.id}-${pathName}-${viewMode}`} {...product} />
+            <ProductCard
+              key={`${product.id}-${pathName}-${viewMode}`}
+              {...product}
+              isInWishlist={wishlistSet.has(product.id)}
+            />
           ))}
         </div>
       ) : (
-        <div className="space-y-4 sm:space-y-6">
+        <div className="space-y-6 sm:space-y-6">
           {products.map((product) => (
-            <ProductListItem key={product.id} product={product} />
+            <ProductListItem
+              key={product.id}
+              product={product}
+              isInWishlist={wishlistSet.has(product.id)}
+            />
           ))}
         </div>
       )}

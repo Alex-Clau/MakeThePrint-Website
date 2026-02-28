@@ -1,5 +1,6 @@
-import {createClient} from "./server";
-import {handleSupabaseError} from "../utils/supabase-errors";
+import { createClient } from "./server";
+import { createAdminClient } from "./admin";
+import { handleSupabaseError } from "../utils/supabase-errors";
 
 /**
  * Get user's cart items
@@ -136,5 +137,13 @@ export async function clearCart(userId: string) {
     throw handleSupabaseError(error);
   }
   return {success: true};
+}
+
+/**
+ * Clear user's cart using admin client (e.g. webhook, no user session).
+ */
+export async function clearCartAdmin(userId: string) {
+  const supabase = createAdminClient();
+  return supabase.from("cart").delete().eq("user_id", userId);
 }
 

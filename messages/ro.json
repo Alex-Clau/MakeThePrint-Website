@@ -1,12 +1,12 @@
 {
   "nav": {
-    "brand": "Make The Print",
+    "brand": "MakeThePrint",
     "customProducts": "Produse personalizate",
     "seasonalProducts": "Produse sezoniere",
     "about": "Despre noi"
   },
   "footer": {
-    "brand": "Make The Print",
+    "brand": "MakeThePrint",
     "tagline": "Produse printate 3D de calitate.",
     "shop": "Magazin",
     "allProducts": "Toate produsele",
@@ -19,7 +19,7 @@
     "terms": "Termeni și condiții",
     "privacy": "Politica de confidențialitate",
     "anpc": "ANPC",
-    "copyright": "© 2025 Make The Print. Toate drepturile rezervate.",
+    "copyright": "© 2025 MakeThePrint. Toate drepturile rezervate.",
     "companyDetails": "Date firmă",
     "legalNameLabel": "Denumire legală",
     "legalName": "IGNAT D. SILVIU PERSOANA FIZICA AUTORIZATĂ",
@@ -191,7 +191,7 @@
   "product": {
     "featured": "Recomandat",
     "customInquiry": "Cere ofertă",
-    "contactForPricing": "Contactează pentru preț",
+    "contactForPricing": "Contactează-ne pentru preț",
     "addToCart": "Adaugă în coș",
     "addToCartShort": "Adaugă",
     "addToWishlist": "Adaugă la favorite",
@@ -236,7 +236,7 @@
     "basedOn": "Bazat pe",
     "review": "recenzie",
     "reviews": "recenzii",
-    "noReviewsYet": "Nicio recenzie încă. Fii primul care lasă o recenzie!",
+    "noReviewsYet": "Fii primul care lasă o recenzie!",
     "customerReviews": "Recenzii clienți",
     "newest": "Cele mai noi",
     "oldest": "Cele mai vechi",
@@ -359,7 +359,7 @@
   "terms": {
     "title": "Termeni și condiții",
     "lastUpdated": "Ultima actualizare: 2026.",
-    "body1": "Utilizând Make The Print acceptați acești termeni. Vindem produse printate 3D; prin plasarea unei comenzi acceptați prețul afișat și politicile noastre de livrare și rambursare.",
+    "body1": "Utilizând MakeThePrint acceptați acești termeni. Vindem produse printate 3D; prin plasarea unei comenzi acceptați prețul afișat și politicile noastre de livrare și rambursare.",
     "body2": "Nu aveți voie să folosiți site-ul în scopuri ilegale sau pentru a încălca drepturile altora. Ne rezervăm dreptul de a refuza sau anula comenzi și de a modifica acești termeni; continuarea utilizării după modificări înseamnă acceptarea noilor termeni.",
     "body3": "Pentru întrebări, contactați-ne prin detaliile de pe site."
   },
