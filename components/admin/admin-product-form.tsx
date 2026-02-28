@@ -94,23 +94,25 @@ export function AdminProductForm({ product, initialType = "seasonal" }: AdminPro
 
       let cleanedConfig = formData.custom_config;
       if (formData.category === "preset") {
+        const presetConfig = formData.custom_config && "colors" in formData.custom_config ? formData.custom_config : undefined;
         cleanedConfig = {
-          colors: formData.custom_config?.colors || [],
-          fonts: formData.custom_config?.fonts || [],
-          defaultFont: formData.custom_config?.defaultFont || "",
-          sizePrices: formData.custom_config?.sizePrices || [],
-          isOutdoor: formData.custom_config?.isOutdoor ?? false,
-          isLedStrip: formData.custom_config?.isLedStrip ?? false,
-          isColor: formData.custom_config?.isColor ?? false,
-          outdoorPrice: formData.custom_config?.outdoorPrice ?? 0,
-          ledStripPrice: formData.custom_config?.ledStripPrice ?? 0,
-          colorPrice: formData.custom_config?.colorPrice ?? 0,
-          pricePerCharacter: formData.custom_config?.pricePerCharacter ?? 0,
+          colors: presetConfig?.colors || [],
+          fonts: presetConfig?.fonts || [],
+          defaultFont: presetConfig?.defaultFont || "",
+          sizePrices: presetConfig?.sizePrices || [],
+          isOutdoor: presetConfig?.isOutdoor ?? false,
+          isLedStrip: presetConfig?.isLedStrip ?? false,
+          isColor: presetConfig?.isColor ?? false,
+          outdoorPrice: presetConfig?.outdoorPrice ?? 0,
+          ledStripPrice: presetConfig?.ledStripPrice ?? 0,
+          colorPrice: presetConfig?.colorPrice ?? 0,
+          pricePerCharacter: presetConfig?.pricePerCharacter ?? 0,
         };
       } else if (formData.category === "inquire") {
+        const inquireConfig = formData.custom_config && "whatsappNumber" in formData.custom_config ? formData.custom_config : undefined;
         cleanedConfig = {
-          whatsappNumber: formData.custom_config?.whatsappNumber || "",
-          whatsappMessage: formData.custom_config?.whatsappMessage || "",
+          whatsappNumber: inquireConfig?.whatsappNumber || "",
+          whatsappMessage: inquireConfig?.whatsappMessage || "",
         };
       } else {
         cleanedConfig = undefined;

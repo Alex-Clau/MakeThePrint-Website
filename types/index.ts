@@ -17,5 +17,4 @@ export * from "./wishlist";
 export * from "./navigation";
 export * from "./admin";
 export * from "./auth";
-export * from "./ui";
 

@@ -17,31 +17,32 @@ interface AdminPresetConfigCardProps {
 
 export function AdminPresetConfigCard({ formData, setFormData }: AdminPresetConfigCardProps) {
   const t = messages.admin;
+  const presetConfig = formData.custom_config && "colors" in formData.custom_config ? formData.custom_config : undefined;
 
   const toggleColor = (color: string) => {
-    const current = formData.custom_config?.colors || [];
+    const current = presetConfig?.colors || [];
     const next = current.includes(color) ? current.filter((c) => c !== color) : [...current, color];
     setFormData({
       ...formData,
-      custom_config: { ...formData.custom_config, colors: next },
+      custom_config: { ...presetConfig, colors: next },
     });
   };
 
   const toggleFont = (font: string) => {
-    const current = formData.custom_config?.fonts || [];
+    const current = presetConfig?.fonts || [];
     const next = current.includes(font) ? current.filter((f) => f !== font) : [...current, font];
     setFormData({
       ...formData,
-      custom_config: { ...formData.custom_config, fonts: next },
+      custom_config: { ...presetConfig, fonts: next },
     });
   };
 
-  const sizePrices = formData.custom_config?.sizePrices || [];
+  const sizePrices = Array.isArray(presetConfig?.sizePrices) ? presetConfig.sizePrices : [];
   const addSizePrice = () => {
     setFormData({
       ...formData,
       custom_config: {
-        ...formData.custom_config,
+        ...presetConfig,
         sizePrices: [...sizePrices, { size: "", price: 0 }],
       },
     });
@@ -51,14 +52,14 @@ export function AdminPresetConfigCard({ formData, setFormData }: AdminPresetConf
     next[index] = { ...next[index], [field]: field === "price" ? Number(value) : value };
     setFormData({
       ...formData,
-      custom_config: { ...formData.custom_config, sizePrices: next },
+      custom_config: { ...presetConfig, sizePrices: next },
     });
   };
   const removeSizePrice = (index: number) => {
     setFormData({
       ...formData,
       custom_config: {
-        ...formData.custom_config,
+        ...presetConfig,
         sizePrices: sizePrices.filter((_, i) => i !== index),
       },
     });
@@ -77,7 +78,7 @@ export function AdminPresetConfigCard({ formData, setFormData }: AdminPresetConf
               <div key={color} className="flex items-center gap-2">
                 <Checkbox
                   id={`color-${color}`}
-                  checked={formData.custom_config?.colors?.includes(color) ?? false}
+                  checked={presetConfig?.colors?.includes(color) ?? false}
                   onCheckedChange={() => toggleColor(color)}
                 />
                 <Label htmlFor={`color-${color}`} className="cursor-pointer flex items-center gap-2">
@@ -102,7 +103,7 @@ export function AdminPresetConfigCard({ formData, setFormData }: AdminPresetConf
               <div key={font} className="flex items-center gap-2">
                 <Checkbox
                   id={`font-${font}`}
-                  checked={formData.custom_config?.fonts?.includes(font) ?? false}
+                  checked={presetConfig?.fonts?.includes(font) ?? false}
                   onCheckedChange={() => toggleFont(font)}
                 />
                 <Label htmlFor={`font-${font}`} className="cursor-pointer">
@@ -116,11 +117,11 @@ export function AdminPresetConfigCard({ formData, setFormData }: AdminPresetConf
         <div className="space-y-2">
           <Label htmlFor="defaultFont">{t.defaultFontLabel}</Label>
           <Select
-            value={formData.custom_config?.defaultFont}
+            value={presetConfig?.defaultFont}
             onValueChange={(value) =>
               setFormData({
                 ...formData,
-                custom_config: { ...formData.custom_config, defaultFont: value },
+                custom_config: { ...presetConfig, defaultFont: value },
               })
             }
           >
@@ -128,7 +129,7 @@ export function AdminPresetConfigCard({ formData, setFormData }: AdminPresetConf
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {(formData.custom_config?.fonts?.length ? formData.custom_config.fonts : PRESET_FONTS).map((font) => (
+              {(presetConfig?.fonts?.length ? presetConfig.fonts : PRESET_FONTS).map((font) => (
                 <SelectItem key={font} value={font}>
                   {font}
                 </SelectItem>
@@ -177,11 +178,11 @@ export function AdminPresetConfigCard({ formData, setFormData }: AdminPresetConf
             min="0"
             placeholder={t.pricePerCharPlaceholder}
             className="w-28"
-            value={formData.custom_config?.pricePerCharacter ?? ""}
+            value={presetConfig?.pricePerCharacter ?? ""}
             onChange={(e) =>
               setFormData({
                 ...formData,
-                custom_config: { ...formData.custom_config, pricePerCharacter: parseFloat(e.target.value) || 0 },
+                custom_config: { ...presetConfig, pricePerCharacter: parseFloat(e.target.value) || 0 },
               })
             }
           />
@@ -195,11 +196,11 @@ export function AdminPresetConfigCard({ formData, setFormData }: AdminPresetConf
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="isOutdoor"
-                  checked={formData.custom_config?.isOutdoor ?? false}
+                  checked={presetConfig?.isOutdoor ?? false}
                   onCheckedChange={(checked) =>
                     setFormData({
                       ...formData,
-                      custom_config: { ...formData.custom_config, isOutdoor: checked as boolean },
+                      custom_config: { ...presetConfig, isOutdoor: checked as boolean },
                     })
                   }
                 />
@@ -211,11 +212,11 @@ export function AdminPresetConfigCard({ formData, setFormData }: AdminPresetConf
                 min="0"
                 placeholder={t.pricePlaceholder}
                 className="w-28"
-                value={formData.custom_config?.outdoorPrice ?? ""}
+                value={presetConfig?.outdoorPrice ?? ""}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    custom_config: { ...formData.custom_config, outdoorPrice: parseFloat(e.target.value) || 0 },
+                    custom_config: { ...presetConfig, outdoorPrice: parseFloat(e.target.value) || 0 },
                   })
                 }
               />
@@ -224,11 +225,11 @@ export function AdminPresetConfigCard({ formData, setFormData }: AdminPresetConf
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="isLedStrip"
-                  checked={formData.custom_config?.isLedStrip ?? false}
+                  checked={presetConfig?.isLedStrip ?? false}
                   onCheckedChange={(checked) =>
                     setFormData({
                       ...formData,
-                      custom_config: { ...formData.custom_config, isLedStrip: checked as boolean },
+                      custom_config: { ...presetConfig, isLedStrip: checked as boolean },
                     })
                   }
                 />
@@ -240,11 +241,11 @@ export function AdminPresetConfigCard({ formData, setFormData }: AdminPresetConf
                 min="0"
                 placeholder={t.pricePlaceholder}
                 className="w-28"
-                value={formData.custom_config?.ledStripPrice ?? ""}
+                value={presetConfig?.ledStripPrice ?? ""}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    custom_config: { ...formData.custom_config, ledStripPrice: parseFloat(e.target.value) || 0 },
+                    custom_config: { ...presetConfig, ledStripPrice: parseFloat(e.target.value) || 0 },
                   })
                 }
               />
@@ -253,11 +254,11 @@ export function AdminPresetConfigCard({ formData, setFormData }: AdminPresetConf
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="isColor"
-                  checked={formData.custom_config?.isColor ?? false}
+                  checked={presetConfig?.isColor ?? false}
                   onCheckedChange={(checked) =>
                     setFormData({
                       ...formData,
-                      custom_config: { ...formData.custom_config, isColor: checked as boolean },
+                      custom_config: { ...presetConfig, isColor: checked as boolean },
                     })
                   }
                 />
@@ -269,11 +270,11 @@ export function AdminPresetConfigCard({ formData, setFormData }: AdminPresetConf
                 min="0"
                 placeholder={t.pricePlaceholder}
                 className="w-28"
-                value={formData.custom_config?.colorPrice ?? ""}
+                value={presetConfig?.colorPrice ?? ""}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    custom_config: { ...formData.custom_config, colorPrice: parseFloat(e.target.value) || 0 },
+                    custom_config: { ...presetConfig, colorPrice: parseFloat(e.target.value) || 0 },
                   })
                 }
               />
