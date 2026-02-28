@@ -36,7 +36,7 @@ export async function getProducts(options?: {
 
   if (options?.search) {
     query = query.or(
-      `name.ilike.%${options.search}%,name_ro.ilike.%${options.search}%,description.ilike.%${options.search}%`
+      `name.ilike.%${options.search}%,description.ilike.%${options.search}%`
     );
   }
 
@@ -78,11 +78,9 @@ export async function getProductById(id: string) {
  */
 export async function createProduct(product: {
   name: string;
-  name_ro?: string | null;
   description?: string;
   price: number;
   images?: string[];
-  material_options?: string[];
   featured?: boolean;
   seasonal?: boolean;
   product_type?: "custom" | "seasonal";
@@ -94,7 +92,6 @@ export async function createProduct(product: {
     .from("products")
     .insert({
       ...product,
-      material_options: product.material_options || [],
       images: product.images || [],
     })
     .select()
@@ -113,11 +110,9 @@ export async function updateProduct(
   id: string,
   updates: Partial<{
     name: string;
-    name_ro?: string | null;
     description: string;
     price: number;
     images: string[];
-    material_options: string[];
     featured: boolean;
     seasonal?: boolean;
     product_type?: "custom" | "seasonal";

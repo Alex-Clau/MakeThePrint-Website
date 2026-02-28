@@ -3,7 +3,6 @@ import { PRESET_COLORS, PRESET_FONTS } from "@/lib/constants/preset-options";
 
 export interface ProductFormData {
   name: string;
-  name_ro: string;
   description: string;
   price: number;
   images: string[];
@@ -11,7 +10,6 @@ export interface ProductFormData {
   category: string;
   featured: boolean;
   seasonal: boolean;
-  material_options: string[];
   custom_config?: {
     colors?: string[];
     fonts?: string[];

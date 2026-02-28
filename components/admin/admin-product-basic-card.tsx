@@ -93,17 +93,6 @@ export function AdminProductBasicCard({
           />
         </div>
 
-        {/* Name (Romanian) */}
-        <div className="space-y-2">
-          <Label htmlFor="name_ro">{t.productNameRo}</Label>
-          <Input
-            id="name_ro"
-            value={formData.name_ro}
-            onChange={(e) => setFormData({ ...formData, name_ro: e.target.value })}
-            placeholder={t.productNameRoPlaceholder}
-          />
-        </div>
-
         {/* Description */}
         <div className="space-y-2">
           <Label htmlFor="description">{t.descriptionLabel}</Label>

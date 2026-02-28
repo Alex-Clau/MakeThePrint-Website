@@ -42,11 +42,8 @@ export interface KeychainConfig {
 export interface Product {
   id: string;
   name: string;
-  /** Romanian display name; shown when locale is ro, fallback to name */
-  name_ro?: string | null;
   description: string;
   price: number;
-  material_options: string[];
   product_type?: "custom" | "seasonal";
   category?: "preset" | "inquire" | "finished";
   custom_config?: CustomProductConfig | KeychainConfig;

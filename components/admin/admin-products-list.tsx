@@ -15,7 +15,6 @@ import { messages } from "@/lib/messages";
 interface Product {
   id: string;
   name: string;
-  name_ro?: string | null;
   description: string;
   price: number;
   images: string[];

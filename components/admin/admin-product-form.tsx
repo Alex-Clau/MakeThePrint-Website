@@ -29,7 +29,6 @@ export function AdminProductForm({ product, initialType = "seasonal" }: AdminPro
 
   const [formData, setFormData] = useState<ProductFormData>({
     name: product?.name || "",
-    name_ro: product?.name_ro ?? "",
     description: product?.description || "",
     price: product?.price || 0,
     images: product?.images || [],
@@ -37,7 +36,6 @@ export function AdminProductForm({ product, initialType = "seasonal" }: AdminPro
     category: initialCategory,
     featured: product?.featured || false,
     seasonal: product?.seasonal || (initialType === "seasonal"),
-    material_options: product?.material_options || [],
     custom_config: product?.custom_config || getDefaultConfig(initialCategory),
   });
 
@@ -120,7 +118,6 @@ export function AdminProductForm({ product, initialType = "seasonal" }: AdminPro
 
       const productData = {
         ...formData,
-        material_options: formData.material_options.length > 0 ? formData.material_options : ["standard"],
         custom_config: cleanedConfig,
       };
 

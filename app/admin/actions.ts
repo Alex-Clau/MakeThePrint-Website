@@ -37,11 +37,9 @@ export async function requireAdmin() {
  */
 export async function createProductAction(product: {
   name: string;
-  name_ro?: string | null;
   description?: string;
   price: number;
   images?: string[];
-  material_options?: string[];
   featured?: boolean;
   seasonal?: boolean;
   product_type?: "custom" | "seasonal";
@@ -55,7 +53,6 @@ export async function createProductAction(product: {
     .from("products")
     .insert({
       ...product,
-      material_options: product.material_options || [],
       images: product.images || [],
     })
     .select();
@@ -75,11 +72,9 @@ export async function updateProductAction(
   id: string,
   updates: Partial<{
     name: string;
-    name_ro?: string | null;
     description: string;
     price: number;
     images: string[];
-    material_options: string[];
     featured: boolean;
     seasonal?: boolean;
     product_type?: "custom" | "seasonal";

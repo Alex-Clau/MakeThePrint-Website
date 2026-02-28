@@ -1,15 +1,12 @@
 import { ProductCardData } from "@/types/product";
 
 /**
- * Get product display name (RO-only: prefers name_ro, fallback to name).
+ * Get product display name
  */
 export function getProductDisplayName(product: {
   name?: string;
-  name_ro?: string | null;
 }): string {
-  if (product.name_ro?.trim()) {
-    return product.name_ro.trim();
-  }
+
   return (product.name ?? "").trim() || "";
 }
 
@@ -31,16 +28,14 @@ export function transformProductToCardData(product: any): ProductCardData {
 }
 
 /**
- * Transform database product to ProductWithImage format (keeps name_ro for display).
+ * Transform database product to ProductWithImage format
  */
 export function transformProductToFull(product: any) {
   return {
     id: product.id,
     name: product.name,
-    name_ro: product.name_ro ?? undefined,
     description: product.description || "",
     price: parseFloat(product.price),
-    material_options: (product.material_options as string[]) || [],
     product_type: product.product_type || "custom",
     category: product.category || "",
     custom_config: product.custom_config || {},
