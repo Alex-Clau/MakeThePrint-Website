@@ -1,4 +1,4 @@
-import { Navigation } from "@/components/navigation";
+import { PageLayout } from "@/components/layout/page-layout";
 import { ProductsContent } from "@/components/product/products-content";
 import { getProducts } from "@/lib/supabase/products";
 import { transformProductToCardData } from "@/lib/utils/products";
@@ -14,9 +14,9 @@ export default async function ProductsPage() {
   const t = messages.products;
 
   return (
-    <main className="min-h-screen flex flex-col">
-      <Navigation />
-      <div className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    <PageLayout
+      titleClassName="mb-0"
+      title={
         <div className="mb-6 sm:mb-8 border-b border-accent-primary/30 pb-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
             <div>
@@ -29,10 +29,10 @@ export default async function ProductsPage() {
             </div>
           </div>
         </div>
-
-        <ProductsList />
-      </div>
-    </main>
+      }
+    >
+      <ProductsList />
+    </PageLayout>
   );
 }
 

@@ -1,5 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import type { User } from "@supabase/supabase-js";
 
 /**
  * Especially important if using Fluid compute: Don't put this client in a
@@ -31,4 +33,21 @@ export async function createClient() {
       },
     },
   );
+}
+
+/**
+ * Returns the current user or redirects to login if unauthenticated.
+ * Use in server components and server actions for protected routes.
+ */
+export async function getRequiredUser(): Promise<User> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/auth/login");
+  }
+
+  return user;
 }

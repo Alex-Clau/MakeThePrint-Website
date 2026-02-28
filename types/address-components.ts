@@ -1,18 +1,10 @@
 import { AddressFormData } from "./address";
 
 /**
- * Address interface (for address list display)
+ * Address interface (optional fields, e.g. for list display).
+ * Use Partial<AddressFormData> for a single source of truth.
  */
-export interface Address {
-  firstName?: string;
-  lastName?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  zip?: string;
-  country?: string;
-  phone?: string;
-}
+export type Address = Partial<AddressFormData>;
 
 /**
  * Database Address interface

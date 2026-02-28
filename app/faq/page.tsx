@@ -1,16 +1,13 @@
 import Link from "next/link";
-import { Navigation } from "@/components/navigation";
+import { PageLayout } from "@/components/layout/page-layout";
 import { messages } from "@/lib/messages";
 
 export default async function FAQPage() {
   const f = messages.faq;
 
   return (
-    <main className="min-h-screen flex flex-col">
-      <Navigation />
-      <div className="flex-1 max-w-3xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        <h1 className="text-3xl font-bold mb-8">{f.title}</h1>
-        <dl className="space-y-6">
+    <PageLayout title={<h1 className="text-3xl font-bold">{f.title}</h1>} maxWidth="3xl" padding="relaxed">
+      <dl className="space-y-6">
           <div>
             <dt className="font-semibold text-lg">{f.q1}</dt>
             <dd className="text-muted-foreground mt-1">{f.a1}</dd>
@@ -30,7 +27,6 @@ export default async function FAQPage() {
             </dd>
           </div>
         </dl>
-      </div>
-    </main>
+    </PageLayout>
   );
 }

@@ -1,4 +1,4 @@
-import { Navigation } from "@/components/navigation";
+import { PageLayout } from "@/components/layout/page-layout";
 import { AnimatedProductPageContent } from "@/components/product/animated-product-page-content";
 import { ProductReviewsList } from "@/components/product/product-reviews-list";
 import { getProductById } from "@/lib/supabase/products";
@@ -41,12 +41,9 @@ async function ReviewsContent({ productId }: { productId: string }) {
 export default async function ProductDetailPage({ params }: ProductPageParams) {
   const { id } = await params;
   return (
-    <main className="min-h-screen flex flex-col">
-      <Navigation />
-      <div className="flex-1 max-w-7xl mx-auto w-full px-3 sm:px-4 lg:px-8 py-4 sm:py-6 lg:py-12">
-        <ProductMainContent productId={id} />
-        <ReviewsContent productId={id} />
-      </div>
-    </main>
+    <PageLayout padding="tight" contentClassName="py-4 sm:py-6 lg:py-12">
+      <ProductMainContent productId={id} />
+      <ReviewsContent productId={id} />
+    </PageLayout>
   );
 }

@@ -2,6 +2,7 @@
  * Central export point for all Supabase CRUD operations
  */
 
+export * from "./admin";
 export * from "./products";
 export * from "./cart";
 export * from "./orders";

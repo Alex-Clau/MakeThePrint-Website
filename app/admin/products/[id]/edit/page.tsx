@@ -2,10 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AdminProductForm } from "@/components/admin/admin-product-form";
 import { notFound, redirect } from "next/navigation";
 import { messages } from "@/lib/messages";
-
-interface EditProductPageProps {
-  params: Promise<{ id: string }>;
-}
+import type { EditProductPageProps } from "@/types/admin";
 
 async function EditProductContent({ productId }: { productId: string }) {
   const supabase = await createClient();

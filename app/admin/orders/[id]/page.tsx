@@ -5,12 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { OrderItemsList } from "@/components/order/order-items-list";
 import { OrderShippingInfo } from "@/components/order/order-shipping-info";
 import { OrderStatusForm } from "./order-status-form";
+import type { AdminOrderDetailPageProps } from "@/types/admin";
 
-interface PageProps {
-  params: Promise<{ id: string }>;
-}
-
-export default async function AdminOrderDetailPage({ params }: PageProps) {
+export default async function AdminOrderDetailPage({
+  params,
+}: AdminOrderDetailPageProps) {
   const { id } = await params;
 
   let order: Awaited<ReturnType<typeof getOrderByIdAdmin>>;

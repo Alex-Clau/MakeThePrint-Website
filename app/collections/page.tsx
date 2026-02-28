@@ -1,4 +1,4 @@
-import { Navigation } from "@/components/navigation";
+import { PageLayout } from "@/components/layout/page-layout";
 import { Sparkles, Gift } from "lucide-react";
 import { getProducts } from "@/lib/supabase/products";
 import { transformProductToCardData } from "@/lib/utils/products";
@@ -35,9 +35,9 @@ export default async function CollectionsPage() {
   const t = messages.seasons;
 
   return (
-    <main className="min-h-screen flex flex-col relative z-10 bg-background">
-      <Navigation />
-      <div className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+    <PageLayout
+      mainClassName="relative z-10 bg-background"
+      title={
         <div className="mb-8 sm:mb-12">
           <div className="flex items-center gap-2 mb-4">
             <Sparkles className="h-6 w-6 text-accent-primary-dark" />
@@ -49,10 +49,11 @@ export default async function CollectionsPage() {
             {t.subhead}
           </p>
         </div>
-
-        <SeasonalCollections messages={messages} />
-      </div>
-    </main>
+      }
+      padding="relaxed"
+    >
+      <SeasonalCollections messages={messages} />
+    </PageLayout>
   );
 }
 

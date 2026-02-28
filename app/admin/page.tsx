@@ -1,57 +1,44 @@
-import {createClient} from "@/lib/supabase/server";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {Package, ShoppingCart, Users, TrendingUp} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Package, ShoppingCart, Users, TrendingUp } from "lucide-react";
 import Link from "next/link";
-import {Button} from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { messages } from "@/lib/messages";
-import {requireAdmin} from "@/app/admin/actions";
+import { getDashboardStats } from "@/lib/supabase/admin";
 
 async function DashboardContent() {
-  const supabase = await createClient();
   const a = messages.admin;
-
-  // Fetch statistics
-  const [productsCount, ordersCount, customProductsCount, seasonalProductsCount] =
-    await Promise.all([
-      supabase.from("products")
-              .select("id", {count: "exact", head: true}),
-      supabase.from("orders")
-              .select("id", {count: "exact", head: true}),
-      supabase
-        .from("products")
-        .select("id", {count: "exact", head: true})
-        .eq("product_type", "custom"),
-      supabase
-        .from("products")
-        .select("id", {count: "exact", head: true})
-        .eq("product_type", "seasonal"),
-    ]);
+  const {
+    productsCount,
+    ordersCount,
+    customProductsCount,
+    seasonalProductsCount,
+  } = await getDashboardStats();
 
   const stats = [
     {
       title: a.totalProducts,
-      value: productsCount.count || 0,
+      value: productsCount,
       icon: Package,
       description: a.allProductsInCatalog,
       href: "/admin/products",
     },
     {
       title: a.customProducts,
-      value: customProductsCount.count || 0,
+      value: customProductsCount,
       icon: TrendingUp,
       description: a.customProducts,
       href: "/admin/products?type=custom",
     },
     {
       title: a.seasonalProducts,
-      value: seasonalProductsCount.count || 0,
+      value: seasonalProductsCount,
       icon: ShoppingCart,
       description: a.seasonalDecorItems,
       href: "/admin/products?type=seasonal",
     },
     {
       title: a.totalOrders,
-      value: ordersCount.count || 0,
+      value: ordersCount,
       icon: Users,
       description: a.customerOrders,
       href: "/account/orders",

@@ -1,19 +1,10 @@
-import { redirect } from "next/navigation";
-import { Navigation } from "@/components/navigation";
+import { PageLayout } from "@/components/layout/page-layout";
 import { getUserProfile } from "@/lib/supabase/user-profiles";
-import { createClient } from "@/lib/supabase/server";
+import { getRequiredUser } from "@/lib/supabase/server";
 import { ProfileForm } from "@/components/settings/profile-form";
 
 async function SettingsContent() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/auth/login");
-  }
-
+  const user = await getRequiredUser();
   const profile = await getUserProfile(user.id);
 
   return (
@@ -38,12 +29,9 @@ async function SettingsContent() {
 
 export default function SettingsPage() {
   return (
-    <main className="min-h-screen flex flex-col">
-      <Navigation />
-      <div className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
-        <SettingsContent />
-      </div>
-    </main>
+    <PageLayout maxWidth="4xl" padding="relaxed">
+      <SettingsContent />
+    </PageLayout>
   );
 }
 

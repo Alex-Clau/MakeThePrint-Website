@@ -11,18 +11,7 @@ import { deleteProductAction } from "@/app/admin/actions";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { messages } from "@/lib/messages";
-
-interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  images: string[];
-  product_type: string;
-  category: string;
-  featured: boolean;
-  seasonal: boolean;
-}
+import type { Product } from "@/types/product";
 
 export function AdminProductsList({ products }: { products: Product[] }) {
   const router = useRouter();

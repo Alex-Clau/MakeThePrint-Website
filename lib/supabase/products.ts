@@ -57,6 +57,36 @@ export async function getProducts(options?: {
 }
 
 /**
+ * Get products for admin list with optional type/category filters.
+ * Throws on error (same as getProducts, getProductById, etc.).
+ */
+export async function getAdminProducts(filters?: {
+  type?: string;
+  category?: string;
+}): Promise<Product[]> {
+  const supabase = await createClient();
+  let query = supabase
+    .from("products")
+    .select(
+      "id, name, description, price, images, featured, created_at, seasonal, product_type, category"
+    )
+    .order("created_at", { ascending: false });
+
+  if (filters?.type) {
+    query = query.eq("product_type", filters.type);
+  }
+  if (filters?.category) {
+    query = query.eq("category", filters.category);
+  }
+
+  const { data, error } = await query;
+  if (error) {
+    throw handleSupabaseError(error);
+  }
+  return (data ?? []) as Product[];
+}
+
+/**
  * Get a single product by ID
  */
 export async function getProductById(id: string) {

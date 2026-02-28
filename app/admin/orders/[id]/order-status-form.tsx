@@ -6,16 +6,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTransition } from "react";
 import { messages } from "@/lib/messages";
-
-type Props = {
-  orderId: string;
-  currentStatus: string;
-  currentTracking?: string;
-};
+import type { OrderStatusFormProps } from "@/types/admin";
 
 const STATUSES = ["pending", "confirmed", "shipped", "delivered"] as const;
 
-export function OrderStatusForm({ orderId, currentStatus, currentTracking }: Props) {
+export function OrderStatusForm({
+  orderId,
+  currentStatus,
+  currentTracking,
+}: OrderStatusFormProps) {
   const [isPending, startTransition] = useTransition();
   const t = messages.admin;
 

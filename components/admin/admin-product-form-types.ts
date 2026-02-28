@@ -1,4 +1,8 @@
-import type { SizePriceEntry } from "@/types/product";
+import type {
+  SizePriceEntry,
+  CustomProductConfig,
+  KeychainConfig,
+} from "@/types/product";
 import { PRESET_COLORS, PRESET_FONTS } from "@/lib/constants/preset-options";
 
 export interface ProductFormData {
@@ -10,21 +14,7 @@ export interface ProductFormData {
   category: string;
   featured: boolean;
   seasonal: boolean;
-  custom_config?: {
-    colors?: string[];
-    fonts?: string[];
-    defaultFont?: string;
-    sizePrices?: SizePriceEntry[];
-    isOutdoor?: boolean;
-    isLedStrip?: boolean;
-    isColor?: boolean;
-    outdoorPrice?: number;
-    ledStripPrice?: number;
-    colorPrice?: number;
-    pricePerCharacter?: number;
-    whatsappNumber?: string;
-    whatsappMessage?: string;
-  };
+  custom_config?: CustomProductConfig | KeychainConfig;
 }
 
 export function getDefaultConfig(category: string): ProductFormData["custom_config"] {

@@ -1,3 +1,8 @@
+import type { AddressFormData } from "./address";
+
+/** Shipping address (optional fields + email). Single source: AddressFormData. */
+export type OrderShippingAddress = Partial<AddressFormData> & { email?: string };
+
 export interface Order {
   id: string;
   total_amount: number;
@@ -35,17 +40,6 @@ export interface OrderDetailHeaderProps {
   createdAt: string;
   totalAmount: number;
 }
-export interface OrderShippingAddress {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  zip?: string;
-  country?: string;
-  phone?: string;
-};
 
 /**
  * Order Shipping Info component props

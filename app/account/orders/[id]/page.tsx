@@ -1,26 +1,15 @@
 import { redirect } from "next/navigation";
-import { Navigation } from "@/components/navigation";
+import { PageLayout } from "@/components/layout/page-layout";
 import { getOrderById } from "@/lib/supabase/orders";
-import { createClient } from "@/lib/supabase/server";
+import { getRequiredUser } from "@/lib/supabase/server";
 import { OrderDetailHeader } from "@/components/order/order-detail-header";
 import { OrderItemsList } from "@/components/order/order-items-list";
 import { OrderShippingInfo } from "@/components/order/order-shipping-info";
 import { notFound } from "next/navigation";
-
-interface OrderDetailPageParams {
-  params: Promise<{ id: string }>;
-}
+import type { OrderDetailPageParams } from "@/types/pages";
 
 async function OrderDetailContent({ orderId }: { orderId: string }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/auth/login");
-  }
-
+  const user = await getRequiredUser();
   const order = await getOrderById(orderId, user.id);
   if (!order) {
     notFound();
@@ -56,12 +45,9 @@ async function OrderDetailWrapper({ params }: OrderDetailPageParams) {
 
 export default function OrderDetailPage({ params }: OrderDetailPageParams) {
   return (
-    <main className="min-h-screen flex flex-col">
-      <Navigation />
-      <div className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <OrderDetailWrapper params={params} />
-      </div>
-    </main>
+    <PageLayout>
+      <OrderDetailWrapper params={params} />
+    </PageLayout>
   );
 }
 

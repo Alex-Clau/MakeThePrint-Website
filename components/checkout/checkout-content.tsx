@@ -15,6 +15,7 @@ import { addShippingAddressClient } from "@/lib/supabase/user-profiles-client";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { CheckoutContentProps } from "@/types/checkout";
+import { getShippingCost } from "@/lib/constants/shipping";
 import { messages } from "@/lib/messages";
 
 export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
@@ -54,7 +55,7 @@ export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
     }
     return sum + (item.products?.price || 0) * item.quantity;
   }, 0);
-  const shipping = subtotal > 50 ? 0 : 9.99;
+  const shipping = getShippingCost(subtotal);
   const tax = subtotal * 0.1;
   const total = subtotal + shipping + tax;
 

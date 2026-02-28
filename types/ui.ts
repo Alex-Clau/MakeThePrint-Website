@@ -1,21 +1,5 @@
-import * as React from "react";
-import { VariantProps } from "class-variance-authority";
-
 /**
- * Button component props
- * Note: This extends VariantProps in the actual component
+ * UI component props (Button, Badge, etc.) are defined in the components themselves
+ * so they can extend the correct CVA variant types. Import from the component:
+ * e.g. import type { ButtonProps } from "@/components/ui/button";
  */
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<any> {
-  asChild?: boolean;
-}
-
-/**
- * Badge component props
- * Note: This extends VariantProps in the actual component
- */
-export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<any> {}
-

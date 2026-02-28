@@ -1,24 +1,15 @@
-import { redirect } from "next/navigation";
-import { Navigation } from "@/components/navigation";
+import { PageLayout } from "@/components/layout/page-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Truck, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { getOrders } from "@/lib/supabase/orders";
-import { createClient } from "@/lib/supabase/server";
+import { getRequiredUser } from "@/lib/supabase/server";
 import { messages } from "@/lib/messages";
 
 async function OrdersList() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/auth/login");
-  }
-
+  const user = await getRequiredUser();
   const t = messages.account;
   const c = messages.common;
 
@@ -109,19 +100,18 @@ export default async function OrdersPage() {
   const c = messages.common;
   const t = messages.account;
   return (
-    <main className="min-h-screen flex flex-col">
-      <Navigation />
-      <div className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
+    <PageLayout
+      title={
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">{c.orderHistory}</h1>
           <Button variant="outline" size="sm" className="h-9 sm:h-10 w-full sm:w-auto" asChild>
             <Link href="/account">{t.backToAccount}</Link>
           </Button>
         </div>
-
-        <OrdersList />
-      </div>
-    </main>
+      }
+    >
+      <OrdersList />
+    </PageLayout>
   );
 }
 

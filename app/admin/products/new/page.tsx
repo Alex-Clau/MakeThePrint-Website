@@ -1,9 +1,6 @@
 import { AdminProductForm } from "@/components/admin/admin-product-form";
 import { messages } from "@/lib/messages";
-
-interface NewProductPageProps {
-  searchParams: Promise<{ type?: string }>;
-}
+import type { NewProductPageProps } from "@/types/admin";
 
 async function NewProductContent({ type }: { type?: string }) {
   const productType = type;

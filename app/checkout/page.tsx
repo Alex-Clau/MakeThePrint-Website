@@ -1,19 +1,10 @@
-import { redirect } from "next/navigation";
-import { Navigation } from "@/components/navigation";
+import { PageLayout } from "@/components/layout/page-layout";
 import { CheckoutContent } from "@/components/checkout/checkout-content";
 import { getCartItems } from "@/lib/supabase/cart";
-import { createClient } from "@/lib/supabase/server";
+import { getRequiredUser } from "@/lib/supabase/server";
 
 async function CheckoutData() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/auth/login");
-  }
-
+  const user = await getRequiredUser();
   const cartItems = await getCartItems(user.id);
 
   return <CheckoutContent cartItems={cartItems} userId={user.id} />;
@@ -21,13 +12,8 @@ async function CheckoutData() {
 
 export default function CheckoutPage() {
   return (
-    <main className="min-h-screen flex flex-col">
-      <Navigation />
-      <div className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-6 sm:mb-8">Checkout</h1>
-
-        <CheckoutData />
-      </div>
-    </main>
+    <PageLayout title="Checkout">
+      <CheckoutData />
+    </PageLayout>
   );
 }

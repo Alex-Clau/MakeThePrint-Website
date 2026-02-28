@@ -1,38 +1,26 @@
-import {createClient} from "@/lib/supabase/server";
-import {AdminProductsList} from "@/components/admin/admin-products-list";
+import { getAdminProducts } from "@/lib/supabase/products";
+import { AdminProductsList } from "@/components/admin/admin-products-list";
 import Link from "next/link";
-import {Button} from "@/components/ui/button";
-import {Plus} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import type { AdminProductsPageProps } from "@/types/admin";
+import type { Product } from "@/types/product";
 
-interface AdminProductsPageProps {
-  searchParams: Promise<{ type?: string; category?: string }>;
-}
-
-async function ProductsContent({type, category}: { type?: string; category?: string }) {
-  const supabase = await createClient();
-
-  let query = supabase.from("products")
-                      .select("id, name, description, price, images, featured, created_at, seasonal, product_type, category")
-                      .order("created_at", {ascending: false});
-
-  if (type) {
-    query = query.eq("product_type", type);
-  }
-  if (category) {
-    query = query.eq("category", category);
-  }
-
-  const {data: products, error} = await query;
-
-  if (error) {
+async function ProductsContent({
+  type,
+  category,
+}: { type?: string; category?: string }) {
+  try {
+    const products: Product[] = await getAdminProducts({ type, category });
+    return <AdminProductsList products={products} />;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Failed to load products";
     return (
       <div className="text-center py-12">
-        <p className="text-red-500">Error loading products: {error.message}</p>
+        <p className="text-red-500">Error loading products: {message}</p>
       </div>
     );
   }
-
-  return <AdminProductsList products={products || []}/>;
 }
 
 function FilterButtons({type, category}: { type?: string; category?: string }) {
