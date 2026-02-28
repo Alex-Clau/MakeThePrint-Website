@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Upload, X, Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
+import { messages } from "@/lib/messages";
 
 interface AdminImageUploadProps {
   images: string[];
@@ -82,7 +83,7 @@ export function AdminImageUpload({
     if (!files || files.length === 0) return;
 
     if (images.length + files.length > maxImages) {
-      toast.error(`Maximum ${maxImages} images allowed`);
+      toast.error(messages.admin.maxImagesAllowed.replace("{max}", String(maxImages)));
       return;
     }
 
@@ -96,13 +97,13 @@ export function AdminImageUpload({
 
         // Validate file type
         if (!file.type.startsWith("image/")) {
-          toast.error(`${file.name} is not an image`);
+          toast.error(messages.admin.notAnImage.replace("{name}", file.name));
           continue;
         }
 
         // Validate file size (max 10MB)
         if (file.size > 10 * 1024 * 1024) {
-          toast.error(`${file.name} is too large (max 10MB)`);
+          toast.error(messages.admin.tooLarge.replace("{name}", file.name));
           continue;
         }
 
@@ -111,17 +112,17 @@ export function AdminImageUpload({
           newImages.push(compressedImage);
         } catch (error) {
           console.error("Error compressing image:", error);
-          toast.error(`Failed to process ${file.name}`);
+          toast.error(messages.admin.failedToProcess.replace("{name}", file.name));
         }
       }
 
       if (newImages.length > 0) {
         onChange([...images, ...newImages]);
-        toast.success(`Added ${newImages.length} image(s)`);
+        toast.success(messages.admin.addedImages.replace("{count}", String(newImages.length)));
       }
     } catch (error) {
       console.error("Error uploading images:", error);
-      toast.error("Failed to upload images");
+      toast.error(messages.admin.failedToUploadImages);
     } finally {
       setUploading(false);
       if (fileInputRef.current) {
@@ -156,7 +157,7 @@ export function AdminImageUpload({
   const handleRemove = (index: number) => {
     const newImages = images.filter((_, i) => i !== index);
     onChange(newImages);
-    toast.success("Image removed");
+    toast.success(messages.admin.imageRemoved);
   };
 
   const handleReorder = (fromIndex: number, toIndex: number) => {
@@ -183,7 +184,7 @@ export function AdminImageUpload({
         <div className="p-8 text-center">
           <Upload className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
           <p className="text-sm text-muted-foreground mb-4">
-            Drag and drop images here, or click to select
+            {messages.admin.dragDropImages}
           </p>
           <input
             ref={fileInputRef}
@@ -200,12 +201,12 @@ export function AdminImageUpload({
             disabled={uploading || images.length >= maxImages}
           >
             <ImageIcon className="mr-2 h-4 w-4" />
-            {uploading ? "Processing..." : "Select Images"}
+            {uploading ? messages.checkout.processing : messages.admin.selectImages}
           </Button>
           <p className="text-xs text-muted-foreground mt-4">
-            Max {maxImages} images. Images will be auto-compressed and converted to WebP.
+            {messages.admin.maxImagesCompressed.replace("{max}", String(maxImages))}
             <br />
-            {images.length}/{maxImages} images uploaded
+            {messages.admin.imagesUploadedCount.replace("{current}", String(images.length)).replace("{max}", String(maxImages))}
           </p>
         </div>
       </Card>
@@ -224,7 +225,7 @@ export function AdminImageUpload({
                 />
                 {index === 0 && (
                   <div className="absolute top-2 left-2 bg-accent-primary text-white text-xs px-2 py-1 rounded">
-                    Main
+                    {messages.admin.main}
                   </div>
                 )}
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
@@ -243,7 +244,7 @@ export function AdminImageUpload({
                       size="sm"
                       onClick={() => handleReorder(index, 0)}
                     >
-                      Make Main
+                      {messages.admin.makeMain}
                     </Button>
                   )}
                 </div>
@@ -255,7 +256,7 @@ export function AdminImageUpload({
 
       {images.length > 0 && (
         <p className="text-xs text-muted-foreground">
-          First image will be used as the main product image. Hover over images to reorder or remove.
+          {messages.admin.firstImageMainHint}
         </p>
       )}
     </div>

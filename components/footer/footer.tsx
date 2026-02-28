@@ -1,9 +1,8 @@
 import { FooterAccountLinks } from "./footer-account-links";
 import { ThemeSwitcher } from "@/components/theme-switcher";
-import { LanguageSwitcher } from "@/components/language-switcher";
 import Link from "next/link";
 import Image from "next/image";
-import type { Messages } from "@/lib/i18n";
+import type { Messages } from "@/lib/messages";
 
 export function Footer({ messages }: { messages: Messages }) {
   const f = messages.footer;
@@ -76,7 +75,6 @@ export function Footer({ messages }: { messages: Messages }) {
           <div className="flex flex-col items-center sm:items-start gap-2">
             <p className="text-xs text-muted-foreground text-center sm:text-left">{f.copyright}</p>
             <div className="flex items-center gap-2">
-              <LanguageSwitcher />
               <ThemeSwitcher />
             </div>
           </div>

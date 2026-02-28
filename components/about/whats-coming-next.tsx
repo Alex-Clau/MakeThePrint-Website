@@ -1,10 +1,10 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function WhatsComingNext() {
-  const t = useTranslations().about;
+  const t = messages.about;
   return (
     <section className="mb-8">
       <Card>

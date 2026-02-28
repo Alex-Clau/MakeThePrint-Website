@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { CustomLettersFormProps } from "@/types/product-components";
 import { getPriceForSize, getSizeLabels } from "@/lib/utils/custom-letters-pricing";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function CustomLettersForm({
   availableFonts,
@@ -15,8 +15,8 @@ export function CustomLettersForm({
   onTextChange,
   onConfigChange,
 }: CustomLettersFormProps) {
-  const t = useTranslations().product;
-  const c = useTranslations().common;
+  const t = messages.product;
+  const c = messages.common;
   const sizeLabels = getSizeLabels(customConfig.sizePrices);
   const firstSize = sizeLabels[0] ?? "";
 

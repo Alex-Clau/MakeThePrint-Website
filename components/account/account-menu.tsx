@@ -3,10 +3,10 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Package, Settings, Heart, MapPin } from "lucide-react";
 import Link from "next/link";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function AccountMenu() {
-  const t = useTranslations().account;
+  const t = messages.account;
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
       <Link href="/account/orders">

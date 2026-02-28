@@ -7,7 +7,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ProductCardProps } from "@/types/components";
 import { ProductCardActions } from "./product-card-actions";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function ProductCard({
   id,
@@ -20,9 +20,9 @@ export function ProductCard({
   review_count,
 }: ProductCardProps) {
   const isInquire = category === "inquire";
-  const t = useTranslations().product;
-  const c = useTranslations().common;
-  const r = useTranslations().reviews;
+  const t = messages.product;
+  const c = messages.common;
+  const r = messages.reviews;
   return (
     <motion.div
       initial={{ opacity: 0, y: 30, scale: 0.9, rotateX: -15 }}

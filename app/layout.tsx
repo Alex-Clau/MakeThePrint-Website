@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
-import { LocaleContent } from "@/components/locale-content";
-import { LocaleFallback } from "@/components/locale-fallback";
+import { ToastProvider } from "@/components/providers/toast-provider";
+import { Footer } from "@/components/footer/footer";
+import { messages } from "@/lib/messages";
 import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -12,8 +12,9 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Make The Print - Premium 3D Printed Products",
-  description: "Discover our collection of high-quality 3D printed items. From functional prototypes to artistic creations, we bring precision and innovation to every print.",
+  title: "Make The Print - Produse printate 3D de calitate",
+  description:
+    "Descoperă colecția noastră de produse printate 3D de calitate. De la prototipuri funcționale la creații artistice, aducem precizie și inovație în fiecare print.",
 };
 
 const geistSans = Geist({
@@ -28,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="ro" suppressHydrationWarning>
       <body className={`${geistSans.className} antialiased`}>
         <ThemeProvider
           attribute="class"
@@ -36,9 +37,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Suspense fallback={<LocaleFallback />}>
-            <LocaleContent>{children}</LocaleContent>
-          </Suspense>
+          <ToastProvider />
+          <div className="min-h-screen flex flex-col">
+            {children}
+            <Footer messages={messages} />
+          </div>
         </ThemeProvider>
       </body>
     </html>

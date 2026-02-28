@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 import { PRESET_COLORS, PRESET_FONTS } from "@/lib/constants/preset-options";
 import type { ProductFormData } from "./admin-product-form-types";
 
@@ -16,7 +16,7 @@ interface AdminPresetConfigCardProps {
 }
 
 export function AdminPresetConfigCard({ formData, setFormData }: AdminPresetConfigCardProps) {
-  const t = useTranslations().admin;
+  const t = messages.admin;
 
   const toggleColor = (color: string) => {
     const current = formData.custom_config?.colors || [];
@@ -67,11 +67,11 @@ export function AdminPresetConfigCard({ formData, setFormData }: AdminPresetConf
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Preset Configuration</CardTitle>
+        <CardTitle>{t.presetConfigTitle}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label>Colors (select from list)</Label>
+          <Label>{t.colorsLabel}</Label>
           <div className="flex flex-wrap gap-3">
             {PRESET_COLORS.map((color) => (
               <div key={color} className="flex items-center gap-2">
@@ -114,7 +114,7 @@ export function AdminPresetConfigCard({ formData, setFormData }: AdminPresetConf
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="defaultFont">Default Font</Label>
+          <Label htmlFor="defaultFont">{t.defaultFontLabel}</Label>
           <Select
             value={formData.custom_config?.defaultFont}
             onValueChange={(value) =>
@@ -138,12 +138,12 @@ export function AdminPresetConfigCard({ formData, setFormData }: AdminPresetConf
         </div>
 
         <div className="space-y-2">
-          <Label>Sizes and prices (RON)</Label>
-          <p className="text-xs text-muted-foreground">Add one row per size (e.g. 10cm, 20cm) with its price.</p>
+          <Label>{t.sizesAndPricesLabel}</Label>
+          <p className="text-xs text-muted-foreground">{t.sizesAndPricesHint}</p>
           {sizePrices.map((entry, index) => (
             <div key={index} className="flex gap-2 items-center">
               <Input
-                placeholder="Size (e.g. 10cm)"
+                placeholder={t.sizePlaceholder}
                 value={entry.size}
                 onChange={(e) => updateSizePrice(index, "size", e.target.value)}
               />
@@ -151,7 +151,7 @@ export function AdminPresetConfigCard({ formData, setFormData }: AdminPresetConf
                 type="number"
                 step="0.01"
                 min="0"
-                placeholder="Price (RON)"
+                placeholder={t.pricePlaceholder}
                 value={entry.price || ""}
                 onChange={(e) => updateSizePrice(index, "price", e.target.value)}
               />
@@ -166,16 +166,16 @@ export function AdminPresetConfigCard({ formData, setFormData }: AdminPresetConf
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="pricePerCharacter">Price per character (RON)</Label>
+          <Label htmlFor="pricePerCharacter">{t.pricePerCharLabel}</Label>
           <p className="text-xs text-muted-foreground">
-            Adds to total as the customer types; price updates with each character. Use 0 for no per-character pricing (size + options only).
+            {t.pricePerCharHint}
           </p>
           <Input
             id="pricePerCharacter"
             type="number"
             step="0.01"
             min="0"
-            placeholder="0"
+            placeholder={t.pricePerCharPlaceholder}
             className="w-28"
             value={formData.custom_config?.pricePerCharacter ?? ""}
             onChange={(e) =>
@@ -188,8 +188,8 @@ export function AdminPresetConfigCard({ formData, setFormData }: AdminPresetConf
         </div>
 
         <div className="space-y-2">
-          <Label className="text-sm font-medium">Options on product page</Label>
-          <p className="text-xs text-muted-foreground">Enable options and set add-on price (RON) when the customer turns each on.</p>
+          <Label className="text-sm font-medium">{t.optionsOnProductPage}</Label>
+          <p className="text-xs text-muted-foreground">{t.optionsOnProductPageHint}</p>
           <div className="flex flex-col gap-3 pt-1">
             <div className="flex flex-wrap items-center gap-3">
               <div className="flex items-center space-x-2">
@@ -203,13 +203,13 @@ export function AdminPresetConfigCard({ formData, setFormData }: AdminPresetConf
                     })
                   }
                 />
-                <Label htmlFor="isOutdoor" className="cursor-pointer">Show Outdoor option</Label>
+                <Label htmlFor="isOutdoor" className="cursor-pointer">{t.showOutdoorOption}</Label>
               </div>
               <Input
                 type="number"
                 step="0.01"
                 min="0"
-                placeholder="Price (RON)"
+                placeholder={t.pricePlaceholder}
                 className="w-28"
                 value={formData.custom_config?.outdoorPrice ?? ""}
                 onChange={(e) =>
@@ -232,13 +232,13 @@ export function AdminPresetConfigCard({ formData, setFormData }: AdminPresetConf
                     })
                   }
                 />
-                <Label htmlFor="isLedStrip" className="cursor-pointer">Show LED strip option</Label>
+                <Label htmlFor="isLedStrip" className="cursor-pointer">{t.showLedStripOption}</Label>
               </div>
               <Input
                 type="number"
                 step="0.01"
                 min="0"
-                placeholder="Price (RON)"
+                placeholder={t.pricePlaceholder}
                 className="w-28"
                 value={formData.custom_config?.ledStripPrice ?? ""}
                 onChange={(e) =>
@@ -261,13 +261,13 @@ export function AdminPresetConfigCard({ formData, setFormData }: AdminPresetConf
                     })
                   }
                 />
-                <Label htmlFor="isColor" className="cursor-pointer">Show Color option</Label>
+                <Label htmlFor="isColor" className="cursor-pointer">{t.showColorOption}</Label>
               </div>
               <Input
                 type="number"
                 step="0.01"
                 min="0"
-                placeholder="Price (RON)"
+                placeholder={t.pricePlaceholder}
                 className="w-28"
                 value={formData.custom_config?.colorPrice ?? ""}
                 onChange={(e) =>

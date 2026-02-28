@@ -9,13 +9,10 @@ export default function PrivacyPage() {
 }
 
 async function PrivacyContent() {
-  const { cookies } = await import("next/headers");
   const { Navigation } = await import("@/components/navigation");
-  const { getDictionary, getLocaleFromCookie } = await import("@/lib/i18n");
+  const { messages } = await import("@/lib/messages");
 
-  const locale = getLocaleFromCookie((await cookies()).get("locale")?.value);
-  const t = getDictionary(locale);
-  const p = t.privacy;
+  const p = messages.privacy;
 
   return (
     <main className="min-h-screen flex flex-col">

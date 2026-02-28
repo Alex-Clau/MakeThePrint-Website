@@ -9,7 +9,7 @@ import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { ProductCardActionsProps } from "@/types/product-components";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function ProductCardActions({
   productId,
@@ -18,8 +18,8 @@ export function ProductCardActions({
   showCartOnly = false,
 }: ProductCardActionsProps) {
   const router = useRouter();
-  const t = useTranslations().product;
-  const w = useTranslations().wishlist;
+  const t = messages.product;
+  const w = messages.wishlist;
   const [isTogglingWishlist, setIsTogglingWishlist] = useState(false);
   const [inWishlist, setInWishlist] = useState(isInWishlist);
 

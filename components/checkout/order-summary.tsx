@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { Lock } from "lucide-react";
 import { OrderSummaryProps } from "@/types/checkout";
 import { OrderItem } from "./order-item";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function OrderSummary({
   cartItems,
@@ -15,9 +15,9 @@ export function OrderSummary({
   tax,
   total,
 }: OrderSummaryProps) {
-  const cartT = useTranslations().cart;
-  const checkoutT = useTranslations().checkout;
-  const c = useTranslations().common;
+  const cartT = messages.cart;
+  const checkoutT = messages.checkout;
+  const c = messages.common;
   return (
     <Card className="lg:sticky lg:top-24">
       <CardHeader>

@@ -5,11 +5,11 @@ import Link from "next/link";
 import { Button } from "./ui/button";
 import { Menu, X } from "lucide-react";
 import { NavigationMobileAuth } from "./navigation-mobile-auth";
-import { useTranslations } from "./locale-provider";
+import { messages } from "@/lib/messages";
 
 export function NavigationMobileMenu() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const n = useTranslations().nav;
+  const n = messages.nav;
   const closeMenu = () => setMobileMenuOpen(false);
 
   // Prevent body scroll when menu is open

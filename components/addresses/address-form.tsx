@@ -7,11 +7,11 @@ import { MapPin } from "lucide-react";
 import { AddressFields } from "./address-fields";
 import { AddressFormProps } from "@/types/address-components";
 import { AddressFormData } from "@/types";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function AddressForm({ onSave, initialData, onCancel }: AddressFormProps) {
-  const t = useTranslations().account;
-  const a = useTranslations().admin;
+  const t = messages.account;
+  const a = messages.admin;
   const [formData, setFormData] = useState<AddressFormData>({
     firstName: initialData?.firstName || "",
     lastName: initialData?.lastName || "",

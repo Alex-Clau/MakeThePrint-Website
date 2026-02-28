@@ -15,13 +15,13 @@ import { addShippingAddressClient } from "@/lib/supabase/user-profiles-client";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { CheckoutContentProps } from "@/types/checkout";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
   const router = useRouter();
-  const cartT = useTranslations().cart;
-  const checkoutT = useTranslations().checkout;
-  const c = useTranslations().common;
+  const cartT = messages.cart;
+  const checkoutT = messages.checkout;
+  const c = messages.common;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
@@ -111,7 +111,7 @@ export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
 
         if (!pendingRes.ok) {
           const err = await pendingRes.json().catch(() => ({}));
-          throw new Error(err.error || "Failed to create order");
+          throw new Error(err.error || checkoutT.failedCreateOrder);
         }
 
         const { orderId } = await pendingRes.json();
@@ -128,14 +128,14 @@ export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
         });
 
         if (!intentRes.ok) {
-          throw new Error("Failed to create payment intent");
+          throw new Error(checkoutT.failedCreatePaymentIntent);
         }
 
         const data = await intentRes.json();
         setClientSecret(data.clientSecret);
         setPaymentIntentId(data.paymentIntentId);
       } catch (error: any) {
-        toast.error(error?.message || "Failed to initialize payment. Please try again.");
+        toast.error(error?.message || checkoutT.failedInitializePayment);
         setClientSecret(null);
         setPaymentIntentId(null);
         setPendingOrderId(null);
@@ -150,11 +150,11 @@ export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
 
   const handlePaymentSuccess = async (paidPaymentIntentId: string) => {
     if (!pendingOrderId) {
-      toast.error("Order session expired. Please refresh and try again.");
+      toast.error(checkoutT.orderSessionExpired);
       return;
     }
     if (!formData) {
-      toast.error("Please fill in all required fields");
+      toast.error(checkoutT.fillRequiredFields);
       return;
     }
 
@@ -171,7 +171,7 @@ export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
 
       if (!confirmRes.ok) {
         const err = await confirmRes.json().catch(() => ({}));
-        throw new Error(err.error || "Failed to confirm order");
+        throw new Error(err.error || checkoutT.failedConfirmOrder);
       }
 
       if (formData.saveAddress) {
@@ -179,22 +179,22 @@ export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
           const { email, ...addressToSave } = formData.shipping;
           await addShippingAddressClient(userId, addressToSave);
         } catch (error: any) {
-          toast.error("Failed to save address, but order was placed successfully");
+          toast.error(checkoutT.failedSaveAddressOrderPlaced);
         }
       }
 
-      toast.success("Order placed successfully!");
+      toast.success(checkoutT.orderPlacedSuccess);
       router.push(`/checkout/confirmation/${pendingOrderId}`);
     } catch (error: any) {
       const friendlyMessage = getUserFriendlyError(error);
-      toast.error(friendlyMessage || "Failed to complete order");
+      toast.error(friendlyMessage || checkoutT.failedConfirmOrder);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handlePaymentError = (error: string) => {
-    toast.error(error || "Payment failed. Please try again.");
+    toast.error(error || checkoutT.paymentFailedTryAgain);
   };
 
   return (

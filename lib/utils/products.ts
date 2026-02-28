@@ -1,15 +1,13 @@
-import type { Locale } from "@/lib/i18n";
 import { ProductCardData } from "@/types/product";
 
 /**
- * Get product display name for the given locale.
- * Uses name_ro when locale is "ro" (fallback to name); otherwise uses name.
+ * Get product display name (RO-only: prefers name_ro, fallback to name).
  */
-export function getProductDisplayName(
-  product: { name?: string; name_ro?: string | null },
-  locale: Locale
-): string {
-  if (locale === "ro" && product.name_ro?.trim()) {
+export function getProductDisplayName(product: {
+  name?: string;
+  name_ro?: string | null;
+}): string {
+  if (product.name_ro?.trim()) {
     return product.name_ro.trim();
   }
   return (product.name ?? "").trim() || "";
@@ -17,19 +15,12 @@ export function getProductDisplayName(
 
 /**
  * Transform database product to ProductCardData format.
- * Pass locale to resolve name from name (EN) / name_ro (RO).
  */
-export function transformProductToCardData(
-  product: any,
-  locale?: Locale
-): ProductCardData {
-  const name =
-    locale !== undefined
-      ? getProductDisplayName(product, locale)
-      : (product.name ?? "").trim();
+export function transformProductToCardData(product: any): ProductCardData {
+  const name = getProductDisplayName(product) || (product.name ?? "");
   return {
     id: product.id,
-    name: name || (product.name ?? ""),
+    name,
     price: parseFloat(product.price),
     image: product.images?.[0] || "",
     category: product.category,
@@ -59,4 +50,3 @@ export function transformProductToFull(product: any) {
     images: (product.images as string[]) || [],
   };
 }
-

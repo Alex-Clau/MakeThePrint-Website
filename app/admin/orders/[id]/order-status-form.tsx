@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTransition } from "react";
+import { messages } from "@/lib/messages";
 
 type Props = {
   orderId: string;
@@ -16,6 +17,7 @@ const STATUSES = ["pending", "confirmed", "shipped", "delivered"] as const;
 
 export function OrderStatusForm({ orderId, currentStatus, currentTracking }: Props) {
   const [isPending, startTransition] = useTransition();
+  const t = messages.admin;
 
   return (
     <form
@@ -28,7 +30,7 @@ export function OrderStatusForm({ orderId, currentStatus, currentTracking }: Pro
     >
       <input type="hidden" name="orderId" value={orderId} />
       <div className="space-y-2">
-        <Label htmlFor="status">Status</Label>
+        <Label htmlFor="status">{t.statusLabel}</Label>
         <select
           id="status"
           name="status"
@@ -43,17 +45,17 @@ export function OrderStatusForm({ orderId, currentStatus, currentTracking }: Pro
         </select>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="trackingNumber">Tracking number</Label>
+        <Label htmlFor="trackingNumber">{t.trackingNumberLabel}</Label>
         <Input
           id="trackingNumber"
           name="trackingNumber"
-          placeholder="Optional"
+          placeholder={t.optionalPlaceholder}
           defaultValue={currentTracking}
           className="w-48"
         />
       </div>
       <Button type="submit" disabled={isPending}>
-        {isPending ? "Updating…" : "Update"}
+        {isPending ? t.updating : t.update}
       </Button>
     </form>
   );

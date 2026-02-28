@@ -6,13 +6,12 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trash2, ShoppingCart } from "lucide-react";
 import { getProductDisplayName } from "@/lib/utils/products";
-import { useLocale, useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 import { WishlistItemProps } from "@/types/wishlist";
 
 export function WishlistItem({ product, onRemove }: WishlistItemProps) {
-  const { locale } = useLocale();
-  const displayName = getProductDisplayName(product, locale);
-  const w = useTranslations().wishlist;
+  const displayName = getProductDisplayName(product);
+  const w = messages.wishlist;
   return (
     <Card className="group overflow-hidden hover:shadow-lg transition-all">
       <Link href={`/products/${product.id}`}>

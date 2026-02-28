@@ -3,6 +3,7 @@
 import { useRef, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { TextPreviewProps } from "@/types/product-components";
+import { messages } from "@/lib/messages";
 
 // Map font names to CSS font families
 const getFontFamily = (fontName: string) => {
@@ -70,7 +71,7 @@ export function TextPreview({ text, font, color, size, maxLength = MAX_TEXT_LENG
               ref={inputRef}
               value={text}
               onChange={(e) => onTextChange(e.target.value)}
-              placeholder="Enter your text"
+              placeholder={messages.product.enterYourText}
               maxLength={maxLength}
               className="w-full bg-transparent border-none outline-none resize-none text-center font-bold placeholder:text-muted-foreground/50"
               style={{
@@ -92,7 +93,7 @@ export function TextPreview({ text, font, color, size, maxLength = MAX_TEXT_LENG
                 lineHeight: "1.2",
               }}
             >
-              {text || "Enter your text"}
+              {text || messages.product.enterYourText}
             </p>
           )}
           <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground pt-2 border-t border-accent-primary/10">
@@ -104,11 +105,11 @@ export function TextPreview({ text, font, color, size, maxLength = MAX_TEXT_LENG
                 <span>•</span>
               </>
             )}
-            <span>Font: {font}</span>
+            <span>{messages.product.fontLabel} {font}</span>
             <span>•</span>
-            <span>Color: {color}</span>
+            <span>{messages.product.colorLabel} {color}</span>
             <span>•</span>
-            <span>Height: {size}</span>
+            <span>{messages.product.heightLabel} {size}</span>
           </div>
         </div>
       </CardContent>

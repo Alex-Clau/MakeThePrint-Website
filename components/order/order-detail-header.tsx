@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Package, Truck, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { OrderDetailHeaderProps } from "@/types/order";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function OrderDetailHeader({
   orderId,
@@ -13,8 +13,8 @@ export function OrderDetailHeader({
   createdAt,
   totalAmount,
 }: OrderDetailHeaderProps) {
-  const t = useTranslations().account;
-  const c = useTranslations().common;
+  const t = messages.account;
+  const c = messages.common;
   const orderDate = new Date(createdAt).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",

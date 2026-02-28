@@ -3,13 +3,11 @@
 import Image from "next/image";
 import { OrderItemProps } from "@/types/checkout";
 import { getProductDisplayName } from "@/lib/utils/products";
-import { useLocale } from "@/components/locale-provider";
 
 export function OrderItem({ item }: OrderItemProps) {
-  const { locale } = useLocale();
   const product = item.products;
   const displayName = product
-    ? getProductDisplayName(product, locale)
+    ? getProductDisplayName(product)
     : "Product";
   const imageUrl =
     product?.images && product.images.length > 0

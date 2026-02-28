@@ -6,13 +6,11 @@ import { ProductDetailForm } from "@/components/product/product-detail-form";
 import { ProductImageGallery } from "@/components/product/product-image-gallery";
 import { AnimatedProductPageContentProps } from "@/types/components";
 import { getProductDisplayName } from "@/lib/utils/products";
-import { useLocale } from "@/components/locale-provider";
 
 export function AnimatedProductPageContent({
   product,
 }: AnimatedProductPageContentProps) {
-  const { locale } = useLocale();
-  const displayName = getProductDisplayName(product, locale);
+  const displayName = getProductDisplayName(product);
   const isPreset = product.category === "preset";
   const customConfig = isPreset && product.custom_config && "fonts" in product.custom_config ? product.custom_config : null;
   const [preview, setPreview] = useState<{
@@ -22,7 +20,7 @@ export function AnimatedProductPageContent({
     size: string;
   }>({
     text: "",
-    font: customConfig?.fonts?.[0] || customConfig?.defaultFont || product.material_options[0] || "",
+    font: customConfig?.fonts?.[0] || customConfig?.defaultFont  || "",
     color: customConfig?.colors?.[0] || "black",
     size: "",
   });

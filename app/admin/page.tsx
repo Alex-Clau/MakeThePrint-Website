@@ -1,17 +1,15 @@
 import {Suspense} from "react";
-import {cookies} from "next/headers";
 import {createClient} from "@/lib/supabase/server";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Package, ShoppingCart, Users, TrendingUp} from "lucide-react";
 import Link from "next/link";
 import {Button} from "@/components/ui/button";
-import {getDictionary, getLocaleFromCookie} from "@/lib/i18n";
+import { messages } from "@/lib/messages";
 import {requireAdmin} from "@/app/admin/actions";
 
 async function DashboardContent() {
   const supabase = await createClient();
-  const locale = getLocaleFromCookie((await cookies()).get("locale")?.value);
-  const a = getDictionary(locale).admin;
+  const a = messages.admin;
 
   // Fetch statistics
   const [productsCount, ordersCount, customProductsCount, seasonalProductsCount] =

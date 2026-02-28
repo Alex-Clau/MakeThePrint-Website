@@ -9,7 +9,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -17,7 +17,7 @@ type Status = "loading" | "interstitial" | "confirming" | "error";
 
 export default function AuthConfirmPage() {
   const router = useRouter();
-  const t = useTranslations().auth;
+  const t = messages.auth;
   const [status, setStatus] = useState<Status>("loading");
   const [pendingToken, setPendingToken] = useState<{ token_hash: string; type: string } | null>(null);
 

@@ -5,11 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { CartSummaryProps } from "@/types/cart-components";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function CartSummary({ subtotal, shipping, total }: CartSummaryProps) {
-  const t = useTranslations().cart;
-  const c = useTranslations().common;
+  const t = messages.cart;
+  const c = messages.common;
   return (
     <Card className="lg:sticky lg:top-24">
       <CardHeader>

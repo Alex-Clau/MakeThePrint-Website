@@ -2,10 +2,10 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Package, Heart, Zap, TrendingUp } from "lucide-react";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function WhyWorkWithUs() {
-  const t = useTranslations().about;
+  const t = messages.about;
   return (
     <section className="mb-12 sm:mb-16">
       <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center">

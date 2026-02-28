@@ -10,7 +10,7 @@ import { Edit, Trash2, Eye } from "lucide-react";
 import { deleteProductAction } from "@/app/admin/actions";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 interface Product {
   id: string;
@@ -27,7 +27,7 @@ interface Product {
 
 export function AdminProductsList({ products }: { products: Product[] }) {
   const router = useRouter();
-  const t = useTranslations().admin;
+  const t = messages.admin;
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [optimisticProducts, setOptimisticProducts] = useState(products);
 

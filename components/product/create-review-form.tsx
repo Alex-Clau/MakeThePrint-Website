@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { useRouter } from "next/navigation";
 import { CreateReviewFormProps } from "@/types/product-components";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function CreateReviewForm({
   productId,
@@ -19,7 +19,7 @@ export function CreateReviewForm({
   onClose,
 }: CreateReviewFormProps) {
   const router = useRouter();
-  const t = useTranslations().reviews;
+  const t = messages.reviews;
   const existingReview = reviews.find((r) => r.user_id === userId);
   const [rating, setRating] = useState(existingReview?.rating || 0);
   const [comment, setComment] = useState(existingReview?.comment || "");

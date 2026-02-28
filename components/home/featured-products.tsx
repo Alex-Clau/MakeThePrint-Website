@@ -1,20 +1,11 @@
 import { ProductCard } from "@/components/product/product-card";
 import { getProducts } from "@/lib/supabase/products";
 import { transformProductToCardData } from "@/lib/utils/products";
-import type { Messages } from "@/lib/i18n";
-import type { Locale } from "@/lib/i18n";
+import type { Messages } from "@/lib/messages";
 
-export async function FeaturedProducts({
-  messages,
-  locale,
-}: {
-  messages: Messages;
-  locale: Locale;
-}) {
+export async function FeaturedProducts({ messages }: { messages: Messages }) {
   const products = await getProducts({ featured: true, limit: 4 });
-  const transformedProducts = products.map((p) =>
-    transformProductToCardData(p, locale)
-  );
+  const transformedProducts = products.map((p) => transformProductToCardData(p));
   const t = messages.home;
 
   return (

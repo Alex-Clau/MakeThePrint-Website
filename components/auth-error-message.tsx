@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 interface AuthErrorMessageProps {
   error?: string | null;
@@ -8,7 +8,7 @@ interface AuthErrorMessageProps {
 }
 
 export function AuthErrorMessage({ error, error_code }: AuthErrorMessageProps) {
-  const t = useTranslations().auth;
+  const t = messages.auth;
 
   const code = error_code || error;
   if (code === "otp_expired") {

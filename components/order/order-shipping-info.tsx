@@ -3,13 +3,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
 import { OrderShippingInfoProps } from "@/types/order";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function OrderShippingInfo({
   shippingAddress,
   trackingNumber,
 }: OrderShippingInfoProps) {
-  const t = useTranslations().account;
+  const t = messages.account;
   return (
     <Card>
       <CardHeader>

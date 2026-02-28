@@ -1,14 +1,11 @@
 import { Suspense } from "react";
-import { cookies } from "next/headers";
 import { Navigation } from "@/components/navigation";
 import { HeroSection } from "@/components/home/hero-section";
 import { FeaturedProducts } from "@/components/home/featured-products";
 import { CustomPrintingSection } from "@/components/home/custom-printing-section";
-import { getDictionary, getLocaleFromCookie } from "@/lib/i18n";
+import { messages } from "@/lib/messages";
 
 export default async function Home() {
-  const locale = getLocaleFromCookie((await cookies()).get("locale")?.value);
-  const messages = getDictionary(locale);
   return (
     <main className="min-h-screen flex flex-col">
       <Navigation />
@@ -29,7 +26,7 @@ export default async function Home() {
           </section>
         }
       >
-        <FeaturedProducts messages={messages} locale={locale} />
+        <FeaturedProducts messages={messages} />
       </Suspense>
       <CustomPrintingSection />
     </main>

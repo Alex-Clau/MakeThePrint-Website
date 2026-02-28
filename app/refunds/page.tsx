@@ -1,11 +1,8 @@
-import { cookies } from "next/headers";
 import { Navigation } from "@/components/navigation";
-import { getDictionary, getLocaleFromCookie } from "@/lib/i18n";
+import { messages } from "@/lib/messages";
 
 export default async function RefundsPage() {
-  const locale = getLocaleFromCookie((await cookies()).get("locale")?.value);
-  const t = getDictionary(locale);
-  const r = t.refunds;
+  const r = messages.refunds;
   return (
     <main className="min-h-screen flex flex-col">
       <Navigation />

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/navigation";
 import { AlertCircle, Home } from "lucide-react";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export default function Error({
   error,
@@ -13,8 +13,8 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  const t = useTranslations().error;
-  const c = useTranslations().common;
+  const t = messages.error;
+  const c = messages.common;
   return (
     <main className="min-h-screen flex flex-col">
       <Navigation />

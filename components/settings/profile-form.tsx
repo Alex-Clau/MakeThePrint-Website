@@ -11,12 +11,12 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { ProfileFormProps } from "@/types/account";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function ProfileForm({ initialData, userId }: ProfileFormProps) {
   const router = useRouter();
-  const t = useTranslations().account;
-  const a = useTranslations().auth;
+  const t = messages.account;
+  const a = messages.auth;
   const [formData, setFormData] = useState({
     email: initialData.email || "",
     full_name: initialData.full_name || "",

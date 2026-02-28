@@ -13,13 +13,10 @@ export default function FAQPage() {
 
 
 async function FAQContent() {
-  const { cookies } = await import("next/headers");
-  const { getDictionary, getLocaleFromCookie } = await import("@/lib/i18n");
+  const { messages } = await import("@/lib/messages");
   const { Navigation } = await import("@/components/navigation");
 
-  const locale = getLocaleFromCookie((await cookies()).get("locale")?.value);
-  const t = getDictionary(locale);
-  const f = t.faq;
+  const f = messages.faq;
 
   return (
     <main className="min-h-screen flex flex-col">

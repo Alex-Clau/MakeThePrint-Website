@@ -7,10 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CheckoutFormsProps } from "@/types/checkout";
 import { AddressFormData } from "@/types";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function CheckoutForms({ onFormDataChange }: CheckoutFormsProps) {
-  const t = useTranslations().checkout;
+  const t = messages.checkout;
   const [shipping, setShipping] = useState<AddressFormData>({
     firstName: "",
     lastName: "",
@@ -87,7 +87,7 @@ export function CheckoutForms({ onFormDataChange }: CheckoutFormsProps) {
                 }}
                 required
                 pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$"
-                title="Please enter a valid email address"
+                title={t.validEmailTitle}
               />
           </div>
           <div>

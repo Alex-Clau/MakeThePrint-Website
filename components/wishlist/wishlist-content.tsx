@@ -10,12 +10,12 @@ import { WishlistItem } from "./wishlist-item";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { WishlistContentProps } from "@/types/wishlist";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function WishlistContent({ items, userId }: WishlistContentProps) {
   const router = useRouter();
-  const w = useTranslations().wishlist;
-  const c = useTranslations().common;
+  const w = messages.wishlist;
+  const c = messages.common;
 
   const handleRemove = async (productId: string) => {
     try {

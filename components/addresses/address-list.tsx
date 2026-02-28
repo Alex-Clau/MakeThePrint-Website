@@ -4,15 +4,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trash2, Edit, MapPin } from "lucide-react";
 import { AddressListProps } from "@/types/address-components";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function AddressList({
   addresses,
   onEdit,
   onDelete,
 }: AddressListProps) {
-  const t = useTranslations().account;
-  const a = useTranslations().admin;
+  const t = messages.account;
+  const a = messages.admin;
   if (addresses.length === 0) {
     return (
       <Card className="p-12 text-center">

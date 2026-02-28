@@ -3,10 +3,10 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AddressFieldsProps } from "@/types/address-components";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function AddressFields({ formData, onChange }: AddressFieldsProps) {
-  const t = useTranslations().checkout;
+  const t = messages.checkout;
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

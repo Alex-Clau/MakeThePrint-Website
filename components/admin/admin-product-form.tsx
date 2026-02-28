@@ -12,7 +12,7 @@ import { createProductAction, updateProductAction } from "@/app/admin/actions";
 import { toast } from "sonner";
 import { ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 import { type ProductFormData, getDefaultConfig } from "./admin-product-form-types";
 
 interface AdminProductFormProps {
@@ -22,7 +22,7 @@ interface AdminProductFormProps {
 
 export function AdminProductForm({ product, initialType = "seasonal" }: AdminProductFormProps) {
   const router = useRouter();
-  const t = useTranslations().admin;
+  const t = messages.admin;
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const initialCategory = product?.category || (initialType === "custom" ? "preset" : "finished");

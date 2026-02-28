@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CreditCard, Loader2 } from "lucide-react";
 import { StripePaymentFormProps } from "@/types/checkout";
+import { messages } from "@/lib/messages";
 
 export function StripePaymentForm({
   clientSecret,
@@ -26,21 +27,21 @@ export function StripePaymentForm({
     if (!stripe || !clientSecret) {
       return;
     }
-
+    const t = messages.checkout;
     stripe.retrievePaymentIntent(clientSecret).then((result) => {
       if (result.paymentIntent) {
         switch (result.paymentIntent.status) {
           case "succeeded":
-            setMessage("Payment succeeded!");
+            setMessage(t.paymentSucceeded);
             break;
           case "processing":
-            setMessage("Your payment is processing.");
+            setMessage(t.paymentProcessing);
             break;
           case "requires_payment_method":
-            setMessage("Your payment was not successful, please try again.");
+            setMessage(t.paymentNotSuccessful);
             break;
           default:
-            setMessage("Something went wrong.");
+            setMessage(t.somethingWentWrong);
             break;
         }
       }
@@ -66,11 +67,11 @@ export function StripePaymentForm({
     });
 
     if (error) {
-      setMessage(error.message || "An error occurred");
-      onPaymentError(error.message || "Payment failed");
+      setMessage(error.message || messages.checkout.somethingWentWrong);
+      onPaymentError(error.message || messages.checkout.paymentNotSuccessful);
       setIsProcessing(false);
     } else if (paymentIntent && paymentIntent.status === "succeeded") {
-      setMessage("Payment succeeded!");
+      setMessage(messages.checkout.paymentSucceeded);
       onPaymentSuccess(paymentIntent.id);
       setIsProcessing(false);
     } else {
@@ -95,7 +96,7 @@ export function StripePaymentForm({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <CreditCard className="h-5 w-5" />
-          Payment Method
+          {messages.checkout.paymentMethod}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -109,7 +110,7 @@ export function StripePaymentForm({
           {message && (
             <div
               className={`text-sm ${
-                message.includes("succeeded")
+                message === messages.checkout.paymentSucceeded || message === messages.checkout.paymentProcessing
                   ? "text-green-600 dark:text-green-400"
                   : "text-red-600 dark:text-red-400"
               }`}
@@ -126,10 +127,10 @@ export function StripePaymentForm({
             {isProcessing || isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Processing...
+                {messages.checkout.processing}
               </>
             ) : (
-              "Pay Now"
+              messages.checkout.payNow
             )}
           </Button>
         </form>

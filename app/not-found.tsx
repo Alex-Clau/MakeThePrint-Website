@@ -4,11 +4,11 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/navigation";
 import { Home, Search } from "lucide-react";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export default function NotFound() {
-  const t = useTranslations().notFound;
-  const c = useTranslations().common;
+  const t = messages.notFound;
+  const c = messages.common;
   return (
     <main className="min-h-screen flex flex-col">
       <Navigation />

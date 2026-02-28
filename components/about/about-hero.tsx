@@ -2,10 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function AboutHero() {
-  const t = useTranslations().about;
+  const t = messages.about;
   return (
     <div className="text-center mb-12 sm:mb-16">
       <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4">

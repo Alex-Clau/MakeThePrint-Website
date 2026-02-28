@@ -14,8 +14,10 @@ import { Mail, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
+import { messages } from "@/lib/messages";
 
 export default function Page() {
+  const t = messages.auth;
   const [resent, setResent] = useState(false);
   const [isResending, setIsResending] = useState(false);
   
@@ -45,7 +47,7 @@ export default function Page() {
       
       if (error) throw error;
       setResent(true);
-      toast.success("Confirmation email resent!");
+      toast.success(t.confirmationEmailResent);
     } catch (error: any) {
       toast.error(getUserFriendlyError(error));
     } finally {
@@ -62,33 +64,33 @@ export default function Page() {
               <div className="flex items-center gap-2 mb-2">
                 <Mail className="h-6 w-6 text-primary" />
                 <CardTitle className="text-2xl">
-                  Check your email
+                  {t.signUpSuccessCheckEmail}
                 </CardTitle>
               </div>
               <CardDescription>
-                We&apos;ve sent a confirmation link to your email
+                {t.signUpSuccessConfirmationSent}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Click the link in the email to confirm your account. The link will expire in 24 hours.
+                {t.clickLinkInEmail}
               </p>
               
               {email && (
                 <div className="p-3 bg-muted rounded-md">
-                  <p className="text-xs text-muted-foreground mb-1">Email sent to:</p>
+                  <p className="text-xs text-muted-foreground mb-1">{t.emailSentTo}</p>
                   <p className="text-sm font-medium">{email}</p>
                 </div>
               )}
 
               <div className="space-y-2">
                 <p className="text-xs text-muted-foreground">
-                  Didn&apos;t receive the email? Check your spam folder or:
+                  {t.didntReceiveEmail}
                 </p>
                 {resent ? (
                   <div className="flex items-center gap-2 text-sm text-green-600">
                     <CheckCircle2 className="h-4 w-4" />
-                    <span>Email resent! Check your inbox.</span>
+                    <span>{t.emailResentCheckInbox}</span>
                   </div>
                 ) : (
                   <Button
@@ -97,7 +99,7 @@ export default function Page() {
                     onClick={handleResendEmail}
                     disabled={isResending || !email}
                   >
-                    {isResending ? "Sending..." : "Resend confirmation email"}
+                    {isResending ? t.sending : t.resendConfirmationEmail}
                   </Button>
                 )}
               </div>
@@ -105,7 +107,7 @@ export default function Page() {
               <div className="pt-4 border-t">
                 <Link href="/auth/login">
                   <Button variant="link" className="w-full">
-                    Back to login
+                    {t.backToLogin}
                   </Button>
                 </Link>
               </div>

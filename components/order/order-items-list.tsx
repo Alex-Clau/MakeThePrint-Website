@@ -4,18 +4,17 @@ import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { OrderItemsListProps } from "@/types/order";
 import { getProductDisplayName } from "@/lib/utils/products";
-import { useLocale, useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function OrderItemsList({ items }: OrderItemsListProps) {
-  const { locale } = useLocale();
-  const t = useTranslations().account;
+  const t = messages.account;
   return (
     <Card>
       <CardContent className="p-6">
         <h2 className="text-xl font-bold mb-4">{t.orderItems}</h2>
         <div className="space-y-4">
           {items.map((item) => {
-            const displayName = getProductDisplayName(item.products, locale);
+            const displayName = getProductDisplayName(item.products);
             return (
               <div key={item.id} className="flex flex-col sm:flex-row gap-3 sm:gap-4 pb-4 border-b last:border-0">
                 <div className="relative w-full sm:w-20 h-32 sm:h-20 flex-shrink-0 overflow-hidden rounded-lg border bg-muted">

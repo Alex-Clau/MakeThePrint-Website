@@ -13,14 +13,14 @@ import { AddressList } from "./address-list";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { AddressesContentProps } from "@/types/address-components";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function AddressesContent({
   addresses: initialAddresses,
   userId,
 }: AddressesContentProps) {
   const router = useRouter();
-  const t = useTranslations().account;
+  const t = messages.account;
   const [addresses, setAddresses] = useState(initialAddresses || []);
   const [showForm, setShowForm] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);

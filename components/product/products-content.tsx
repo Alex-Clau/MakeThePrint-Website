@@ -6,12 +6,12 @@ import { ProductListItem } from "@/components/product/product-list-item";
 import { ViewToggle } from "@/components/product/view-toggle";
 import { ProductsContentProps } from "@/types/components";
 import { usePathname } from "next/navigation";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function ProductsContent({ products }: ProductsContentProps) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const pathName = usePathname();
-  const t = useTranslations().products;
+  const t = messages.products;
 
   return (
     <>

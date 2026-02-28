@@ -14,22 +14,17 @@ import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { CustomLettersForm } from "./custom-letters-form";
 import { KeychainConfig } from "@/types/product";
 import { getProductDisplayName } from "@/lib/utils/products";
-import { useLocale, useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function ProductDetailForm({ product, previewText = "", onPreviewChange }: ProductDetailFormProps) {
-  const { locale } = useLocale();
-  const displayName = getProductDisplayName(product, locale);
-  const t = useTranslations().product;
-  const c = useTranslations().common;
+  const displayName = getProductDisplayName(product);
+  const t = messages.product;
+  const c = messages.common;
   const router = useRouter();
   const category = product.category as string | undefined;
   const isPreset = category === "preset";
   const isInquire = category === "inquire" || category === "keychains";
-  const isFinished = category === "finished" || (!isPreset && !isInquire);
 
-  const [selectedFeature, setSelectedFeature] = useState(
-    product.material_options[0] || "Standard"
-  );
   const [quantity, setQuantity] = useState(1);
 
   const customProductConfig = isPreset && product.custom_config && "defaultFont" in product.custom_config
@@ -111,9 +106,6 @@ export function ProductDetailForm({ product, previewText = "", onPreviewChange }
         user_id: user.id,
         product_id: product.id,
         quantity: isPreset ? 1 : quantity,
-        material: isPreset
-          ? `${customConfig.font}|${customConfig.color}|${customConfig.size}|${customConfig.text}`
-          : selectedFeature,
         customizations: isPreset ? {
           text: customConfig.text,
           font: customConfig.font,
@@ -127,7 +119,7 @@ export function ProductDetailForm({ product, previewText = "", onPreviewChange }
         } : undefined,
       });
 
-      toast.success("Added to cart!");
+      toast.success(t.addedToCart);
       // Dispatch custom event to refresh cart count
       window.dispatchEvent(new CustomEvent("cart-updated"));
       router.push("/cart");
@@ -245,35 +237,6 @@ export function ProductDetailForm({ product, previewText = "", onPreviewChange }
               </p>
             )}
           </div>
-
-          {/* Feature Selection */}
-          {product.material_options.length > 0 && (
-            <div>
-              <Label className="text-sm sm:text-base font-semibold mb-3 sm:mb-4 block">
-                {t.chooseFeatures}
-              </Label>
-              <RadioGroup
-                value={selectedFeature}
-                onValueChange={setSelectedFeature}
-                className="space-y-3"
-              >
-                {product.material_options.map((feature) => (
-                  <div
-                    key={feature}
-                    className="flex items-center space-x-3 p-3 sm:p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-accent-primary/50 transition-colors cursor-pointer"
-                  >
-                    <RadioGroupItem value={feature} id={feature} className="h-4 w-4 flex-shrink-0" />
-                    <Label
-                      htmlFor={feature}
-                      className="font-medium text-sm sm:text-base cursor-pointer flex-1"
-                    >
-                      {feature}
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
-            </div>
-          )}
 
           {/* Quantity Selector */}
           <div>

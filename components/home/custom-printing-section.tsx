@@ -2,10 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import { Sparkles, Mail, MessageCircle } from "lucide-react";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function CustomPrintingSection() {
-  const t = useTranslations().home;
+  const t = messages.home;
   return (
     <section className="mx-3 py-12 sm:py-16 lg:py-24 bg-gradient-to-br from-accent-primary-light/10 via-background to-accent-primary-light/5 border-t border-accent-primary/30">
       <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8">

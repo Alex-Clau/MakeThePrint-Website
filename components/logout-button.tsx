@@ -3,11 +3,11 @@
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function LogoutButton() {
   const router = useRouter();
-  const t = useTranslations().auth;
+  const t = messages.auth;
 
   const logout = async () => {
     const supabase = createClient();

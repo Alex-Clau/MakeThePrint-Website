@@ -14,12 +14,12 @@ import { CartItemsList } from "./cart-items-list";
 import { CartSummary } from "./cart-summary";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function CartContent({ items }: CartContentProps) {
   const router = useRouter();
-  const t = useTranslations().cart;
-  const c = useTranslations().common;
+  const t = messages.cart;
+  const c = messages.common;
 
   const handleUpdateQuantity = async (cartItemId: string, newQuantity: number) => {
     if (newQuantity < 1) return;

@@ -8,8 +8,7 @@ import { Truck, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { getOrders } from "@/lib/supabase/orders";
 import { createClient } from "@/lib/supabase/server";
-import { getDictionary, getLocaleFromCookie } from "@/lib/i18n";
-import { cookies } from "next/headers";
+import { messages } from "@/lib/messages";
 
 async function OrdersList() {
   const supabase = await createClient();
@@ -21,8 +20,6 @@ async function OrdersList() {
     redirect("/auth/login");
   }
 
-  const locale = getLocaleFromCookie((await cookies()).get("locale")?.value);
-  const messages = getDictionary(locale);
   const t = messages.account;
   const c = messages.common;
 
@@ -110,8 +107,6 @@ async function OrdersList() {
 }
 
 export default async function OrdersPage() {
-  const locale = getLocaleFromCookie((await cookies()).get("locale")?.value);
-  const messages = getDictionary(locale);
   const c = messages.common;
   const t = messages.account;
   return (

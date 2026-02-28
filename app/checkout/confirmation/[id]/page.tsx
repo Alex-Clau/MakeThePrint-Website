@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 import { Navigation } from "@/components/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,7 +7,7 @@ import { CheckCircle, Package, Mail } from "lucide-react";
 import Link from "next/link";
 import { getOrderById } from "@/lib/supabase/orders";
 import { createClient } from "@/lib/supabase/server";
-import { getDictionary, getLocaleFromCookie } from "@/lib/i18n";
+import { messages } from "@/lib/messages";
 
 interface OrderConfirmationParams {
   params: Promise<{ id: string }>;
@@ -29,8 +28,6 @@ async function OrderConfirmationContent({ orderId }: { orderId: string }) {
     redirect("/account/orders");
   }
 
-  const locale = getLocaleFromCookie((await cookies()).get("locale")?.value);
-  const messages = getDictionary(locale);
   const t = messages.checkout;
   const c = messages.common;
 

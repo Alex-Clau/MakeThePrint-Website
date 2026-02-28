@@ -1,11 +1,10 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 import { Navigation } from "@/components/navigation";
 import { getWishlist } from "@/lib/supabase/wishlist";
 import { createClient } from "@/lib/supabase/server";
 import { WishlistContent } from "@/components/wishlist/wishlist-content";
-import { getDictionary, getLocaleFromCookie } from "@/lib/i18n";
+import { messages } from "@/lib/messages";
 
 async function WishlistItems() {
   const supabase = await createClient();
@@ -22,8 +21,6 @@ async function WishlistItems() {
 }
 
 export default async function WishlistPage() {
-  const locale = getLocaleFromCookie((await cookies()).get("locale")?.value);
-  const messages = getDictionary(locale);
   const t = messages.account;
   return (
     <main className="min-h-screen flex flex-col">

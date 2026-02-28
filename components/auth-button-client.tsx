@@ -6,11 +6,11 @@ import { Button } from "./ui/button";
 import { LogoutButton } from "./logout-button";
 import { User } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function AuthButtonClient() {
-  const c = useTranslations().common;
-  const a = useTranslations().auth;
+  const c = messages.common;
+  const a = messages.auth;
   const [user, setUser] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 

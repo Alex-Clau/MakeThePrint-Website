@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 import type { ProductFormData } from "./admin-product-form-types";
 
 interface AdminProductBasicCardProps {
@@ -24,17 +24,17 @@ export function AdminProductBasicCard({
   isPresetCategory,
   isInquireCategory,
 }: AdminProductBasicCardProps) {
-  const t = useTranslations().admin;
+  const t = messages.admin;
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Basic Information</CardTitle>
+        <CardTitle>{t.basicInformation}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Product Type */}
         <div className="space-y-2">
-          <Label htmlFor="product_type">Product Type *</Label>
+          <Label htmlFor="product_type">{t.productTypeLabel}</Label>
           <Select
             value={formData.product_type}
             onValueChange={(value: "custom" | "seasonal") =>
@@ -46,20 +46,20 @@ export function AdminProductBasicCard({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="custom">Custom Product</SelectItem>
-              <SelectItem value="seasonal">Seasonal Product</SelectItem>
+              <SelectItem value="custom">{t.customProductOption}</SelectItem>
+              <SelectItem value="seasonal">{t.seasonalProductOption}</SelectItem>
             </SelectContent>
           </Select>
           {product && (
             <p className="text-xs text-muted-foreground">
-              Product type cannot be changed after creation
+              {t.productTypeCannotChange}
             </p>
           )}
         </div>
 
         {/* Category */}
         <div className="space-y-2">
-          <Label htmlFor="category">Category *</Label>
+          <Label htmlFor="category">{t.categoryLabel}</Label>
           <Select
             value={formData.category}
             onValueChange={(value) => setFormData({ ...formData, category: value })}
@@ -70,12 +70,12 @@ export function AdminProductBasicCard({
             <SelectContent>
               {formData.product_type === "custom" ? (
                 <>
-                  <SelectItem value="preset">Preset (configurable)</SelectItem>
-                  <SelectItem value="inquire">Inquire (contact only)</SelectItem>
-                  <SelectItem value="finished">Finished (sells as-is)</SelectItem>
+                  <SelectItem value="preset">{t.presetOption}</SelectItem>
+                  <SelectItem value="inquire">{t.inquireOption}</SelectItem>
+                  <SelectItem value="finished">{t.finishedOption}</SelectItem>
                 </>
               ) : (
-                <SelectItem value="finished">Finished (sells as-is)</SelectItem>
+                <SelectItem value="finished">{t.finishedOption}</SelectItem>
               )}
             </SelectContent>
           </Select>
@@ -106,12 +106,12 @@ export function AdminProductBasicCard({
 
         {/* Description */}
         <div className="space-y-2">
-          <Label htmlFor="description">Description</Label>
+          <Label htmlFor="description">{t.descriptionLabel}</Label>
           <Textarea
             id="description"
             value={formData.description}
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            placeholder="Detailed product description..."
+            placeholder={t.descriptionPlaceholder}
             rows={4}
           />
         </div>
@@ -120,10 +120,10 @@ export function AdminProductBasicCard({
         <div className="space-y-2">
           <Label htmlFor="price">
             {isPresetCategory
-              ? "Base Price (RON) - Display only; actual price per size below"
+              ? t.basePricePresetLabel
               : isInquireCategory
-              ? "Contact for Pricing (displayed as info)"
-              : "Price (RON) *"}
+              ? t.contactForPricingLabel
+              : t.priceRonRequired}
           </Label>
           <Input
             id="price"
@@ -136,12 +136,12 @@ export function AdminProductBasicCard({
           />
           {isPresetCategory && (
             <p className="text-xs text-muted-foreground">
-              Preset: configure size and price per size below.
+              {t.presetConfigureBelow}
             </p>
           )}
           {isInquireCategory && (
             <p className="text-xs text-muted-foreground">
-              Inquire: price is for reference only.
+              {t.inquirePriceReference}
             </p>
           )}
         </div>
@@ -156,7 +156,7 @@ export function AdminProductBasicCard({
             }
           />
           <Label htmlFor="featured" className="cursor-pointer">
-            Feature this product on homepage
+            {t.featureOnHomepage}
           </Label>
         </div>
       </CardContent>

@@ -7,7 +7,7 @@ import { CheckCircle2, ChevronDown } from "lucide-react";
 import { CreateReviewForm } from "./create-review-form";
 import { createClient } from "@/lib/supabase/client";
 import { ProductReviewsListProps } from "@/types/product-components";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function ProductReviewsList({
   reviews,
@@ -16,7 +16,7 @@ export function ProductReviewsList({
   totalReviews,
   productId,
 }: ProductReviewsListProps) {
-  const t = useTranslations().reviews;
+  const t = messages.reviews;
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "highest" | "lowest">("newest");
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(false);

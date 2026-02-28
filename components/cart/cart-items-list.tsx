@@ -6,20 +6,19 @@ import { Trash2, Plus, Minus } from "lucide-react";
 import Image from "next/image";
 import { CartItemsListProps } from "@/types/cart-components";
 import { getProductDisplayName } from "@/lib/utils/products";
-import { useLocale, useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function CartItemsList({
   items,
   onUpdateQuantity,
   onRemove,
 }: CartItemsListProps) {
-  const { locale } = useLocale();
-  const t = useTranslations().product;
-  const c = useTranslations().common;
+  const t = messages.product;
+  const c = messages.common;
   return (
     <div className="space-y-3 sm:space-y-4">
       {items.map((item) => {
-        const displayName = getProductDisplayName(item.products, locale);
+        const displayName = getProductDisplayName(item.products);
         return (
         <Card key={item.id}>
           <CardContent className="p-3 sm:p-4 lg:p-6">

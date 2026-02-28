@@ -1,23 +1,16 @@
 import { Suspense } from "react";
-import { cookies } from "next/headers";
 import { Navigation } from "@/components/navigation";
 import { Sparkles, Gift } from "lucide-react";
 import { getProducts } from "@/lib/supabase/products";
 import { transformProductToCardData } from "@/lib/utils/products";
 import { ProductCard } from "@/components/product/product-card";
-import { getDictionary, getLocaleFromCookie } from "@/lib/i18n";
-import type { Messages } from "@/lib/i18n";
+import { messages } from "@/lib/messages";
+import type { Messages } from "@/lib/messages";
 
-async function SeasonalCollections({
-  messages,
-  locale,
-}: {
-  messages: Messages;
-  locale: "en" | "ro";
-}) {
+async function SeasonalCollections({ messages }: { messages: Messages }) {
   const products = await getProducts({ seasonal: true, limit: 12 });
   const transformedProducts = products.map((p) =>
-    transformProductToCardData(p, locale)
+    transformProductToCardData(p)
   );
   const t = messages.seasons;
 
@@ -40,8 +33,6 @@ async function SeasonalCollections({
 }
 
 export default async function CollectionsPage() {
-  const locale = getLocaleFromCookie((await cookies()).get("locale")?.value);
-  const messages = getDictionary(locale);
   const t = messages.seasons;
 
   return (
@@ -72,7 +63,7 @@ export default async function CollectionsPage() {
             </div>
           }
         >
-          <SeasonalCollections messages={messages} locale={locale} />
+          <SeasonalCollections messages={messages} />
         </Suspense>
       </div>
     </main>

@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { ProductFormData } from "./admin-product-form-types";
+import { messages } from "@/lib/messages";
 
 interface AdminInquireConfigCardProps {
   formData: ProductFormData;
@@ -12,14 +13,15 @@ interface AdminInquireConfigCardProps {
 }
 
 export function AdminInquireConfigCard({ formData, setFormData }: AdminInquireConfigCardProps) {
+  const t = messages.admin;
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Inquire – WhatsApp (optional)</CardTitle>
+        <CardTitle>{t.inquireWhatsAppTitle}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="whatsappNumber">WhatsApp Number</Label>
+          <Label htmlFor="whatsappNumber">{t.whatsAppNumberLabel}</Label>
           <Input
             id="whatsappNumber"
             type="tel"
@@ -33,15 +35,15 @@ export function AdminInquireConfigCard({ formData, setFormData }: AdminInquireCo
                 },
               })
             }
-            placeholder="e.g., 40712345678 (country code + number, no spaces)"
+            placeholder={t.whatsAppNumberPlaceholder}
           />
           <p className="text-xs text-muted-foreground">
-            Enter phone number with country code (e.g., 40712345678 for Romania)
+            {t.whatsAppNumberHint}
           </p>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="whatsappMessage">Custom Message Template (Optional)</Label>
+          <Label htmlFor="whatsappMessage">{t.customMessageTemplateLabel}</Label>
           <Textarea
             id="whatsappMessage"
             value={formData.custom_config?.whatsappMessage || ""}
@@ -54,11 +56,11 @@ export function AdminInquireConfigCard({ formData, setFormData }: AdminInquireCo
                 },
               })
             }
-            placeholder="Hi! I'm interested in the {product_name}. Can you provide more details?"
+            placeholder={t.whatsAppMessagePlaceholder}
             rows={3}
           />
           <p className="text-xs text-muted-foreground">
-            Leave blank to use default message.
+            {t.whatsAppMessageHint}
           </p>
         </div>
       </CardContent>

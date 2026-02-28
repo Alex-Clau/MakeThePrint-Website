@@ -4,12 +4,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
-import { useTranslations } from "@/components/locale-provider";
+import { messages } from "@/lib/messages";
 
 export function HeroSection() {
-  const t = useTranslations();
-  const h = t.home;
-  const c = t.common;
+  const h = messages.home;
+  const c = messages.common;
   return (
     <section className="relative w-full overflow-hidden min-h-[700px] lg:h-[850px] flex items-center">
       {/* Background: light theme = heroWhite, dark theme = heroBlack */}

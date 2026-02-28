@@ -3,20 +3,15 @@ import { Navigation } from "@/components/navigation";
 import { ProductsContent } from "@/components/product/products-content";
 import { getProducts } from "@/lib/supabase/products";
 import { transformProductToCardData } from "@/lib/utils/products";
-import {getDictionary, getLocaleFromCookie} from "@/lib/i18n";
-import {cookies} from "next/headers";
+import { messages } from "@/lib/messages";
 
-async function ProductsList({ locale }: { locale: "en" | "ro" }) {
+async function ProductsList() {
   const products = await getProducts({ product_type: "custom" });
-  const transformedProducts = products.map((p) =>
-    transformProductToCardData(p, locale)
-  );
+  const transformedProducts = products.map((p) => transformProductToCardData(p));
   return <ProductsContent products={transformedProducts} />;
 }
 
 export default async function ProductsPage() {
-  const locale = getLocaleFromCookie((await cookies()).get("locale")?.value);
-  const messages = getDictionary(locale);
   const t = messages.products;
 
   return (
@@ -48,7 +43,7 @@ export default async function ProductsPage() {
             </div>
           }
         >
-          <ProductsList locale={locale} />
+          <ProductsList />
         </Suspense>
       </div>
     </main>
