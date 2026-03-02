@@ -10,6 +10,7 @@ import { Edit, Trash2, Eye } from "lucide-react";
 import { deleteProductAction } from "@/app/admin/actions";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { messages } from "@/lib/messages";
 import type { Product } from "@/types/product";
 
@@ -32,10 +33,9 @@ export function AdminProductsList({ products }: { products: Product[] }) {
       await deleteProductAction(id);
       toast.success(t.productDeleted);
       router.refresh();
-    } catch (error) {
+    } catch (error: unknown) {
       setOptimisticProducts(products);
-      toast.error(t.deleteFailed);
-      console.error(error);
+      toast.error(getUserFriendlyError(error) || t.deleteFailed);
     } finally {
       setDeletingId(null);
     }

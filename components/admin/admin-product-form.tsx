@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
 import { messages } from "@/lib/messages";
+import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { type ProductFormData, getDefaultConfig } from "./admin-product-form-types";
 
 interface AdminProductFormProps {
@@ -133,9 +134,8 @@ export function AdminProductForm({ product, initialType = "seasonal" }: AdminPro
 
       router.push("/admin/products");
       router.refresh();
-    } catch (error) {
-      console.error("Error saving product:", error);
-      toast.error(error instanceof Error ? error.message : t.saveFailed);
+    } catch (error: unknown) {
+      toast.error(getUserFriendlyError(error) || t.saveFailed);
     } finally {
       setIsSubmitting(false);
     }

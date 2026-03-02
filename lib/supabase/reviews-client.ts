@@ -1,5 +1,7 @@
 "use client";
 
+import { getApiErrorBody } from "@/lib/utils/api-error";
+
 /**
  * Create a product review - Client-side
  * Uses API route to ensure product rating is updated
@@ -23,8 +25,10 @@ export async function createReviewClient(review: {
   });
 
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || "Failed to create review");
+    const { message, code } = await getApiErrorBody(response);
+    const err = new Error(message || "Failed to create review") as Error & { code?: string };
+    err.code = code;
+    throw err;
   }
 
   return response.json();
@@ -57,8 +61,10 @@ export async function updateReviewClient(
   });
 
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || "Failed to update review");
+    const { message, code } = await getApiErrorBody(response);
+    const err = new Error(message || "Failed to update review") as Error & { code?: string };
+    err.code = code;
+    throw err;
   }
 
   return response.json();
@@ -74,8 +80,10 @@ export async function deleteReviewClient(reviewId: string, userId: string) {
   });
 
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || "Failed to delete review");
+    const { message, code } = await getApiErrorBody(response);
+    const err = new Error(message || "Failed to delete review") as Error & { code?: string };
+    err.code = code;
+    throw err;
   }
 
   return response.json();

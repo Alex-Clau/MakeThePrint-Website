@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe/server";
 import { createClient } from "@/lib/supabase/server";
+import { apiErrorResponse, normalizeToApiError } from "@/lib/utils/api-error";
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,7 +11,7 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return apiErrorResponse("Unauthorized", 401, "UNAUTHORIZED");
     }
 
     const body = await request.json();
@@ -39,12 +40,9 @@ export async function POST(request: NextRequest) {
       paymentIntentId: paymentIntent.id,
       amount: paymentIntent.amount / 100, // Convert from cents
     });
-  } catch (error: any) {
-    console.error("Error confirming payment:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to confirm payment" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    const { message } = normalizeToApiError(error);
+    return apiErrorResponse(message, 500);
   }
 }
 

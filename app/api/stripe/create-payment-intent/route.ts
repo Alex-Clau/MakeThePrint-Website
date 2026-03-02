@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe/server";
 import { createClient } from "@/lib/supabase/server";
 import { getOrderForPayment } from "@/lib/supabase/orders";
+import { apiErrorResponse, normalizeToApiError } from "@/lib/utils/api-error";
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,7 +12,7 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return apiErrorResponse("Unauthorized", 401, "UNAUTHORIZED");
     }
 
     const body = await request.json();
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
     try {
       order = await getOrderForPayment(orderId, user.id);
     } catch {
-      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+      return apiErrorResponse("Order not found", 404, "NOT_FOUND");
     }
 
     if (order.payment_status === "paid") {
@@ -64,8 +65,7 @@ export async function POST(request: NextRequest) {
       paymentIntentId: paymentIntent.id,
     });
   } catch (error: unknown) {
-    const message =
-      error instanceof Error ? error.message : "Failed to create payment intent";
-    return NextResponse.json({ error: message }, { status: 500 });
+    const { message } = normalizeToApiError(error);
+    return apiErrorResponse(message, 500);
   }
 }

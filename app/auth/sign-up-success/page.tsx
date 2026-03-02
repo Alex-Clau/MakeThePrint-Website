@@ -48,7 +48,7 @@ export default function Page() {
       if (error) throw error;
       setResent(true);
       toast.success(t.confirmationEmailResent);
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error(getUserFriendlyError(error));
     } finally {
       setIsResending(false);

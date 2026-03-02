@@ -31,7 +31,7 @@ export function ProfileForm({ initialData, userId }: ProfileFormProps) {
       await updateUserProfileClient(userId, formData);
       toast.success(t.profileUpdated);
       router.refresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error(getUserFriendlyError(error));
     } finally {
       setIsSaving(false);

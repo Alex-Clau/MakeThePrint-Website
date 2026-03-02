@@ -23,7 +23,7 @@ export function AuthButtonClient() {
           data: { user: authUser },
         } = await supabase.auth.getUser();
         setUser(authUser);
-      } catch (error: any) {
+      } catch (_error: unknown) {
         // Silently fail - auth check failures are non-critical
         setUser(null);
       } finally {

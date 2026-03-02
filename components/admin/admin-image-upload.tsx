@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Upload, X, Image as ImageIcon } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
+import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { messages } from "@/lib/messages";
 
 interface AdminImageUploadProps {
@@ -110,9 +111,8 @@ export function AdminImageUpload({
         try {
           const compressedImage = await compressImage(file);
           newImages.push(compressedImage);
-        } catch (error) {
-          console.error("Error compressing image:", error);
-          toast.error(messages.admin.failedToProcess.replace("{name}", file.name));
+        } catch (error: unknown) {
+          toast.error(getUserFriendlyError(error) || messages.admin.failedToProcess.replace("{name}", file.name));
         }
       }
 
@@ -120,9 +120,8 @@ export function AdminImageUpload({
         onChange([...images, ...newImages]);
         toast.success(messages.admin.addedImages.replace("{count}", String(newImages.length)));
       }
-    } catch (error) {
-      console.error("Error uploading images:", error);
-      toast.error(messages.admin.failedToUploadImages);
+    } catch (error: unknown) {
+      toast.error(getUserFriendlyError(error) || messages.admin.failedToUploadImages);
     } finally {
       setUploading(false);
       if (fileInputRef.current) {

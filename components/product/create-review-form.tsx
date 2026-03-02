@@ -51,8 +51,11 @@ export function CreateReviewForm({
       }
       if (onClose) onClose();
       router.refresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error(getUserFriendlyError(error));
+      if ((error as Error & { code?: string })?.code === "UNAUTHORIZED") {
+        router.push("/auth/login?redirect=" + encodeURIComponent(window.location.pathname));
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -68,8 +71,11 @@ export function CreateReviewForm({
       toast.success(t.reviewDeleted);
       if (onClose) onClose();
       router.refresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error(getUserFriendlyError(error));
+      if ((error as Error & { code?: string })?.code === "UNAUTHORIZED") {
+        router.push("/auth/login?redirect=" + encodeURIComponent(window.location.pathname));
+      }
     } finally {
       setIsSubmitting(false);
     }

@@ -60,7 +60,7 @@ export function ProductCardActions({
       }
       router.refresh();
       await revalidateWishlistPaths();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error(getUserFriendlyError(error));
     } finally {
       setIsTogglingWishlist(false);

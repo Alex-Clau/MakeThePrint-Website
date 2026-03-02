@@ -16,6 +16,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { messages } from "@/lib/messages";
+import { getUserFriendlyError } from "@/lib/utils/error-messages";
 
 export function SignUpForm({
   className,
@@ -60,7 +61,7 @@ export function SignUpForm({
       }
       router.push(`/auth/sign-up-success?email=${encodeURIComponent(email)}`);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : t.errorOccurred);
+      setError(getUserFriendlyError(err) || t.errorOccurred);
     } finally {
       setIsLoading(false);
     }

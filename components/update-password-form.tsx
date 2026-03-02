@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { messages } from "@/lib/messages";
+import { getUserFriendlyError } from "@/lib/utils/error-messages";
 
 export function UpdatePasswordForm({
   className,
@@ -37,7 +38,7 @@ export function UpdatePasswordForm({
       if (error) throw error;
       router.push("/account");
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : t.errorOccurred);
+      setError(getUserFriendlyError(error) || t.errorOccurred);
     } finally {
       setIsLoading(false);
     }
