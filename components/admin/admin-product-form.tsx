@@ -1,26 +1,32 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AdminImageUpload } from "./admin-image-upload";
-import { AdminProductBasicCard } from "./admin-product-basic-card";
-import { AdminPresetConfigCard } from "./admin-preset-config-card";
-import { AdminInquireConfigCard } from "./admin-inquire-config-card";
-import { createProductAction, updateProductAction } from "@/app/admin/actions";
-import { toast } from "sonner";
-import { ArrowLeft, Save } from "lucide-react";
+import {useState, useEffect} from "react";
+import {useRouter} from "next/navigation";
+import {Button} from "@/components/ui/button";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {AdminImageUpload} from "./admin-image-upload";
+import {AdminProductBasicCard} from "./admin-product-basic-card";
+import {AdminPresetConfigCard} from "./admin-preset-config-card";
+import {AdminInquireConfigCard} from "./admin-inquire-config-card";
+import {createProductAction, updateProductAction} from "@/app/(auth)/admin/actions";
+import {toast} from "sonner";
+import {ArrowLeft, Save} from "lucide-react";
 import Link from "next/link";
+<<<<<<< Updated upstream
 import { messages } from "@/lib/messages";
 import { type ProductFormData, getDefaultConfig } from "./admin-product-form-types";
+=======
+import {messages} from "@/lib/messages";
+import {getUserFriendlyError} from "@/lib/utils/error-messages";
+import {type ProductFormData, getDefaultConfig} from "./admin-product-form-types";
+>>>>>>> Stashed changes
 
 interface AdminProductFormProps {
   product?: any;
   initialType?: "custom" | "seasonal";
 }
 
-export function AdminProductForm({ product, initialType = "seasonal" }: AdminProductFormProps) {
+export function AdminProductForm({product, initialType = "seasonal"}: AdminProductFormProps) {
   const router = useRouter();
   const t = messages.admin;
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,7 +41,6 @@ export function AdminProductForm({ product, initialType = "seasonal" }: AdminPro
     product_type: product?.product_type || initialType,
     category: initialCategory,
     featured: product?.featured || false,
-    seasonal: product?.seasonal || (initialType === "seasonal"),
     custom_config: product?.custom_config || getDefaultConfig(initialCategory),
   });
 
@@ -47,14 +52,12 @@ export function AdminProductForm({ product, initialType = "seasonal" }: AdminPro
       setFormData((prev) => ({
         ...prev,
         category: "finished",
-        seasonal: true,
         custom_config: undefined,
       }));
     } else if (formData.product_type === "custom" && formData.category === "finished") {
       setFormData((prev) => ({
         ...prev,
         category: "preset",
-        seasonal: false,
         custom_config: getDefaultConfig("preset"),
       }));
     }
@@ -140,14 +143,20 @@ export function AdminProductForm({ product, initialType = "seasonal" }: AdminPro
   };
 
   const handleImagesChange = (images: string[]) => {
-    setFormData({ ...formData, images });
+    setFormData({...formData, images});
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-6"
+    >
       <Link href="/admin/products">
-        <Button variant="ghost" type="button">
-          <ArrowLeft className="mr-2 h-4 w-4" />
+        <Button
+          variant="ghost"
+          type="button"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4"/>
           {t.back}
         </Button>
       </Link>
@@ -173,20 +182,34 @@ export function AdminProductForm({ product, initialType = "seasonal" }: AdminPro
       </Card>
 
       {isPresetCategory && (
-        <AdminPresetConfigCard formData={formData} setFormData={setFormData} />
+        <AdminPresetConfigCard
+          formData={formData}
+          setFormData={setFormData}
+        />
       )}
 
       {isInquireCategory && (
-        <AdminInquireConfigCard formData={formData} setFormData={setFormData} />
+        <AdminInquireConfigCard
+          formData={formData}
+          setFormData={setFormData}
+        />
       )}
 
       <div className="flex gap-4">
-        <Button type="submit" size="lg" disabled={isSubmitting}>
-          <Save className="mr-2 h-5 w-5" />
+        <Button
+          type="submit"
+          size="lg"
+          disabled={isSubmitting}
+        >
+          <Save className="mr-2 h-5 w-5"/>
           {isSubmitting ? t.saving : product ? t.updateProduct : t.createProduct}
         </Button>
         <Link href="/admin/products">
-          <Button type="button" variant="outline" size="lg">
+          <Button
+            type="button"
+            variant="outline"
+            size="lg"
+          >
             {t.cancel}
           </Button>
         </Link>

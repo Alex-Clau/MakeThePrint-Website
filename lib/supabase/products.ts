@@ -7,7 +7,6 @@ import { handleSupabaseError } from "../utils/supabase-errors";
  */
 export async function getProducts(options?: {
   featured?: boolean;
-  seasonal?: boolean;
   product_type?: string | string[];
   limit?: number;
   offset?: number;
@@ -16,14 +15,12 @@ export async function getProducts(options?: {
   const supabase = await createClient();
   let query = supabase
     .from("products")
-    .select("*");
+    .select(
+      "id, name, description, price, product_type, category, custom_config, featured, images, created_at, updated_at"
+    );
 
   if (options?.featured !== undefined) {
     query = query.eq("featured", options.featured);
-  }
-
-  if (options?.seasonal !== undefined) {
-    query = query.eq("seasonal", options.seasonal);
   }
 
   if (options?.product_type) {
@@ -57,6 +54,23 @@ export async function getProducts(options?: {
 }
 
 /**
+ * Public helpers for common product lists used on marketing pages.
+ * These intentionally do not perform any user-specific logic so that
+ * the calling pages can remain as cacheable as possible.
+ */
+export async function getPublicCustomProducts() {
+  return getProducts({ product_type: "custom" });
+}
+
+export async function getPublicSeasonalProducts(limit = 12) {
+  return getProducts({ product_type: "seasonal", limit });
+}
+
+export async function getPublicFeaturedProducts(limit = 4) {
+  return getProducts({ featured: true, limit });
+}
+
+/**
  * Get products for admin list with optional type/category filters.
  * Throws on error (same as getProducts, getProductById, etc.).
  */
@@ -68,7 +82,7 @@ export async function getAdminProducts(filters?: {
   let query = supabase
     .from("products")
     .select(
-      "id, name, description, price, images, featured, created_at, seasonal, product_type, category"
+      "id, name, description, price, images, featured, created_at, product_type, category"
     )
     .order("created_at", { ascending: false });
 
@@ -93,7 +107,9 @@ export async function getProductById(id: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("products")
-    .select("*")
+    .select(
+      "id, name, description, price, product_type, category, custom_config, featured, images, created_at, updated_at"
+    )
     .eq("id", id)
     .single();
 
@@ -112,7 +128,6 @@ export async function createProduct(product: {
   price: number;
   images?: string[];
   featured?: boolean;
-  seasonal?: boolean;
   product_type?: "custom" | "seasonal";
   category?: string;
   custom_config?: Record<string, any>;
@@ -124,7 +139,9 @@ export async function createProduct(product: {
       ...product,
       images: product.images || [],
     })
-    .select()
+    .select(
+      "id, name, description, price, product_type, category, custom_config, featured, images, created_at, updated_at"
+    )
     .single();
 
   if (error) {
@@ -144,7 +161,6 @@ export async function updateProduct(
     price: number;
     images: string[];
     featured: boolean;
-    seasonal?: boolean;
     product_type?: "custom" | "seasonal";
     category?: string;
     custom_config?: Record<string, any>;

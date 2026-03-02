@@ -1,33 +1,19 @@
 import { PageLayout } from "@/components/layout/page-layout";
 import { Sparkles, Gift } from "lucide-react";
-import { getProducts } from "@/lib/supabase/products";
-import { getWishlist } from "@/lib/supabase/wishlist";
+import { getPublicSeasonalProducts } from "@/lib/supabase/products";
 import { getProductReviewStats } from "@/lib/supabase/reviews";
-import { createClient } from "@/lib/supabase/server";
 import { transformProductToCardData } from "@/lib/utils/products";
 import { ProductCard } from "@/components/product/product-card";
 import { messages } from "@/lib/messages";
 import type { Messages } from "@/lib/messages";
 
 async function SeasonalCollections({ messages }: { messages: Messages }) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  const [products, wishlistItems] = await Promise.all([
-    getProducts({ seasonal: true, limit: 12 }),
-    user != null ? getWishlist(user.id) : Promise.resolve([]),
-  ]);
+  const products = await getPublicSeasonalProducts(12);
   const reviewStats = await getProductReviewStats(products.map((p) => p.id));
   const transformedProducts = products.map((p) => {
     const stats = reviewStats.get(p.id);
     return transformProductToCardData({ ...p, rating: stats?.rating, review_count: stats?.review_count });
   });
-  const wishlistProductIds = new Set(
-    wishlistItems.map((item) =>
-      typeof item.products === "object" && item.products != null && "id" in item.products
-        ? String((item.products as { id: string }).id)
-        : (item as { product_id: string }).product_id
-    )
-  );
   const t = messages.seasons;
 
   return (
@@ -38,7 +24,6 @@ async function SeasonalCollections({ messages }: { messages: Messages }) {
             <ProductCard
               key={product.id}
               {...product}
-              isInWishlist={wishlistProductIds.has(product.id)}
             />
           ))}
         </div>

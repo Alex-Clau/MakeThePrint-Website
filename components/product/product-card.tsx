@@ -61,30 +61,32 @@ export function ProductCard({
             )}
           </div>
         </div>
-        <div className="w-full flex items-center gap-1.5 pt-2 border-t border-border/50 min-h-6">
-          {rating !== undefined && rating > 0 ? (
-            <>
-              <div className="flex items-center">
-                {[...Array(5)].map((_, i) => (
-                  <span
-                    key={i}
-                    className={`text-xs sm:text-sm ${
-                      i < Math.floor(rating)
-                        ? "text-yellow-400"
-                        : "text-muted-foreground"
-                    }`}
-                  >
-                    ★
-                  </span>
-                ))}
-              </div>
-              <span className="text-[10px] sm:text-xs text-muted-foreground">
-                {review_count !== undefined ? `${review_count} ${review_count === 1 ? r.review : r.reviews}` : ""}
-              </span>
-            </>
-          ) : (
-            <span className="text-xs text-muted-foreground/70">{r.noReviewsYet}</span>
-          )}
+        <div className="w-full pt-2 border-t border-border/50">
+          <div className="flex items-center gap-1.5 min-h-[1.5rem]">
+            {rating !== undefined && rating > 0 ? (
+              <>
+                <div className="flex items-center">
+                  {[...Array(5)].map((_, i) => (
+                    <span
+                      key={i}
+                      className={`text-xs sm:text-sm ${
+                        i < Math.floor(rating)
+                          ? "text-yellow-400"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      ★
+                    </span>
+                  ))}
+                </div>
+                <span className="text-[10px] sm:text-xs text-muted-foreground">
+                  {review_count !== undefined ? `${review_count} ${review_count === 1 ? r.review : r.reviews}` : ""}
+                </span>
+              </>
+            ) : (
+              <span className="text-xs text-muted-foreground/70">{r.noReviewsYet}</span>
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>

@@ -1,17 +1,25 @@
 import { createClient } from "./server";
 import { createAdminClient } from "./admin";
 import { handleSupabaseError } from "../utils/supabase-errors";
+import type { CartContentProps } from "@/types/cart";
 
 /**
- * Get user's cart items
+ * Get user's cart items, normalized to typed CartItem objects.
  */
-export async function getCartItems(userId: string) {
+export async function getCartItems(userId: string): Promise<CartContentProps["items"]> {
   const supabase = await createClient();
-  const {data, error} = await supabase
+  const { data, error } = await supabase
     .from("cart")
     .select(
       `
-      *,
+      id,
+      user_id,
+      product_id,
+      quantity,
+      material,
+      customizations,
+      created_at,
+      updated_at,
       products (
         id,
         name,
@@ -21,12 +29,24 @@ export async function getCartItems(userId: string) {
     `
     )
     .eq("user_id", userId)
-    .order("created_at", {ascending: false});
+    .order("created_at", { ascending: false });
 
   if (error) {
     throw handleSupabaseError(error);
   }
-  return data;
+  const items: CartContentProps["items"] = (data ?? []).map((item: any) => ({
+    id: item.id,
+    user_id: item.user_id,
+    product_id: item.product_id,
+    quantity: item.quantity,
+    material: item.material,
+    customizations: item.customizations,
+    created_at: item.created_at,
+    updated_at: item.updated_at,
+    products: Array.isArray(item.products) ? item.products[0] : item.products,
+  }));
+
+  return items;
 }
 
 /**
@@ -44,7 +64,7 @@ export async function addToCart(item: {
   // Check if item already exists with same material and customizations
   const {data: existingItem} = await supabase
     .from("cart")
-    .select("*")
+    .select("id, quantity")
     .eq("user_id", item.user_id)
     .eq("product_id", item.product_id)
     .eq("material", item.material || "")

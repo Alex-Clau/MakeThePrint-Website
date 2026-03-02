@@ -1,5 +1,6 @@
 import { createClient } from "./server";
 import { handleSupabaseError } from "../utils/supabase-errors";
+import type { Review } from "@/types/product-components";
 
 /**
  * Get aggregate rating and review count for multiple products (for listing cards).
@@ -37,15 +38,21 @@ export async function getProductReviewStats(productIds: string[]): Promise<
 }
 
 /**
- * Get reviews for a product
+ * Get reviews for a product, normalized to the Review type used in components.
  */
-export async function getProductReviews(productId: string) {
+export async function getProductReviews(productId: string): Promise<Review[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("product_reviews")
     .select(
       `
-      *,
+      id,
+      user_id,
+      product_id,
+      rating,
+      comment,
+      created_at,
+      updated_at,
       user_profiles (
         id,
         full_name,
@@ -59,7 +66,23 @@ export async function getProductReviews(productId: string) {
   if (error) {
     throw handleSupabaseError(error);
   }
-  return data;
+
+  const reviews: Review[] = (data ?? []).map((item: any) => ({
+    id: item.id,
+    rating: item.rating,
+    comment: item.comment ?? undefined,
+    created_at: item.created_at,
+    updated_at: item.updated_at ?? undefined,
+    user_id: item.user_id,
+    user_profiles: Array.isArray(item.user_profiles) && item.user_profiles.length > 0
+      ? {
+          full_name: item.user_profiles[0]?.full_name ?? undefined,
+          email: item.user_profiles[0]?.email ?? undefined,
+        }
+      : undefined,
+  }));
+
+  return reviews;
 }
 
 /**
@@ -76,7 +99,7 @@ export async function createReview(review: {
   // Check if user already reviewed this product
   const { data: existingReview } = await supabase
     .from("product_reviews")
-    .select("*")
+    .select("id")
     .eq("user_id", review.user_id)
     .eq("product_id", review.product_id)
     .maybeSingle();

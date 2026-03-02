@@ -11,7 +11,7 @@ export async function addToWishlistClient(userId: string, productId: string) {
   // Check if already in wishlist
   const { data: existing } = await supabase
     .from("wishlist")
-    .select("*")
+    .select("id")
     .eq("user_id", userId)
     .eq("product_id", productId)
     .maybeSingle();

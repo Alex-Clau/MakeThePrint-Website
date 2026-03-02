@@ -1,31 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 
 export function CartCount() {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    const supabase = createClient();
-
     async function fetchCartCount() {
       try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-
-        if (!user) {
+        const response = await fetch("/api/cart/count");
+        if (!response.ok) {
           setCount(0);
           return;
         }
-
-        const { count: cartCount } = await supabase
-          .from("cart")
-          .select("*", { count: "exact", head: true })
-          .eq("user_id", user.id);
-
-        setCount(cartCount ?? 0);
+        const data = (await response.json()) as { count?: number };
+        setCount(typeof data.count === "number" ? data.count : 0);
       } catch {
         setCount(0);
       }
@@ -33,24 +22,10 @@ export function CartCount() {
 
     fetchCartCount();
 
-    const channel = supabase
-      .channel("cart-changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "cart",
-        },
-        fetchCartCount
-      )
-      .subscribe();
-
     const handleCartUpdate = () => fetchCartCount();
     window.addEventListener("cart-updated", handleCartUpdate);
 
     return () => {
-      supabase.removeChannel(channel);
       window.removeEventListener("cart-updated", handleCartUpdate);
     };
   }, []);

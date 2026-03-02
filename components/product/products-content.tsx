@@ -8,11 +8,10 @@ import { ProductsContentProps } from "@/types/components";
 import { usePathname } from "next/navigation";
 import { messages } from "@/lib/messages";
 
-export function ProductsContent({ products, wishlistProductIds = [] }: ProductsContentProps) {
+export function ProductsContent({ products }: ProductsContentProps) {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const pathName = usePathname();
   const t = messages.products;
-  const wishlistSet = new Set(wishlistProductIds);
 
   return (
     <>
@@ -29,7 +28,6 @@ export function ProductsContent({ products, wishlistProductIds = [] }: ProductsC
             <ProductCard
               key={`${product.id}-${pathName}-${viewMode}`}
               {...product}
-              isInWishlist={wishlistSet.has(product.id)}
             />
           ))}
         </div>
@@ -39,7 +37,6 @@ export function ProductsContent({ products, wishlistProductIds = [] }: ProductsC
             <ProductListItem
               key={product.id}
               product={product}
-              isInWishlist={wishlistSet.has(product.id)}
             />
           ))}
         </div>

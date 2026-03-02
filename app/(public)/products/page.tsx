@@ -1,35 +1,20 @@
 import { PageLayout } from "@/components/layout/page-layout";
 import { ProductsContent } from "@/components/product/products-content";
-import { getProducts } from "@/lib/supabase/products";
-import { getWishlist } from "@/lib/supabase/wishlist";
+import { getPublicCustomProducts } from "@/lib/supabase/products";
 import { getProductReviewStats } from "@/lib/supabase/reviews";
-import { createClient } from "@/lib/supabase/server";
 import { transformProductToCardData } from "@/lib/utils/products";
 import { messages } from "@/lib/messages";
 
 async function ProductsList() {
-  const supabase = await createClient();
-  const [products, { data: { user } }] = await Promise.all([
-    getProducts({ product_type: "custom" }),
-    supabase.auth.getUser(),
-  ]);
+  const products = await getPublicCustomProducts();
   const reviewStats = await getProductReviewStats(products.map((p) => p.id));
   const transformedProducts = products.map((p) => {
     const stats = reviewStats.get(p.id);
     return transformProductToCardData({ ...p, rating: stats?.rating, review_count: stats?.review_count });
   });
-  const wishlistProductIds =
-    user != null
-      ? (await getWishlist(user.id)).map((item) =>
-          typeof item.products === "object" && item.products != null && "id" in item.products
-            ? String((item.products as { id: string }).id)
-            : (item as { product_id: string }).product_id
-        )
-      : [];
   return (
     <ProductsContent
       products={transformedProducts}
-      wishlistProductIds={wishlistProductIds}
     />
   );
 }

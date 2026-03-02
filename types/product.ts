@@ -48,8 +48,6 @@ export interface Product {
   category?: "preset" | "inquire" | "finished";
   custom_config?: CustomProductConfig | KeychainConfig;
   featured?: boolean;
-  seasonal?: boolean;
-  image?: string;
   images?: string[];
   created_at?: string;
   updated_at?: string;

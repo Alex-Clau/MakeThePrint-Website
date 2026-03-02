@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     // Check if user already reviewed this product
     const { data: existingReview } = await supabase
       .from("product_reviews")
-      .select("*")
+      .select("id")
       .eq("user_id", user.id)
       .eq("product_id", product_id)
       .maybeSingle();

@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2, Eye } from "lucide-react";
-import { deleteProductAction } from "@/app/admin/actions";
+import { deleteProductAction} from "@/app/(auth)/admin/actions";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { messages } from "@/lib/messages";

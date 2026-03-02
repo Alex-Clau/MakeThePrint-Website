@@ -8,7 +8,9 @@ export async function getUserProfile(userId: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("user_profiles")
-    .select("*")
+    .select(
+      "id, email, full_name, phone, shipping_addresses, preferences, is_admin, created_at, updated_at"
+    )
     .eq("id", userId)
     .single();
 

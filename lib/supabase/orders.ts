@@ -8,7 +8,7 @@ export async function getOrders(userId: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("orders")
-    .select("*")
+    .select("id, user_id, total_amount, status, created_at")
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
 

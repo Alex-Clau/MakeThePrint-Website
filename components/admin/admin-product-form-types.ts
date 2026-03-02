@@ -13,7 +13,6 @@ export interface ProductFormData {
   product_type: "custom" | "seasonal";
   category: string;
   featured: boolean;
-  seasonal: boolean;
   custom_config?: CustomProductConfig | KeychainConfig;
 }
 

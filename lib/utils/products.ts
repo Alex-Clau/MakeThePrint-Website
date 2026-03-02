@@ -40,7 +40,7 @@ export function transformProductToFull(product: any) {
     category: product.category || "",
     custom_config: product.custom_config || {},
     featured: product.featured || false,
-    seasonal: product.seasonal || false,
+    seasonal: product.product_type === "seasonal",
     image: product.images?.[0] || "",
     images: (product.images as string[]) || [],
   };

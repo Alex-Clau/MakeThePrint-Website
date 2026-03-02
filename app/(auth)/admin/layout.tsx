@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Package, ShoppingBag, LogOut } from "lucide-react";
-import { requireAdmin } from "@/app/admin/actions";
+import {Button} from "@/components/ui/button";
+import {LayoutDashboard, Package, ShoppingBag, LogOut} from "lucide-react";
+import {requireAdmin} from "@/app/(auth)/admin/actions";
 
 export default async function AdminLayout({
-  children,
-}: {
+                                            children,
+                                          }: {
   children: React.ReactNode;
 }) {
   await requireAdmin();
@@ -17,7 +17,10 @@ export default async function AdminLayout({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-8">
-              <Link href="/admin" className="font-bold text-xl text-accent-primary-dark">
+              <Link
+                href="/admin"
+                className="font-bold text-xl text-accent-primary-dark"
+              >
                 Admin Dashboard
               </Link>
               <div className="hidden md:flex items-center gap-6">
@@ -25,34 +28,43 @@ export default async function AdminLayout({
                   href="/admin"
                   className="flex items-center gap-2 text-sm font-medium hover:text-accent-primary-dark transition-colors"
                 >
-                  <LayoutDashboard className="h-4 w-4" />
+                  <LayoutDashboard className="h-4 w-4"/>
                   Overview
                 </Link>
                 <Link
                   href="/admin/products"
                   className="flex items-center gap-2 text-sm font-medium hover:text-accent-primary-dark transition-colors"
                 >
-                  <Package className="h-4 w-4" />
+                  <Package className="h-4 w-4"/>
                   Products
                 </Link>
                 <Link
                   href="/admin/orders"
                   className="flex items-center gap-2 text-sm font-medium hover:text-accent-primary-dark transition-colors"
                 >
-                  <ShoppingBag className="h-4 w-4" />
+                  <ShoppingBag className="h-4 w-4"/>
                   Orders
                 </Link>
               </div>
             </div>
             <div className="flex items-center gap-4">
               <Link href="/">
-                <Button variant="outline" size="sm">
+                <Button
+                  variant="outline"
+                  size="sm"
+                >
                   View Site
                 </Button>
               </Link>
-              <form action="/auth/sign-out" method="post">
-                <Button variant="ghost" size="sm">
-                  <LogOut className="h-4 w-4 mr-2" />
+              <form
+                action="/auth/sign-out"
+                method="post"
+              >
+                <Button
+                  variant="ghost"
+                  size="sm"
+                >
+                  <LogOut className="h-4 w-4 mr-2"/>
                   Logout
                 </Button>
               </form>

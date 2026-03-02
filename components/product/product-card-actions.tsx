@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Heart, ShoppingCart } from "lucide-react";
 import { addToWishlistClient, removeFromWishlistClient } from "@/lib/supabase/wishlist-client";
 import { createClient } from "@/lib/supabase/client";
-import { revalidateWishlistPaths } from "@/app/admin/actions";
+import {revalidateWishlistPaths} from "@/app/(auth)/admin/actions";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { ProductCardActionsProps } from "@/types/product-components";

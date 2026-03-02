@@ -1,20 +1,20 @@
 "use client";
 
-import { updateOrderStatusFormAction } from "@/app/admin/actions";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useTransition } from "react";
-import { messages } from "@/lib/messages";
-import type { OrderStatusFormProps } from "@/types/admin";
+import {updateOrderStatusFormAction} from "@/app/(auth)/admin/actions";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {useTransition} from "react";
+import {messages} from "@/lib/messages";
+import type {OrderStatusFormProps} from "@/types/admin";
 
 const STATUSES = ["pending", "confirmed", "shipped", "delivered"] as const;
 
 export function OrderStatusForm({
-  orderId,
-  currentStatus,
-  currentTracking,
-}: OrderStatusFormProps) {
+                                  orderId,
+                                  currentStatus,
+                                  currentTracking,
+                                }: OrderStatusFormProps) {
   const [isPending, startTransition] = useTransition();
   const t = messages.admin;
 
@@ -27,7 +27,11 @@ export function OrderStatusForm({
         });
       }}
     >
-      <input type="hidden" name="orderId" value={orderId} />
+      <input
+        type="hidden"
+        name="orderId"
+        value={orderId}
+      />
       <div className="space-y-2">
         <Label htmlFor="status">{t.statusLabel}</Label>
         <select
@@ -37,8 +41,12 @@ export function OrderStatusForm({
           className="h-9 w-40 rounded-md border border-input bg-background px-3 py-1 text-sm"
         >
           {STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {s.charAt(0).toUpperCase() + s.slice(1)}
+            <option
+              key={s}
+              value={s}
+            >
+              {s.charAt(0)
+                .toUpperCase() + s.slice(1)}
             </option>
           ))}
         </select>
@@ -53,7 +61,10 @@ export function OrderStatusForm({
           className="w-48"
         />
       </div>
-      <Button type="submit" disabled={isPending}>
+      <Button
+        type="submit"
+        disabled={isPending}
+      >
         {isPending ? t.updating : t.update}
       </Button>
     </form>

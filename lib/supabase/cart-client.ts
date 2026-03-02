@@ -19,7 +19,7 @@ export async function addToCartClient(item: {
   // Build query conditionally to handle empty/null material
   let query = supabase
     .from("cart")
-    .select("*")
+    .select("id, quantity")
     .eq("user_id", item.user_id)
     .eq("product_id", item.product_id);
   

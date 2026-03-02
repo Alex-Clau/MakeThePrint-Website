@@ -13,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { messages } from "@/lib/messages";
@@ -44,6 +45,25 @@ export function LoginForm({
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : t.errorOccurred);
     } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    const supabase = createClient();
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?next=/account`,
+        },
+      });
+      if (error) throw error;
+    } catch (error: unknown) {
+      setError(getUserFriendlyError(error) || t.errorOccurred);
       setIsLoading(false);
     }
   };
@@ -100,6 +120,23 @@ export function LoginForm({
               >
                 {t.signUp}
               </Link>
+            </div>
+            <div className="mt-6">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full flex items-center justify-center"
+                onClick={handleGoogleSignIn}
+                disabled={isLoading}
+              >
+                <Image
+                  src="/googles-logo.png"
+                  alt="Google logo"
+                  width={30}
+                  height={30}
+                />
+                <span>{t.continueWithGoogle}</span>
+              </Button>
             </div>
           </form>
         </CardContent>

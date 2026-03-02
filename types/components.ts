@@ -57,7 +57,6 @@ export interface ProductListItemProps {
  */
 export interface ProductsContentProps {
   products: ProductCardData[];
-  wishlistProductIds?: string[];
 }
 
 /**

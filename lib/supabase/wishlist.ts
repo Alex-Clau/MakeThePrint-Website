@@ -1,16 +1,20 @@
 import { createClient } from "./server";
 import { handleSupabaseError } from "../utils/supabase-errors";
+import type { WishlistContentProps } from "@/types/wishlist";
 
 /**
- * Get user's wishlist
+ * Get user's wishlist, normalized to the shape expected by WishlistContent.
  */
-export async function getWishlist(userId: string) {
+export async function getWishlist(userId: string): Promise<WishlistContentProps["items"]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("wishlist")
     .select(
       `
-      *,
+      id,
+      user_id,
+      product_id,
+      created_at,
       products (
         id,
         name,
@@ -25,7 +29,14 @@ export async function getWishlist(userId: string) {
   if (error) {
     throw handleSupabaseError(error);
   }
-  return data;
+
+  const items: WishlistContentProps["items"] = (data ?? []).map((item: any) => ({
+    id: item.id,
+    product_id: item.product_id,
+    products: Array.isArray(item.products) ? item.products[0] : item.products,
+  }));
+
+  return items;
 }
 
 /**
@@ -37,7 +48,7 @@ export async function addToWishlist(userId: string, productId: string) {
   // Check if already in wishlist
   const { data: existing } = await supabase
     .from("wishlist")
-    .select("*")
+    .select("id")
     .eq("user_id", userId)
     .eq("product_id", productId)
     .maybeSingle();

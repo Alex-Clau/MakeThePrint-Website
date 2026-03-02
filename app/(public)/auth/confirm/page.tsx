@@ -51,16 +51,25 @@ export default function AuthConfirmPage() {
     if (!pendingToken) return;
     setStatus("confirming");
     const supabase = createClient();
+
+    const type = pendingToken.type as "signup" | "email" | "recovery";
+
     const { error } = await supabase.auth.verifyOtp({
-      type: pendingToken.type as "signup" | "email",
+      type,
       token_hash: pendingToken.token_hash,
     });
+
     if (error) {
       setStatus("error");
       router.replace(`/auth/error?error=${encodeURIComponent(error.message)}`);
       return;
     }
-    router.replace("/");
+
+    if (type === "recovery") {
+      router.replace("/auth/update-password");
+    } else {
+      router.replace("/");
+    }
   };
 
   if (status === "error") return null;
