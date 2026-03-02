@@ -42,8 +42,8 @@ export function AddressesContent({
       setShowForm(false);
       toast.success(editingIndex !== null ? t.addressUpdated : t.addressAdded);
       router.refresh();
-    } catch (error: any) {
-      toast.error(error?.message || t.saveAddressFailed);
+    } catch (error: unknown) {
+      toast.error(getUserFriendlyError(error) || t.saveAddressFailed);
     }
   };
 
@@ -61,7 +61,7 @@ export function AddressesContent({
       setAddresses(updated);
       toast.success(t.addressDeleted);
       router.refresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error(getUserFriendlyError(error));
     }
   };

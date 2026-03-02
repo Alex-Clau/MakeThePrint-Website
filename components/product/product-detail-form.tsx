@@ -123,7 +123,7 @@ export function ProductDetailForm({ product, previewText = "", onPreviewChange }
       // Dispatch custom event to refresh cart count
       window.dispatchEvent(new CustomEvent("cart-updated"));
       router.push("/cart");
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error(getUserFriendlyError(error));
     } finally {
       setIsAdding(false);

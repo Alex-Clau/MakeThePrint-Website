@@ -18,7 +18,7 @@ export function FooterAccountLinks() {
           data: { user },
         } = await supabase.auth.getUser();
         setIsAuthenticated(!!user);
-      } catch (error: any) {
+      } catch (_error: unknown) {
         // Silently fail - auth check failures are non-critical
         setIsAuthenticated(false);
       } finally {

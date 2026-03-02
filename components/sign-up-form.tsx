@@ -17,6 +17,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { messages } from "@/lib/messages";
+import { getUserFriendlyError } from "@/lib/utils/error-messages";
 
 export function SignUpForm({
   className,
@@ -61,7 +62,7 @@ export function SignUpForm({
       }
       router.push(`/auth/sign-up-success?email=${encodeURIComponent(email)}`);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : t.errorOccurred);
+      setError(getUserFriendlyError(err) || t.errorOccurred);
     } finally {
       setIsLoading(false);
     }
@@ -153,15 +154,15 @@ export function SignUpForm({
               <Button
                 type="button"
                 variant="outline"
-                className="w-full flex items-center justify-center"
+                className="w-full flex items-center justify-center gap-2"
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
               >
                 <Image
                   src="/googles-logo.png"
                   alt="Google logo"
-                  width={30}
-                  height={30}
+                  width={24}
+                  height={24}
                 />
                 <span>{t.continueWithGoogle}</span>
               </Button>

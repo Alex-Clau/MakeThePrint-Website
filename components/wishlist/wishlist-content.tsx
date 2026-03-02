@@ -22,7 +22,7 @@ export function WishlistContent({ items, userId }: WishlistContentProps) {
       await removeFromWishlistClient(userId, productId);
       toast.success(w.removedFromWishlist);
       router.refresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error(getUserFriendlyError(error));
     }
   };

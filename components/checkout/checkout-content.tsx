@@ -14,6 +14,7 @@ import { AddressFormData } from "@/types/address";
 import { addShippingAddressClient } from "@/lib/supabase/user-profiles-client";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
+import { getApiErrorBody } from "@/lib/utils/api-error";
 import { CheckoutContentProps } from "@/types/checkout";
 import { getShippingCost } from "@/lib/constants/shipping";
 import { messages } from "@/lib/messages";
@@ -111,8 +112,13 @@ export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
         });
 
         if (!pendingRes.ok) {
-          const err = await pendingRes.json().catch(() => ({}));
-          throw new Error(err.error || checkoutT.failedCreateOrder);
+          const { message, code } = await getApiErrorBody(pendingRes);
+          toast.error(message || checkoutT.failedCreateOrder);
+          setClientSecret(null);
+          setPaymentIntentId(null);
+          setPendingOrderId(null);
+          if (code === "UNAUTHORIZED") router.push("/auth/login?redirect=/checkout");
+          return;
         }
 
         const { orderId } = await pendingRes.json();
@@ -129,14 +135,20 @@ export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
         });
 
         if (!intentRes.ok) {
-          throw new Error(checkoutT.failedCreatePaymentIntent);
+          const { message, code } = await getApiErrorBody(intentRes);
+          toast.error(message || checkoutT.failedCreatePaymentIntent);
+          setClientSecret(null);
+          setPaymentIntentId(null);
+          setPendingOrderId(null);
+          if (code === "UNAUTHORIZED") router.push("/auth/login?redirect=/checkout");
+          return;
         }
 
         const data = await intentRes.json();
         setClientSecret(data.clientSecret);
         setPaymentIntentId(data.paymentIntentId);
-      } catch (error: any) {
-        toast.error(error?.message || checkoutT.failedInitializePayment);
+      } catch (error: unknown) {
+        toast.error(getUserFriendlyError(error) || checkoutT.failedInitializePayment);
         setClientSecret(null);
         setPaymentIntentId(null);
         setPendingOrderId(null);
@@ -171,24 +183,26 @@ export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
       });
 
       if (!confirmRes.ok) {
-        const err = await confirmRes.json().catch(() => ({}));
-        throw new Error(err.error || checkoutT.failedConfirmOrder);
+        const { message, code } = await getApiErrorBody(confirmRes);
+        toast.error(message || checkoutT.failedConfirmOrder);
+        if (code === "UNAUTHORIZED") router.push("/auth/login?redirect=/checkout");
+        setIsSubmitting(false);
+        return;
       }
 
       if (formData.saveAddress) {
         try {
           const { email, ...addressToSave } = formData.shipping;
           await addShippingAddressClient(userId, addressToSave);
-        } catch (error: any) {
-          toast.error(checkoutT.failedSaveAddressOrderPlaced);
+        } catch (error: unknown) {
+          toast.error(getUserFriendlyError(error) || checkoutT.failedSaveAddressOrderPlaced);
         }
       }
 
       toast.success(checkoutT.orderPlacedSuccess);
       router.push(`/checkout/confirmation/${pendingOrderId}`);
-    } catch (error: any) {
-      const friendlyMessage = getUserFriendlyError(error);
-      toast.error(friendlyMessage || checkoutT.failedConfirmOrder);
+    } catch (error: unknown) {
+      toast.error(getUserFriendlyError(error) || checkoutT.failedConfirmOrder);
     } finally {
       setIsSubmitting(false);
     }
