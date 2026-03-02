@@ -12,15 +12,9 @@ import {createProductAction, updateProductAction} from "@/app/(auth)/admin/actio
 import {toast} from "sonner";
 import {ArrowLeft, Save} from "lucide-react";
 import Link from "next/link";
-<<<<<<< HEAD
-import {messages} from "@/lib/messages";
-import {getUserFriendlyError} from "@/lib/utils/error-messages";
-import {type ProductFormData, getDefaultConfig} from "./admin-product-form-types";
-=======
 import { messages } from "@/lib/messages";
-import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { type ProductFormData, getDefaultConfig } from "./admin-product-form-types";
->>>>>>> origin/main
+import {getUserFriendlyError} from "@/lib/utils/error-messages";
 
 interface AdminProductFormProps {
   product?: any;
