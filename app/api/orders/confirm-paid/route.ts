@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { setOrderPaid, getOrderForPayment } from "@/lib/supabase/orders";
 import { clearCart } from "@/lib/supabase/cart";
 import { sendOrderConfirmationEmails } from "@/lib/email/send-order-confirmation";
+import { apiErrorResponse, normalizeToApiError } from "@/lib/utils/api-error";
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,7 +14,7 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return apiErrorResponse("Unauthorized", 401, "UNAUTHORIZED");
     }
 
     const body = await request.json();
@@ -60,11 +61,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ orderId });
   } catch (err) {
-    const message =
-      err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json(
-      { error: message },
-      { status: message === "Order not found" ? 404 : 500 }
+    const { message } = normalizeToApiError(err);
+    const isNotFound = message === "Order not found";
+    return apiErrorResponse(
+      message,
+      isNotFound ? 404 : 500,
+      isNotFound ? "NOT_FOUND" : undefined
     );
   }
 }

@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { handleSupabaseError } from "@/lib/utils/supabase-errors";
-
-// Ratings are now calculated dynamically from reviews table
-// No need to update product columns
+import { apiErrorResponse, normalizeToApiError } from "@/lib/utils/api-error";
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,10 +12,7 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json(
-        { error: "Unauthorized. Please sign in to leave a review." },
-        { status: 401 }
-      );
+      return apiErrorResponse("Unauthorized. Please sign in to leave a review.", 401, "UNAUTHORIZED");
     }
 
     const body = await request.json();
@@ -58,42 +53,24 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      // Log the full error for debugging
-      console.error("Review creation error:", JSON.stringify(error, null, 2));
-      console.error("User ID:", user.id);
-      console.error("Product ID:", product_id);
-      console.error("Rating:", rating);
-      
       // Check if it's a foreign key constraint error
       if (error.code === '23503' || error.message?.includes('foreign key')) {
-        return NextResponse.json(
-          { error: "User profile not found. Please ensure your account is properly set up." },
-          { status: 400 }
-        );
+        return apiErrorResponse("User profile not found. Please ensure your account is properly set up.", 400);
       }
       
       // Check if it's an RLS policy violation
       if (error.code === '42501' || error.message?.includes('row-level security') || error.message?.includes('policy')) {
-        return NextResponse.json(
-          { error: "Permission denied. Please ensure you're signed in and try again." },
-          { status: 403 }
-        );
+        return apiErrorResponse("Permission denied. Please ensure you're signed in and try again.", 403);
       }
       
       const handledError = handleSupabaseError(error);
-      return NextResponse.json(
-        { error: handledError.message || "Failed to create review", details: error.message },
-        { status: 500 }
-      );
+      return apiErrorResponse(handledError.message || "Failed to create review", 500);
     }
 
     return NextResponse.json(data);
-  } catch (error: any) {
-    console.error("Unexpected error in review creation:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to create review" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    const { message } = normalizeToApiError(error);
+    return apiErrorResponse(message, 500);
   }
 }
 
@@ -105,7 +82,7 @@ export async function PUT(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return apiErrorResponse("Unauthorized", 401, "UNAUTHORIZED");
     }
 
     const body = await request.json();
@@ -129,11 +106,9 @@ export async function PUT(request: NextRequest) {
     }
 
     return NextResponse.json(data);
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Failed to update review" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    const { message } = normalizeToApiError(error);
+    return apiErrorResponse(message, 500);
   }
 }
 
@@ -145,7 +120,7 @@ export async function DELETE(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return apiErrorResponse("Unauthorized", 401, "UNAUTHORIZED");
     }
 
     const { searchParams } = new URL(request.url);
@@ -166,10 +141,7 @@ export async function DELETE(request: NextRequest) {
       .single();
 
     if (!review) {
-      return NextResponse.json(
-        { error: "Review not found" },
-        { status: 404 }
-      );
+      return apiErrorResponse("Review not found", 404, "NOT_FOUND");
     }
 
     // Delete review
@@ -184,11 +156,9 @@ export async function DELETE(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Failed to delete review" },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    const { message } = normalizeToApiError(error);
+    return apiErrorResponse(message, 500);
   }
 }
 
