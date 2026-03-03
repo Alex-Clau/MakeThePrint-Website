@@ -20,6 +20,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '10mb', // for vercel to match admin-image form
+    }
+  }
 };
 
 export default nextConfig;
