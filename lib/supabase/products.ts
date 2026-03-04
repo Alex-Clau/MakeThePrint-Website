@@ -62,12 +62,70 @@ export async function getPublicCustomProducts() {
   return getProducts({ product_type: "custom" });
 }
 
+export async function getPublicCustomProductsPage({
+  page,
+  pageSize,
+}: {
+  page: number;
+  pageSize: number;
+}): Promise<{ products: Product[]; hasMore: boolean; total: number }> {
+  const supabase = await createClient();
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  const { data, error, count } = await supabase
+    .from("products")
+    .select(
+      "id, name, description, price, product_type, category, custom_config, featured, images, created_at, updated_at",
+      { count: "exact" },
+    )
+    .eq("product_type", "custom")
+    .order("created_at", { ascending: false })
+    .range(from, to);
+
+  if (error) {
+    throw handleSupabaseError(error);
+  }
+
+  const total = count ?? data?.length ?? 0;
+  const hasMore = total ? to + 1 < total : (data?.length ?? 0) === pageSize;
+
+  return {
+    products: (data ?? []) as Product[],
+    hasMore,
+    total,
+  };
+}
+
 export async function getPublicSeasonalProducts(limit = 12) {
   return getProducts({ product_type: "seasonal", limit });
 }
 
 export async function getPublicFeaturedProducts(limit = 4) {
   return getProducts({ featured: true, limit });
+}
+
+type HomepageFeaturedProduct = Pick<
+  Product,
+  "id" | "name" | "price" | "category" | "featured" | "images"
+>;
+
+export async function getHomepageFeaturedProducts(
+  limit = 4,
+): Promise<HomepageFeaturedProduct[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("products")
+    .select("id, name, price, category, featured, images")
+    .eq("featured", true)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    throw handleSupabaseError(error);
+  }
+
+  return (data ?? []) as HomepageFeaturedProduct[];
 }
 
 /**

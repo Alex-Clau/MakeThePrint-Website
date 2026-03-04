@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { PageLayout } from "@/components/layout/page-layout";
 import { Sparkles, Gift } from "lucide-react";
 import { getPublicSeasonalProducts } from "@/lib/supabase/products";
@@ -5,6 +6,7 @@ import { getProductReviewStats } from "@/lib/supabase/reviews";
 import { transformProductToCardData } from "@/lib/utils/products";
 import { ProductCard } from "@/components/product/product-card";
 import { messages } from "@/lib/messages";
+import { ProductsGridSkeleton } from "@/components/skeletons/products-grid-skeleton";
 import type { Messages } from "@/lib/messages";
 
 async function SeasonalCollections({ messages }: { messages: Messages }) {
@@ -58,7 +60,9 @@ export default async function CollectionsPage() {
       }
       padding="relaxed"
     >
-      <SeasonalCollections messages={messages} />
+      <Suspense fallback={<ProductsGridSkeleton count={8} />}>
+        <SeasonalCollections messages={messages} />
+      </Suspense>
     </PageLayout>
   );
 }

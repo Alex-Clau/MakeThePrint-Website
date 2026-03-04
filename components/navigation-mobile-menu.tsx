@@ -43,7 +43,7 @@ export function NavigationMobileMenu() {
               width={200}
               height={67}
               className="object-contain h-12 w-auto"
-              unoptimized
+              sizes="200px"
             />
           </Link>
         </div>

@@ -1,20 +1,33 @@
+import { Suspense } from "react";
 import { PageLayout } from "@/components/layout/page-layout";
-import { ProductsContent } from "@/components/product/products-content";
-import { getPublicCustomProducts } from "@/lib/supabase/products";
+import { ProductsInfiniteList } from "@/components/product/products-infinite-list";
+import { ProductsGridSkeleton } from "@/components/skeletons/products-grid-skeleton";
+import { getPublicCustomProductsPage } from "@/lib/supabase/products";
 import { getProductReviewStats } from "@/lib/supabase/reviews";
 import { transformProductToCardData } from "@/lib/utils/products";
 import { messages } from "@/lib/messages";
 
 async function ProductsList() {
-  const products = await getPublicCustomProducts();
+  const pageSize = 4;
+  const { products, hasMore } = await getPublicCustomProductsPage({
+    page: 1,
+    pageSize,
+  });
   const reviewStats = await getProductReviewStats(products.map((p) => p.id));
   const transformedProducts = products.map((p) => {
     const stats = reviewStats.get(p.id);
-    return transformProductToCardData({ ...p, rating: stats?.rating, review_count: stats?.review_count });
+    return transformProductToCardData({
+      ...p,
+      rating: stats?.rating,
+      review_count: stats?.review_count,
+    });
   });
   return (
-    <ProductsContent
-      products={transformedProducts}
+    <ProductsInfiniteList
+      initialProducts={transformedProducts}
+      initialPage={1}
+      pageSize={pageSize}
+      initialHasMore={hasMore}
     />
   );
 }
@@ -40,7 +53,9 @@ export default async function ProductsPage() {
         </div>
       }
     >
-      <ProductsList />
+      <Suspense fallback={<ProductsGridSkeleton count={8} />}>
+        <ProductsList />
+      </Suspense>
     </PageLayout>
   );
 }

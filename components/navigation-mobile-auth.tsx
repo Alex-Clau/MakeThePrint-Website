@@ -5,10 +5,13 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { User } from "lucide-react";
 import { NavigationMobileAuthProps } from "@/types/navigation";
+import { LogoutButton } from "./logout-button";
+import { messages } from "@/lib/messages";
 
 export function NavigationMobileAuth({ onLinkClick }: NavigationMobileAuthProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const a = messages.auth;
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -47,14 +50,19 @@ export function NavigationMobileAuth({ onLinkClick }: NavigationMobileAuthProps)
   }
 
   return (
-    <Link
-      href="/account"
-      className="flex items-center gap-2 py-3 text-base font-medium hover:text-accent-primary-dark transition-colors border-b border-border/40 touch-manipulation"
-      onClick={onLinkClick}
-    >
-      <User className="h-4 w-4" />
-      My Account
-    </Link>
+    <>
+      <Link
+        href="/account"
+        className="flex items-center gap-2 py-3 text-base font-medium hover:text-accent-primary-dark transition-colors border-b border-border/40 touch-manipulation"
+        onClick={onLinkClick}
+      >
+        <User className="h-4 w-4" />
+        <span>{a.myAccount}</span>
+      </Link>
+      <div className="py-3 border-b border-border/40">
+        <LogoutButton />
+      </div>
+    </>
   );
 }
 

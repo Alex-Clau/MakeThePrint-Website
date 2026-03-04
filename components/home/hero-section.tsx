@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -14,24 +12,22 @@ export function HeroSection() {
       {/* Background: light theme = heroWhite, dark theme = heroBlack */}
       <div className="hidden md:block absolute inset-0">
         <Image
-          src="/heroWhite.png"
+          src="/heroWhite.webp"
           alt="3D Printers"
           fill
-          priority
           quality={75}
           className="object-center dark:hidden"
-          sizes="100vw"
-          unoptimized
+          sizes="(max-width: 1024px) 100vw, 1280px"
+          priority
+          fetchPriority="high"
         />
         <Image
-          src="/heroBlack.png"
+          src="/heroBlack.webp"
           alt="3D Printers"
           fill
-          priority
           quality={75}
           className="object-center hidden dark:block"
-          sizes="100vw"
-          unoptimized
+          sizes="(max-width: 1024px) 100vw, 1280px"
         />
         {/* Overlays: stronger center wash for text, gradient to blend with theme */}
         <div

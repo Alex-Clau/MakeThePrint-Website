@@ -58,11 +58,20 @@ export async function updateSession(request: NextRequest) {
     "/checkout",
   ];
   
-  const isPublicPath = publicPaths.some(path => 
-    request.nextUrl.pathname === path || 
-    request.nextUrl.pathname.startsWith(path + "/")
-  ) || request.nextUrl.pathname.startsWith("/auth")
-  || request.nextUrl.pathname === "/api/stripe/webhook";
+  const pathname = request.nextUrl.pathname;
+
+  const isPublicPath =
+    // marketing/public pages
+    publicPaths.some(
+      (path) =>
+        pathname === path || pathname.startsWith(path + "/"),
+    ) ||
+    // auth pages & flows
+    pathname.startsWith("/auth") ||
+    // all API routes are public; individual handlers enforce auth as needed
+    pathname.startsWith("/api") ||
+    // explicit webhook path (kept for clarity)
+    pathname === "/api/stripe/webhook";
 
   if (!isPublicPath && !user) {
     // Redirect to login only for protected routes
@@ -70,19 +79,6 @@ export async function updateSession(request: NextRequest) {
     url.pathname = "/auth/login";
     return NextResponse.redirect(url);
   }
-
-  // IMPORTANT: You *must* return the supabaseResponse object as it is.
-  // If you're creating a new response object with NextResponse.next() make sure to:
-  // 1. Pass the request in it, like so:
-  //    const myNewResponse = NextResponse.next({ request })
-  // 2. Copy over the cookies, like so:
-  //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())
-  // 3. Change the myNewResponse object to fit your needs, but avoid changing
-  //    the cookies!
-  // 4. Finally:
-  //    return myNewResponse
-  // If this is not done, you may be causing the browser and server to go out
-  // of sync and terminate the user's session prematurely!
 
   return supabaseResponse;
 }
