@@ -31,6 +31,7 @@
     "registeredAddress": "Gura Humorului, Județ Suceava"
   },
   "common": {
+    "cancel": "Anulare",
     "shopNow": "Cumpără acum",
     "learnMore": "Află mai mult",
     "goHome": "Acasă",
@@ -98,6 +99,11 @@
     "manageAddresses": "Gestionează adresele",
     "settings": "Setări",
     "accountSettings": "Setări cont",
+    "profile": "Profil",
+    "profileDescription": "Modifică-ți numele",
+    "displayName": "Nume afișat",
+    "displayNameLabel": "Numele afișat la recenzii",
+    "displayNamePlaceholder": "ex. Ion Popescu",
     "orderItems": "Produse comandate",
     "myAccount": "Contul meu",
     "backToOrders": "Înapoi la comenzi",
@@ -118,6 +124,7 @@
     "addressUpdated": "Adresa a fost actualizată",
     "addressAdded": "Adresa a fost adăugată",
     "addressDeleted": "Adresa a fost ștearsă",
+    "confirmDeleteAddress": "Șterge adresa?",
     "saveAddressFailed": "Salvarea adresei a eșuat",
     "profileInfo": "Informații profil",
     "fullName": "Nume complet",
@@ -132,6 +139,8 @@
     "empty": "Coșul tău este gol",
     "emptyHint": "Adaugă produse în coș",
     "continueShopping": "Continuă cumpărăturile",
+    "confirmRemove": "Elimină din coș?",
+    "remove": "Elimină",
     "itemRemoved": "Produs scos din coș",
     "subtotal": "Subtotal",
     "shipping": "Livrare",
@@ -144,6 +153,8 @@
   "checkout": {
     "title": "Finalizare comandă",
     "shippingAddress": "Adresa de livrare",
+    "useSavedAddress": "Folosește o adresă salvată",
+    "selectSavedAddress": "Selectează o adresă",
     "completeAddress": "Completează formularul de adresă mai sus pentru a continua cu plata.",
     "orderSummary": "Rezumat comandă",
     "payNow": "Plătește acum",
@@ -262,6 +273,7 @@
     "deleteReview": "Șterge recenzia"
   },
   "wishlist": {
+    "confirmRemove": "Elimină din lista de dorințe?",
     "removedFromWishlist": "Scos din lista de dorințe",
     "emptyTitle": "Lista ta de dorințe este goală",
     "emptyHint": "Adaugă produse în lista de dorințe",
@@ -397,7 +409,8 @@
     "add": "Adaugă",
     "edit": "Editează",
     "delete": "Șterge",
-    "confirmDelete": "Sigur vrei să ștergi numele produsului?",
+    "confirmDelete": "Sigur vrei să ștergi produsul \"{name}\"?",
+    "confirmDeleteTitle": "Șterge produsul?",
     "productDeleted": "Produs șters cu succes",
     "deleteFailed": "Ștergerea produsului a eșuat",
     "addYourFirstProduct": "Adaugă primul tău produs",

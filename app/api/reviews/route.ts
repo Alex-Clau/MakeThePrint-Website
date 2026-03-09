@@ -2,6 +2,69 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { handleSupabaseError } from "@/lib/utils/supabase-errors";
 import { apiErrorResponse, normalizeToApiError } from "@/lib/utils/api-error";
+import {
+  getProductReviewsPaginated,
+  getProductReviewStatsForProduct,
+  type ReviewSort,
+} from "@/lib/supabase/reviews";
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const productId = searchParams.get("product_id");
+    const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
+    const limit = Math.min(20, Math.max(1, parseInt(searchParams.get("limit") ?? "5", 10)));
+    const sort = (searchParams.get("sort") ?? "newest") as ReviewSort;
+
+    if (!productId) {
+      return NextResponse.json({ error: "product_id is required" }, { status: 400 });
+    }
+
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const [{ reviews, total }, stats] = await Promise.all([
+      getProductReviewsPaginated(productId, page, limit, sort),
+      getProductReviewStatsForProduct(productId),
+    ]);
+
+    let userReview = null;
+    if (user) {
+      const { data } = await supabase
+        .from("product_reviews")
+        .select("id, user_id, rating, comment, created_at, updated_at")
+        .eq("product_id", productId)
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (data) {
+        userReview = {
+          id: data.id,
+          user_id: data.user_id,
+          rating: data.rating,
+          comment: data.comment ?? undefined,
+          created_at: data.created_at,
+          updated_at: data.updated_at ?? undefined,
+        };
+      }
+    }
+
+    const hasMore = page * limit < total;
+
+    return NextResponse.json({
+      reviews,
+      total,
+      averageRating: stats.averageRating,
+      distribution: stats.distribution,
+      hasMore,
+      userReview,
+    });
+  } catch (error: unknown) {
+    const { message } = normalizeToApiError(error);
+    return apiErrorResponse(message, 500);
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {

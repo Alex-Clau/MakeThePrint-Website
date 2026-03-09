@@ -43,7 +43,7 @@ export async function getCartItems(userId: string): Promise<CartContentProps["it
     customizations: item.customizations,
     created_at: item.created_at,
     updated_at: item.updated_at,
-    products: Array.isArray(item.products) ? item.products[0] : item.products,
+    products: item.products,
   }));
 
   return items;

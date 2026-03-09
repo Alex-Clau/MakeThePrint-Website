@@ -61,13 +61,13 @@ export function CartItemsList({
                   )}
                   <p className="text-lg font-bold">
                     {(item.customizations?.totalPrice != null
-                      ? item.customizations.totalPrice
+                      ? item.customizations.totalPrice * item.quantity
                       : (item.products?.price ?? 0) * item.quantity
                     ).toFixed(2)}{" "}
                     {c.ron}
-                    {item.customizations?.totalPrice == null && item.quantity > 1 && (
+                    {item.quantity > 1 && (
                       <span className="text-sm font-normal text-muted-foreground ml-1">
-                        ({parseFloat((item.products?.price ?? 0).toString()).toFixed(2)} {c.ron} × {item.quantity})
+                        ({(item.customizations?.totalPrice ?? item.products?.price ?? 0).toFixed(2)} {c.ron} × {item.quantity})
                       </span>
                     )}
                   </p>
@@ -98,7 +98,7 @@ export function CartItemsList({
                     variant="ghost"
                     size="icon"
                     className="h-10 w-10 sm:h-9 sm:w-9 text-destructive touch-manipulation"
-                    onClick={() => onRemove(item.id)}
+                    onClick={() => onRemove(item.id, displayName)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>

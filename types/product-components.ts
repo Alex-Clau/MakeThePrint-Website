@@ -32,14 +32,6 @@ export interface ProductImageGalleryProps {
 }
 
 /**
- * Product Reviews component props
- */
-export interface ProductReviewsProps {
-  productId: string;
-  userId?: string;
-}
-
-/**
  * Review interface
  */
 export interface Review {
@@ -59,11 +51,15 @@ export interface Review {
  * Product Reviews List component props
  */
 export interface ProductReviewsListProps {
-  reviews: Review[];
+  initialReviews: Review[];
   currentUserId?: string;
   averageRating: number;
   totalReviews: number;
+  distribution: Record<number, number>;
   productId: string;
+  initialHasMore: boolean;
+  userReview?: Review | null;
+  userDisplayName?: string;
 }
 
 /**
@@ -72,7 +68,8 @@ export interface ProductReviewsListProps {
 export interface CreateReviewFormProps {
   productId: string;
   userId: string;
-  reviews: any[];
+  userReview?: Review | null;
+  userDisplayName?: string;
   onClose?: () => void;
 }
 

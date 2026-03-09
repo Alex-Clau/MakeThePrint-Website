@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,23 +10,35 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CheckCircle2, ChevronDown } from "lucide-react";
+import { CheckCircle2, ChevronDown, Loader2 } from "lucide-react";
 import { CreateReviewForm } from "./create-review-form";
 import { createClient } from "@/lib/supabase/client";
 import { ProductReviewsListProps } from "@/types/product-components";
 import { messages } from "@/lib/messages";
+import type { Review } from "@/types/product-components";
+
+type SortOption = "newest" | "oldest" | "highest" | "lowest";
 
 export function ProductReviewsList({
-  reviews,
+  initialReviews,
   currentUserId,
   averageRating,
   totalReviews,
+  distribution,
   productId,
+  initialHasMore,
+  userReview,
+  userDisplayName,
 }: ProductReviewsListProps) {
   const t = messages.reviews;
-  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "highest" | "lowest">("newest");
+  const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [userId, setUserId] = useState<string | undefined>(currentUserId);
+  const [reviews, setReviews] = useState<Review[]>(initialReviews);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(initialHasMore);
+  const [isLoading, setIsLoading] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     async function getUser() {
@@ -39,11 +51,65 @@ export function ProductReviewsList({
     }
   }, [currentUserId]);
 
-  // Calculate rating distribution
   const ratingDistribution = [5, 4, 3, 2, 1].map((star) => ({
     stars: star,
-    count: reviews.filter((r) => r.rating === star).length,
+    count: distribution[star] ?? 0,
   }));
+
+  const fetchMore = useCallback(
+    async (sort: SortOption, pageNum: number, append: boolean) => {
+      setIsLoading(true);
+      try {
+        const res = await fetch(
+          `/api/reviews?product_id=${productId}&page=${pageNum}&limit=5&sort=${sort}`
+        );
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error ?? "Failed to fetch");
+        const newReviews = data.reviews ?? [];
+        setReviews((prev) => (append ? [...prev, ...newReviews] : newReviews));
+        setHasMore(data.hasMore ?? false);
+      } catch {
+        setHasMore(false);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [productId]
+  );
+
+  useEffect(() => {
+    if (sortBy !== "newest") {
+      setPage(1);
+      setReviews([]);
+      fetchMore(sortBy, 1, false);
+    } else {
+      setReviews(initialReviews);
+      setPage(1);
+      setHasMore(initialHasMore);
+    }
+  }, [sortBy]);
+
+  useEffect(() => {
+    if (!sentinelRef.current || !hasMore || isLoading) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (!entry.isIntersecting || isLoading) return;
+        const nextPage = page + 1;
+        setPage(nextPage);
+        fetchMore(sortBy, nextPage, true);
+      },
+      { rootMargin: "100px" }
+    );
+
+    observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, [hasMore, isLoading, page, sortBy, fetchMore]);
+
+  const handleSortChange = (v: string) => {
+    setSortBy(v as SortOption);
+  };
 
   const renderStars = (rating: number, size: "sm" | "md" | "lg" = "md") => {
     const sizeClasses = {
@@ -67,7 +133,6 @@ export function ProductReviewsList({
     );
   };
 
-  // Sort reviews
   const sortedReviews = [...reviews].sort((a, b) => {
     switch (sortBy) {
       case "newest":
@@ -85,9 +150,8 @@ export function ProductReviewsList({
 
   return (
     <div className="space-y-6">
-      {/* Rating Summary - always show, even if there are no reviews */}
+      {/* Rating Summary */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-12">
-        {/* Left: Overall Rating */}
         <div>
           <div className="flex items-center gap-3 mb-2">
             {renderStars(Math.round(averageRating), "lg")}
@@ -108,7 +172,6 @@ export function ProductReviewsList({
           )}
         </div>
 
-        {/* Right: Rating Breakdown */}
         <div className="space-y-2">
           {ratingDistribution.map(({ stars, count }) => {
             const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0;
@@ -142,7 +205,7 @@ export function ProductReviewsList({
               {t.writeReview}
             </Button>
           )}
-          {reviews.length > 0 && (
+          {totalReviews > 0 && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="gap-2">
@@ -154,7 +217,7 @@ export function ProductReviewsList({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuRadioGroup value={sortBy} onValueChange={(v) => setSortBy(v as typeof sortBy)}>
+                <DropdownMenuRadioGroup value={sortBy} onValueChange={handleSortChange}>
                   <DropdownMenuRadioItem value="newest">{t.newest}</DropdownMenuRadioItem>
                   <DropdownMenuRadioItem value="oldest">{t.oldest}</DropdownMenuRadioItem>
                   <DropdownMenuRadioItem value="highest">{t.highestRating}</DropdownMenuRadioItem>
@@ -172,7 +235,8 @@ export function ProductReviewsList({
           <CreateReviewForm
             productId={productId}
             userId={userId}
-            reviews={reviews}
+            userReview={userReview}
+            userDisplayName={userDisplayName}
             onClose={() => setShowReviewForm(false)}
           />
         </div>
@@ -182,45 +246,57 @@ export function ProductReviewsList({
       {reviews.length > 0 && (
         <div className="space-y-4">
           {sortedReviews.map((review) => {
-          const reviewDate = new Date(review.created_at);
-          const userName =
-            review.user_profiles?.full_name ||
-            review.user_profiles?.email?.split("@")[0] ||
-            "Anonymous";
+            const reviewDate = new Date(review.created_at);
+            const userName =
+              review.user_profiles?.full_name ||
+              review.user_profiles?.email?.split("@")[0] ||
+              "Anonymous";
 
-          return (
-            <Card key={review.id} className="border-accent-primary/20">
-              <CardContent className="p-4 sm:p-6">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      {renderStars(review.rating)}
-                      <div className="flex items-center gap-2">
-                        <div className="h-6 w-6 rounded-full bg-yellow-400 flex items-center justify-center text-white text-xs font-semibold">
-                          {userName.charAt(0).toUpperCase()}
+            return (
+              <Card key={review.id} className="border-accent-primary/20">
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        {renderStars(review.rating)}
+                        <div className="flex items-center gap-2">
+                          <div className="h-6 w-6 rounded-full bg-yellow-400 flex items-center justify-center text-white text-xs font-semibold">
+                            {userName.charAt(0).toUpperCase()}
+                          </div>
+                          <span className="font-semibold">{userName}</span>
                         </div>
-                        <span className="font-semibold">{userName}</span>
                       </div>
+                      {review.comment && (
+                        <p className="text-sm text-muted-foreground mt-2">
+                          {review.comment}
+                        </p>
+                      )}
                     </div>
-                    {review.comment && (
-                      <p className="text-sm text-muted-foreground mt-2">
-                        {review.comment}
-                      </p>
-                    )}
+                    <span className="text-sm text-muted-foreground whitespace-nowrap">
+                      {reviewDate.toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                      })}
+                    </span>
                   </div>
-                  <span className="text-sm text-muted-foreground whitespace-nowrap">
-                    {reviewDate.toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "2-digit",
-                      day: "2-digit",
-                    })}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
+      )}
+
+      <div ref={sentinelRef} className="h-10 flex items-center justify-center">
+        {isLoading && (
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        )}
+      </div>
+
+      {!hasMore && totalReviews > 0 && reviews.length > 5 && (
+        <p className="text-center text-xs text-muted-foreground py-2">
+          Ai ajuns la finalul recenziilor.
+        </p>
       )}
     </div>
   );

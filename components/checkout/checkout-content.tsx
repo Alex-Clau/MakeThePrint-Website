@@ -19,7 +19,12 @@ import { CheckoutContentProps } from "@/types/checkout";
 import { getShippingCost } from "@/lib/constants/shipping";
 import { messages } from "@/lib/messages";
 
-export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
+export function CheckoutContent({
+  cartItems,
+  userId,
+  savedAddresses = [],
+  userEmail,
+}: CheckoutContentProps) {
   const router = useRouter();
   const cartT = messages.cart;
   const checkoutT = messages.checkout;
@@ -50,9 +55,9 @@ export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
   }
 
   const subtotal = cartItems.reduce((sum, item) => {
-    // Preset (configurable): line total is totalPrice from customizations
+    // Preset (configurable): line total is totalPrice * quantity
     if (item.customizations?.totalPrice != null) {
-      return sum + item.customizations.totalPrice;
+      return sum + item.customizations.totalPrice * item.quantity;
     }
     return sum + (item.products?.price || 0) * item.quantity;
   }, 0);
@@ -79,15 +84,30 @@ export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
     formData.shipping.zip?.trim() !== "" &&
     formData.shipping.country?.trim() !== "";
 
+  const clearPaymentState = () => {
+    setClientSecret(null);
+    setPaymentIntentId(null);
+    setPendingOrderId(null);
+  };
+
+  const handleFetchError = async (
+    res: Response,
+    fallbackMessage: string
+  ): Promise<boolean> => {
+    const { message, code } = await getApiErrorBody(res);
+    toast.error(message || fallbackMessage);
+    clearPaymentState();
+    if (code === "UNAUTHORIZED") router.push("/auth/login?redirect=/checkout");
+    return true;
+  };
+
   // Create pending order then payment intent when address is complete (for webhook backup).
   // Depend only on total, cart length, and isAddressComplete so we don't create duplicate orders on every form keystroke.
   useEffect(() => {
     const setupPayment = async () => {
       const currentFormData = formDataRef.current;
       if (cartItems.length === 0 || !isAddressComplete || !currentFormData?.shipping) {
-        setClientSecret(null);
-        setPaymentIntentId(null);
-        setPendingOrderId(null);
+        clearPaymentState();
         return;
       }
 
@@ -112,12 +132,7 @@ export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
         });
 
         if (!pendingRes.ok) {
-          const { message, code } = await getApiErrorBody(pendingRes);
-          toast.error(message || checkoutT.failedCreateOrder);
-          setClientSecret(null);
-          setPaymentIntentId(null);
-          setPendingOrderId(null);
-          if (code === "UNAUTHORIZED") router.push("/auth/login?redirect=/checkout");
+          await handleFetchError(pendingRes, checkoutT.failedCreateOrder);
           return;
         }
 
@@ -135,12 +150,7 @@ export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
         });
 
         if (!intentRes.ok) {
-          const { message, code } = await getApiErrorBody(intentRes);
-          toast.error(message || checkoutT.failedCreatePaymentIntent);
-          setClientSecret(null);
-          setPaymentIntentId(null);
-          setPendingOrderId(null);
-          if (code === "UNAUTHORIZED") router.push("/auth/login?redirect=/checkout");
+          await handleFetchError(intentRes, checkoutT.failedCreatePaymentIntent);
           return;
         }
 
@@ -149,9 +159,7 @@ export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
         setPaymentIntentId(data.paymentIntentId);
       } catch (error: unknown) {
         toast.error(getUserFriendlyError(error) || checkoutT.failedInitializePayment);
-        setClientSecret(null);
-        setPaymentIntentId(null);
-        setPendingOrderId(null);
+        clearPaymentState();
       } finally {
         setIsLoadingPayment(false);
       }
@@ -222,6 +230,8 @@ export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
               saveAddress: data.saveAddress,
             });
           }}
+          savedAddresses={savedAddresses}
+          userEmail={userEmail}
         />
         {!isAddressComplete ? (
           <Card>

@@ -2,28 +2,45 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createReviewClient, updateReviewClient, deleteReviewClient } from "@/lib/supabase/reviews-client";
+import { updateUserProfileClient } from "@/lib/supabase/user-profiles-client";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { useRouter } from "next/navigation";
 import { CreateReviewFormProps } from "@/types/product-components";
 import { messages } from "@/lib/messages";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export function CreateReviewForm({
   productId,
   userId,
-  reviews,
+  userReview,
+  userDisplayName,
   onClose,
 }: CreateReviewFormProps) {
   const router = useRouter();
   const t = messages.reviews;
-  const existingReview = reviews.find((r) => r.user_id === userId);
+  const a = messages.account;
+  const existingReview = userReview ?? undefined;
+  const showDisplayNameField = !existingReview && !userDisplayName;
   const [rating, setRating] = useState(existingReview?.rating || 0);
   const [comment, setComment] = useState(existingReview?.comment || "");
+  const [displayName, setDisplayName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,6 +58,9 @@ export function CreateReviewForm({
         }, productId);
         toast.success(t.reviewUpdated);
       } else {
+        if (showDisplayNameField && displayName.trim()) {
+          await updateUserProfileClient(userId, { full_name: displayName.trim() });
+        }
         await createReviewClient({
           user_id: userId,
           product_id: productId,
@@ -61,10 +81,10 @@ export function CreateReviewForm({
     }
   };
 
-  const handleDelete = async () => {
+  const handleDeleteConfirm = async () => {
     if (!existingReview) return;
-    if (!confirm(t.confirmDeleteReview)) return;
 
+    setShowDeleteDialog(false);
     setIsSubmitting(true);
     try {
       await deleteReviewClient(existingReview.id, userId);
@@ -112,6 +132,18 @@ export function CreateReviewForm({
               )}
             </div>
           </div>
+          {showDisplayNameField && (
+            <div>
+              <Label htmlFor="displayName">{a.displayNameLabel}</Label>
+              <Input
+                id="displayName"
+                value={displayName}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDisplayName(e.target.value)}
+                placeholder={a.displayNamePlaceholder}
+                className="mt-2"
+              />
+            </div>
+          )}
           <div>
             <Label htmlFor="comment">{t.commentOptional}</Label>
             <Textarea
@@ -132,14 +164,35 @@ export function CreateReviewForm({
                 : t.submitReview}
             </Button>
             {existingReview && (
-              <Button
-                type="button"
-                variant="destructive"
-                onClick={handleDelete}
-                disabled={isSubmitting}
-              >
-                {t.deleteReview}
-              </Button>
+              <>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => setShowDeleteDialog(true)}
+                  disabled={isSubmitting}
+                >
+                  {t.deleteReview}
+                </Button>
+                <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>{t.confirmDeleteReview}</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Această acțiune nu poate fi anulată.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>{messages.common.cancel}</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleDeleteConfirm}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        {t.deleteReview}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </>
             )}
           </div>
         </form>

@@ -6,7 +6,7 @@ import { CartItem } from "./cart";
 export interface CartItemsListProps {
   items: CartItem[];
   onUpdateQuantity: (itemId: string, quantity: number) => void;
-  onRemove: (itemId: string) => void;
+  onRemove: (itemId: string, productName: string) => void;
 }
 
 /**

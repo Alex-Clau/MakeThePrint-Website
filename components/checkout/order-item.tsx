@@ -15,7 +15,7 @@ export function OrderItem({ item }: OrderItemProps) {
       : "https://via.placeholder.com/64";
   const lineTotal =
     item.customizations?.totalPrice != null
-      ? item.customizations.totalPrice
+      ? item.customizations.totalPrice * item.quantity
       : (product?.price || 0) * item.quantity;
 
   return (

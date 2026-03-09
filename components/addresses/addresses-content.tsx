@@ -14,6 +14,16 @@ import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { AddressesContentProps } from "@/types/address-components";
 import { messages } from "@/lib/messages";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export function AddressesContent({
   addresses: initialAddresses,
@@ -21,9 +31,11 @@ export function AddressesContent({
 }: AddressesContentProps) {
   const router = useRouter();
   const t = messages.account;
+  const c = messages.common;
   const [addresses, setAddresses] = useState(initialAddresses || []);
   const [showForm, setShowForm] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [deleteTargetIndex, setDeleteTargetIndex] = useState<number | null>(null);
 
   const handleSave = async (addressData: any) => {
     try {
@@ -52,7 +64,15 @@ export function AddressesContent({
     setShowForm(true);
   };
 
-  const handleDelete = async (index: number) => {
+  const handleDeleteClick = (index: number) => {
+    setDeleteTargetIndex(index);
+  };
+
+  const handleDeleteConfirm = async () => {
+    const index = deleteTargetIndex;
+    if (index === null) return;
+
+    setDeleteTargetIndex(null);
     try {
       const updated = addresses.filter((_, i) => i !== index);
       await updateUserProfileClient(userId, {
@@ -93,9 +113,32 @@ export function AddressesContent({
         <AddressList
           addresses={addresses}
           onEdit={handleEdit}
-          onDelete={handleDelete}
+          onDelete={handleDeleteClick}
         />
       )}
+
+      <AlertDialog
+        open={deleteTargetIndex !== null}
+        onOpenChange={(open) => !open && setDeleteTargetIndex(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t.confirmDeleteAddress}</AlertDialogTitle>
+            <AlertDialogDescription>
+              Sigur vrei să ștergi această adresă? Această acțiune nu poate fi anulată.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{c.cancel}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {messages.admin.delete}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

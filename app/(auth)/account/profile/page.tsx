@@ -1,37 +1,35 @@
 import { PageLayout } from "@/components/layout/page-layout";
 import { getUserProfile } from "@/lib/supabase/user-profiles";
 import { getRequiredUser } from "@/lib/supabase/server";
-import { ProfileForm } from "@/components/settings/profile-form";
+import { DisplayNameForm } from "@/components/settings/display-name-form";
+import { messages } from "@/lib/messages";
 
-async function SettingsContent() {
+async function ProfileContent() {
   const user = await getRequiredUser();
   const profile = await getUserProfile(user.id);
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl sm:text-4xl font-bold mb-2">Settings</h1>
+        <h1 className="text-3xl sm:text-4xl font-bold mb-2">
+          {messages.account.profile ?? "Profil"}
+        </h1>
         <p className="text-muted-foreground">
-          Manage your account settings and preferences
+          {messages.account.profileDescription ?? "Cum vrei să apară numele tău la recenzii"}
         </p>
       </div>
-      <ProfileForm
-        initialData={{
-          email: user.email || "",
-          full_name: profile?.full_name || "",
-          phone: profile?.phone || "",
-        }}
+      <DisplayNameForm
+        initialDisplayName={profile?.full_name || ""}
         userId={user.id}
       />
     </div>
   );
 }
 
-export default function SettingsPage() {
+export default function ProfilePage() {
   return (
     <PageLayout maxWidth="4xl" padding="relaxed">
-      <SettingsContent />
+      <ProfileContent />
     </PageLayout>
   );
 }
-
