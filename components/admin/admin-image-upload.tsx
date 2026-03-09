@@ -24,60 +24,39 @@ export function AdminImageUpload({
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Compress and convert image to WebP
+  // Upload original image file to Supabase Storage via API.
+  // Resolves with the public URL string returned by the API.
   const compressImage = async (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (event) => {
-        const img = document.createElement("img");
-        img.src = event.target?.result as string;
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          const ctx = canvas.getContext("2d");
-          if (!ctx) {
-            reject(new Error("Could not get canvas context"));
-            return;
-          }
+    const formData = new FormData();
+    const filename = file.name || "image";
 
-          // Calculate new dimensions (max 1200px width, maintain aspect ratio)
-          let width = img.width;
-          let height = img.height;
-          const maxWidth = 1200;
+    formData.append("file", file, filename);
+    formData.append("filename", filename);
 
-          if (width > maxWidth) {
-            height = (height * maxWidth) / width;
-            width = maxWidth;
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-
-          // Draw and compress
-          ctx.drawImage(img, 0, 0, width, height);
-
-          // Convert to WebP with quality compression
-          canvas.toBlob(
-            (blob) => {
-              if (!blob) {
-                reject(new Error("Could not compress image"));
-                return;
-              }
-
-              const reader = new FileReader();
-              reader.readAsDataURL(blob);
-              reader.onloadend = () => {
-                resolve(reader.result as string);
-              };
-            },
-            "image/webp",
-            0.85 // 85% quality
-          );
-        };
-        img.onerror = () => reject(new Error("Could not load image"));
-      };
-      reader.onerror = () => reject(new Error("Could not read file"));
+    const res = await fetch("/api/upload-image", {
+      method: "POST",
+      body: formData,
     });
+
+    if (!res.ok) {
+      let message = messages.admin.uploadFailedGeneric;
+      try {
+        const data = await res.json();
+        if (data?.error) {
+          message = data.error;
+        }
+      } catch {
+        // ignore JSON parse errors
+      }
+      throw new Error(message);
+    }
+
+    const data = await res.json();
+    if (!data?.url || typeof data.url !== "string") {
+      throw new Error("Upload did not return a URL");
+    }
+
+    return data.url;
   };
 
   const handleFiles = async (files: FileList | null) => {
@@ -102,8 +81,8 @@ export function AdminImageUpload({
           continue;
         }
 
-        // Validate file size (max 10MB)
-        if (file.size > 10 * 1024 * 1024) {
+        // Validate file size (max 1MB per imagine)
+        if (file.size > 1 * 1024 * 1024) {
           toast.error(messages.admin.tooLarge.replace("{name}", file.name));
           continue;
         }

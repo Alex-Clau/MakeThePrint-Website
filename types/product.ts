@@ -65,5 +65,6 @@ export interface ProductCardData {
   featured?: boolean;
   rating?: number; // Calculated from product_reviews, not stored in products table
   review_count?: number; // Calculated from product_reviews, not stored in products table
+  isInWishlist?: boolean;
 }
 

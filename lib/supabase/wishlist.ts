@@ -90,6 +90,22 @@ export async function removeFromWishlist(userId: string, productId: string) {
 }
 
 /**
+ * Get all product IDs in user's wishlist (for batch checks).
+ */
+export async function getWishlistProductIds(userId: string): Promise<Set<string>> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("wishlist")
+    .select("product_id")
+    .eq("user_id", userId);
+
+  if (error) {
+    throw handleSupabaseError(error);
+  }
+  return new Set((data ?? []).map((row: { product_id: string }) => row.product_id));
+}
+
+/**
  * Check if product is in wishlist
  */
 export async function isInWishlist(userId: string, productId: string) {

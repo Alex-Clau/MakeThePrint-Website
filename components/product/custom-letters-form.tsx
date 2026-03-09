@@ -242,6 +242,17 @@ export function CustomLettersForm({
         </div>
       )}
 
+      {/* Selection summary line */}
+      {(font || color || size) && (
+        <p className="text-sm text-muted-foreground">
+          {t.youChose}{" "}
+          {[font, color, size].filter(Boolean).join(" · ")}
+          {showOutdoorOption && isOutdoor ? " · + Outdoor" : ""}
+          {showLedStripOption && isLedStrip ? " · + LED strip" : ""}
+          {showColorOption && isColor ? " · + Color" : ""}
+        </p>
+      )}
+
       {sizeLabels.length > 0 && (
         <div>
           <Label className="text-sm sm:text-base font-semibold mb-2 block">

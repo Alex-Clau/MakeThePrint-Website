@@ -27,7 +27,7 @@ export function ProductCard({
       <Card className="group overflow-hidden transition-shadow duration-200 border-2 border-accent-primary-light/20 hover:border-accent-primary/60 hover:shadow-lg">
         <div className="relative overflow-hidden">
           <Link href={`/products/${id}`}>
-            <div className="relative aspect-[4/3] sm:aspect-square overflow-hidden bg-muted transition-transform duration-200 ease-out group-hover:scale-[1.03]">
+            <div className="relative aspect-[4/3] overflow-hidden bg-muted transition-transform duration-200 ease-out group-hover:scale-[1.03]">
               <Image
                 src={image}
                 alt={name}

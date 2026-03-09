@@ -36,7 +36,7 @@
     "goHome": "Acasă",
     "browseProducts": "Vezi produsele",
     "tryAgain": "Încearcă din nou",
-    "signIn": "Conectare",
+    "signIn": "Conectează-te",
     "myAccount": "Contul meu",
     "orderHistory": "Istoric comenzi",
     "account": "Cont",
@@ -45,9 +45,9 @@
   },
   "home": {
     "badge": "Produse printate 3D de calitate",
-    "headline": "Dă viață ideilor tale",
-    "headlineHighlight": "în 3D",
-    "subhead": "Descoperă colecția noastră de produse printate 3D de calitate.",
+    "headline": "Make it real",
+    "headlineHighlight": "MakeThePRint",
+    "subhead": "Where layers become products",
     "featuredTitle": "Produse recomandate",
     "featuredSubhead": "Modele alese care pun în valoare inovația printării 3D",
     "noFeatured": "Niciun produs recomandat disponibil",
@@ -229,7 +229,11 @@
     "enterYourText": "Introdu textul tău",
     "fontLabel": "Font:",
     "colorLabel": "Culoare:",
-    "heightLabel": "Înălțime:"
+    "heightLabel": "Înălțime:",
+    "youChose": "Ai ales:",
+    "share": "Distribuie",
+    "linkCopied": "Link copiat în clipboard",
+    "shared": "Link partajat"
   },
   "reviews": {
     "outOf5": "din 5",
@@ -270,9 +274,10 @@
     "login": "Conectare",
     "loginDesc": "Introdu emailul pentru a te conecta la cont",
     "email": "Email",
+    "emailPlaceholder": "ex. nume@exemplu.ro",
     "password": "Parolă",
-    "signIn": "Conectare",
-    "signUp": "Înregistrare",
+    "signIn": "Conectează-te",
+    "signUp": "Înregistrează-te",
     "loggingIn": "Se conectează…",
     "noAccount": "Nu ai cont?",
     "hasAccount": "Ai deja cont?",
@@ -475,15 +480,17 @@
     "optionsOnProductPageHint": "Activează opțiunile și setează prețul add-on (RON) când clientul activează fiecare.",
     "maxImagesAllowed": "Maximum {max} imagini permise",
     "notAnImage": "{name} nu este o imagine",
-    "tooLarge": "{name} este prea mare (max 10MB)",
+    "tooLarge": "{name} este prea mare (dimensiunea maximă este 1MB)",
     "failedToProcess": "Procesarea {name} a eșuat",
     "addedImages": "{count} imagine(ni) adăugate",
     "dragDropImages": "Trage și plasează imaginile aici sau apasă pentru a selecta",
     "selectImages": "Selectează imagini",
-    "maxImagesCompressed": "Max {max} imagini. Imaginile vor fi comprimate și convertite în WebP.",
+    "maxImagesCompressed": "Max {max} imagini. Dimensiunea maximă per imagine este 1MB.",
     "imagesUploadedCount": "{current}/{max} imagini încărcate",
     "main": "Principal",
     "makeMain": "Fă principală",
-    "firstImageMainHint": "Prima imagine va fi folosită ca imagine principală. Trece cu mouse-ul peste imagini pentru a reordona sau elimina."
+    "firstImageMainHint": "Prima imagine va fi folosită ca imagine principală. Trece cu mouse-ul peste imagini pentru a reordona sau elimina.",
+    "uploadFailedGeneric": "Încărcarea imaginii a eșuat. Te rugăm să încerci din nou.",
+    "uploadMissingUrl": "Încărcarea a reușit, dar nu am primit adresa imaginii."
   }
 }

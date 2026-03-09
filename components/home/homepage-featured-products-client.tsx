@@ -7,23 +7,36 @@ import { messages } from "@/lib/messages";
 
 export function HomepageFeaturedProductsClient() {
   const [products, setProducts] = useState<ProductCardData[]>([]);
+  const [wishlistIds, setWishlistIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const t = messages.home;
+
+  const fetchWishlistIds = async () => {
+    try {
+      const res = await fetch("/api/wishlist/ids");
+      const data = await res.json();
+      return new Set((data.productIds ?? []) as string[]);
+    } catch {
+      return new Set<string>();
+    }
+  };
 
   useEffect(() => {
     let cancelled = false;
 
     async function load() {
       try {
-        const res = await fetch("/api/featured-products");
-        if (!res.ok) {
-          throw new Error("Request failed");
-        }
-        const data = await res.json();
+        const [productsRes, ids] = await Promise.all([
+          fetch("/api/featured-products"),
+          fetchWishlistIds(),
+        ]);
+        if (!productsRes.ok) throw new Error("Request failed");
+        const data = await productsRes.json();
         if (!cancelled) {
           setProducts(data.products ?? []);
+          setWishlistIds(ids);
           setLoading(false);
         }
       } catch {
@@ -38,6 +51,14 @@ export function HomepageFeaturedProductsClient() {
     return () => {
       cancelled = true;
     };
+  }, []);
+
+  useEffect(() => {
+    const handleWishlistUpdated = () => {
+      fetchWishlistIds().then(setWishlistIds);
+    };
+    window.addEventListener("wishlist-updated", handleWishlistUpdated);
+    return () => window.removeEventListener("wishlist-updated", handleWishlistUpdated);
   }, []);
 
   const showSkeleton = loading && products.length === 0 && !error;
@@ -81,7 +102,11 @@ export function HomepageFeaturedProductsClient() {
         {!showSkeleton && products.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-6">
             {products.map((product) => (
-              <ProductCard key={product.id} {...product} />
+              <ProductCard
+                key={product.id}
+                {...product}
+                isInWishlist={wishlistIds.has(product.id)}
+              />
             ))}
           </div>
         )}

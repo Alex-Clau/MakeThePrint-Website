@@ -54,10 +54,40 @@ export function ProductImageGallery({
   };
 
   return (
-    <div className="relative w-full">
-      {/* Main Image Display */}
+    <div className="relative w-full flex flex-col lg:flex-row lg:gap-4 lg:items-start">
+      {/* Desktop: vertical thumbnails on the left */}
+      {allImages.length > 1 && (
+        <div className="hidden lg:flex flex-col gap-2 flex-shrink-0 order-1">
+          {allImages.map((image, index) => (
+            <button
+              key={index}
+              type="button"
+              onClick={() => goToImage(index)}
+              className={`relative w-14 aspect-[3/4] rounded-lg overflow-hidden border-2 transition-all duration-200 hover:scale-105 ${
+                selectedIndex === index
+                  ? "border-accent-primary-dark shadow-lg"
+                  : "border-transparent hover:border-accent-primary/50 opacity-70 hover:opacity-100"
+              }`}
+            >
+              <Image
+                src={image}
+                alt={`${alt} thumbnail ${index + 1}`}
+                fill
+                className="object-cover"
+                sizes="56px"
+                draggable={false}
+              />
+              {selectedIndex === index && (
+                <div className="absolute inset-0 bg-accent-primary/20" />
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Main Image */}
       <div
-        className="relative w-full aspect-square max-w-md mx-auto min-h-[300px] overflow-hidden rounded-lg bg-muted/30 shadow-2xl"
+        className="relative w-full aspect-[3/4] max-w-2xl mx-auto lg:mx-0 lg:flex-1 lg:order-2 overflow-hidden rounded-lg"
         onTouchStart={allImages.length > 1 ? handleTouchStart : undefined}
         onTouchEnd={allImages.length > 1 ? handleTouchEnd : undefined}
       >
@@ -72,7 +102,7 @@ export function ProductImageGallery({
               src={src}
               alt={`${alt} - Image ${index + 1}`}
               fill
-              className="object-contain pointer-events-none select-none"
+              className="object-contain pointer-events-none select-none bg-transparent"
               sizes="(max-width: 768px) 100vw, 50vw"
               priority={index === 0}
               draggable={false}
@@ -110,9 +140,9 @@ export function ProductImageGallery({
         )}
       </div>
 
-      {/* Dot Indicators */}
+      {/* Dot Indicators - mobile only */}
       {allImages.length > 1 && (
-        <div className="flex justify-center gap-2 mt-4">
+        <div className="flex lg:hidden justify-center gap-2 mt-4">
           {allImages.map((_, index) => (
             <button
               key={index}
@@ -128,16 +158,16 @@ export function ProductImageGallery({
         </div>
       )}
 
-      {/* Thumbnail Navigation */}
+      {/* Thumbnail Navigation - mobile only */}
       {allImages.length > 1 && (
-        <div className="mt-4">
+        <div className="lg:hidden mt-4">
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide justify-center">
             {allImages.map((image, index) => (
               <button
                 key={index}
                 type="button"
                 onClick={() => goToImage(index)}
-                className={`relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 hover:scale-105 active:scale-95 ${
+                className={`relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-200 hover:scale-105 active:scale-95 aspect-square ${
                   selectedIndex === index
                     ? "border-accent-primary-dark scale-105 shadow-lg"
                     : "border-transparent hover:border-accent-primary/50 opacity-70 hover:opacity-100"

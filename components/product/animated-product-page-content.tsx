@@ -8,6 +8,9 @@ import { getProductDisplayName } from "@/lib/utils/products";
 
 export function AnimatedProductPageContent({
   product,
+  averageRating = 0,
+  totalReviews = 0,
+  isInWishlist = false,
 }: AnimatedProductPageContentProps) {
   const displayName = getProductDisplayName(product);
   const isPreset = product.category === "preset";
@@ -31,8 +34,8 @@ export function AnimatedProductPageContent({
     : [];
 
   return (
-    <div className="space-y-12 relative z-10">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-start lg:items-center relative">
+    <div className="space-y-10 sm:space-y-12 relative z-10">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-10 items-start relative">
         {/* Left Side - Product Image Gallery */}
         <div className="relative flex items-center justify-start group">
           <div className="w-full">
@@ -50,6 +53,9 @@ export function AnimatedProductPageContent({
             product={product}
             previewText={preview.text}
             onPreviewChange={setPreview}
+            averageRating={averageRating}
+            totalReviews={totalReviews}
+            isInWishlist={isInWishlist}
           />
         </div>
       </div>

@@ -101,7 +101,7 @@ export async function getPublicSeasonalProducts(limit = 12) {
   return getProducts({ product_type: "seasonal", limit });
 }
 
-export async function getPublicFeaturedProducts(limit = 4) {
+export async function getPublicFeaturedProducts(limit = 8) {
   return getProducts({ featured: true, limit });
 }
 
@@ -111,7 +111,7 @@ type HomepageFeaturedProduct = Pick<
 >;
 
 export async function getHomepageFeaturedProducts(
-  limit = 4,
+  limit = 8,
 ): Promise<HomepageFeaturedProduct[]> {
   const supabase = await createClient();
   const { data, error } = await supabase

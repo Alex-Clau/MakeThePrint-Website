@@ -19,6 +19,7 @@ export function ProductsInfiniteList({
   initialHasMore,
 }: ProductsInfiniteListProps) {
   const [products, setProducts] = useState<ProductCardData[]>(initialProducts);
+  const [wishlistIds, setWishlistIds] = useState<Set<string>>(new Set());
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,6 +27,32 @@ export function ProductsInfiniteList({
   const pageRef = useRef(initialPage);
   const loadingRef = useRef(false);
   const hasMoreRef = useRef(initialHasMore);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/wishlist/ids")
+      .then((res) => res.json())
+      .then((data) => {
+        if (!cancelled) {
+          setWishlistIds(new Set((data.productIds ?? []) as string[]));
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleWishlistUpdated = () => {
+      fetch("/api/wishlist/ids")
+        .then((res) => res.json())
+        .then((data) => setWishlistIds(new Set((data.productIds ?? []) as string[])))
+        .catch(() => {});
+    };
+    window.addEventListener("wishlist-updated", handleWishlistUpdated);
+    return () => window.removeEventListener("wishlist-updated", handleWishlistUpdated);
+  }, []);
 
   useEffect(() => {
     if (!sentinelRef.current) return;
@@ -94,7 +121,11 @@ export function ProductsInfiniteList({
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-6">
         {products.map((product) => (
-          <ProductCard key={product.id} {...product} />
+          <ProductCard
+            key={product.id}
+            {...product}
+            isInWishlist={product.isInWishlist ?? wishlistIds.has(product.id)}
+          />
         ))}
       </div>
       <div ref={sentinelRef} className="h-10" />

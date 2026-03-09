@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Heart, ShoppingCart } from "lucide-react";
@@ -23,6 +23,10 @@ export function ProductCardActions({
   const w = messages.wishlist;
   const [isTogglingWishlist, setIsTogglingWishlist] = useState(false);
   const [inWishlist, setInWishlist] = useState(isInWishlist);
+
+  useEffect(() => {
+    setInWishlist(isInWishlist);
+  }, [isInWishlist]);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -60,6 +64,7 @@ export function ProductCardActions({
       }
       router.refresh();
       await revalidateWishlistPaths();
+      window.dispatchEvent(new CustomEvent("wishlist-updated"));
     } catch (error: unknown) {
       toast.error(getUserFriendlyError(error));
     } finally {

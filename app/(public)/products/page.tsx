@@ -8,7 +8,7 @@ import { transformProductToCardData } from "@/lib/utils/products";
 import { messages } from "@/lib/messages";
 
 async function ProductsList() {
-  const pageSize = 4;
+  const pageSize = 8;
   const { products, hasMore } = await getPublicCustomProductsPage({
     page: 1,
     pageSize,

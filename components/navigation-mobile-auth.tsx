@@ -57,7 +57,7 @@ export function NavigationMobileAuth({ onLinkClick }: NavigationMobileAuthProps)
         onClick={onLinkClick}
       >
         <User className="h-4 w-4" />
-        <span>{a.myAccount}</span>
+        <span>Contul meu</span>
       </Link>
       <div className="py-3 border-b border-border/40">
         <LogoutButton />

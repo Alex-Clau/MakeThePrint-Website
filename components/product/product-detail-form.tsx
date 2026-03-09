@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Minus, Plus, MessageCircle } from "lucide-react";
+import { Minus, Plus, MessageCircle, Share2 } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ProductDetailFormProps } from "@/types/components";
@@ -12,14 +12,23 @@ import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { CustomLettersForm } from "./custom-letters-form";
+import { ProductCardActions } from "./product-card-actions";
 import { KeychainConfig } from "@/types/product";
 import { getProductDisplayName } from "@/lib/utils/products";
 import { messages } from "@/lib/messages";
 
-export function ProductDetailForm({ product, previewText = "", onPreviewChange }: ProductDetailFormProps) {
+export function ProductDetailForm({
+  product,
+  previewText = "",
+  onPreviewChange,
+  averageRating = 0,
+  totalReviews = 0,
+  isInWishlist = false,
+}: ProductDetailFormProps) {
   const displayName = getProductDisplayName(product);
   const t = messages.product;
   const c = messages.common;
+  const r = messages.reviews;
   const router = useRouter();
   const category = product.category as string | undefined;
   const isPreset = category === "preset";
@@ -130,16 +139,63 @@ export function ProductDetailForm({ product, previewText = "", onPreviewChange }
     }
   };
 
+  const handleShare = async () => {
+    if (typeof window === "undefined") return;
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: displayName,
+          url,
+        });
+        toast.success(t.shared);
+      } catch (err) {
+        if ((err as Error).name !== "AbortError") {
+          await navigator.clipboard.writeText(url);
+          toast.success(t.linkCopied);
+        }
+      }
+    } else {
+      await navigator.clipboard.writeText(url);
+      toast.success(t.linkCopied);
+    }
+  };
+
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8 mb-8">
-      {/* Product Name */}
+      {/* Product Name & Description */}
       <div>
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 sm:mb-3 lg:mb-4 text-accent-primary-dark">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 sm:mb-2 lg:mb-3 text-accent-primary-dark">
           {displayName}
         </h1>
-        <p className="text-sm sm:text-base lg:text-lg text-muted-foreground mb-2 sm:mb-3 lg:mb-4">
+        <p className="text-sm sm:text-base lg:text-lg text-muted-foreground mb-3 sm:mb-4 lg:mb-5">
           {product.description}
         </p>
+      </div>
+
+      {/* Compact rating summary */}
+      <div className="flex flex-wrap items-center gap-2 text-sm">
+        <div className="flex items-center gap-1.5">
+          {[...Array(5)].map((_, i) => (
+            <span
+              key={i}
+              className={`text-base ${
+                i < Math.round(averageRating) ? "text-yellow-400" : "text-gray-300"
+              }`}
+            >
+              ★
+            </span>
+          ))}
+          <span className="font-semibold">
+            {averageRating.toFixed(2)} {r.outOf5}
+          </span>
+        </div>
+        <a
+          href="#reviews"
+          className="text-muted-foreground hover:text-accent-primary-dark underline underline-offset-2"
+        >
+          {r.basedOn} {totalReviews} {totalReviews === 1 ? r.review : r.reviews}
+        </a>
       </div>
 
       {/* Inquire - Show inquiry/contact CTA only */}
@@ -167,16 +223,28 @@ export function ProductDetailForm({ product, previewText = "", onPreviewChange }
               </li>
             </ul>
           </div>
-          {inquireConfig?.whatsappNumber ? (
-            <Button
-              size="lg"
-              className="w-full bg-green-600 hover:bg-green-700 text-white text-base sm:text-base py-4 sm:py-5 lg:py-6 touch-manipulation"
-              onClick={handleWhatsAppInquiry}
-            >
-              <MessageCircle className="mr-2 h-5 w-5" />
-              {t.inquireWhatsApp}
-            </Button>
-          ) : null}
+          <div className="flex flex-col sm:flex-row gap-3">
+            {inquireConfig?.whatsappNumber ? (
+              <Button
+                size="lg"
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white text-base sm:text-base py-4 sm:py-5 lg:py-6 touch-manipulation"
+                onClick={handleWhatsAppInquiry}
+              >
+                <MessageCircle className="mr-2 h-5 w-5" />
+                {t.inquireWhatsApp}
+              </Button>
+            ) : null}
+            <div className="flex items-center gap-2">
+              <ProductCardActions
+                productId={product.id}
+                showWishlistOnly
+                isInWishlist={isInWishlist}
+              />
+              <Button variant="outline" size="icon" onClick={handleShare} title={t.share}>
+                <Share2 className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
         </div>
       ) : isPreset ? (
         <>
@@ -215,14 +283,26 @@ export function ProductDetailForm({ product, previewText = "", onPreviewChange }
               });
             }}
           />
-          <Button
-            size="lg"
-            className="w-full bg-accent-primary-dark hover:bg-accent-primary-dark/90 text-white text-base sm:text-base py-4 sm:py-5 lg:py-6 touch-manipulation"
-            onClick={handleAddToCart}
-            disabled={isAdding || customConfig.totalPrice === 0}
-          >
-            {isAdding ? t.adding : customConfig.characterCount === 0 && !customConfig.size ? t.enterTextToContinue : t.addToCart}
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button
+              size="lg"
+              className="flex-1 bg-accent-primary-dark hover:bg-accent-primary-dark/90 text-white text-base sm:text-base py-4 sm:py-5 lg:py-6 touch-manipulation"
+              onClick={handleAddToCart}
+              disabled={isAdding || customConfig.totalPrice === 0}
+            >
+              {isAdding ? t.adding : customConfig.characterCount === 0 && !customConfig.size ? t.enterTextToContinue : t.addToCart}
+            </Button>
+            <div className="flex items-center gap-2">
+              <ProductCardActions
+                productId={product.id}
+                showWishlistOnly
+                isInWishlist={isInWishlist}
+              />
+              <Button variant="outline" size="icon" onClick={handleShare} title={t.share}>
+                <Share2 className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
         </>
       ) : (
         <>
@@ -267,15 +347,27 @@ export function ProductDetailForm({ product, previewText = "", onPreviewChange }
               </div>
             </div>
           </div>
-          {/* Add to Cart Button */}
-          <Button
-            size="lg"
-            className="w-full bg-accent-primary-dark hover:bg-accent-primary-dark/90 text-white text-base sm:text-base py-4 sm:py-5 lg:py-6 touch-manipulation"
-            onClick={handleAddToCart}
-            disabled={isAdding}
-          >
-            {isAdding ? t.adding : t.addToCart}
-          </Button>
+          {/* Add to Cart Button + secondary CTAs */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button
+              size="lg"
+              className="flex-1 bg-accent-primary-dark hover:bg-accent-primary-dark/90 text-white text-base sm:text-base py-4 sm:py-5 lg:py-6 touch-manipulation"
+              onClick={handleAddToCart}
+              disabled={isAdding}
+            >
+              {isAdding ? t.adding : t.addToCart}
+            </Button>
+            <div className="flex items-center gap-2">
+              <ProductCardActions
+                productId={product.id}
+                showWishlistOnly
+                isInWishlist={isInWishlist}
+              />
+              <Button variant="outline" size="icon" onClick={handleShare} title={t.share}>
+                <Share2 className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
         </>
       )}
     </div>

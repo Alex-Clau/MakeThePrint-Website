@@ -3,6 +3,8 @@ import { PageLayout } from "@/components/layout/page-layout";
 import { Sparkles, Gift } from "lucide-react";
 import { getPublicSeasonalProducts } from "@/lib/supabase/products";
 import { getProductReviewStats } from "@/lib/supabase/reviews";
+import { getWishlistProductIds } from "@/lib/supabase/wishlist";
+import { createClient } from "@/lib/supabase/server";
 import { transformProductToCardData } from "@/lib/utils/products";
 import { ProductCard } from "@/components/product/product-card";
 import { messages } from "@/lib/messages";
@@ -10,11 +12,20 @@ import { ProductsGridSkeleton } from "@/components/skeletons/products-grid-skele
 import type { Messages } from "@/lib/messages";
 
 async function SeasonalCollections({ messages }: { messages: Messages }) {
-  const products = await getPublicSeasonalProducts(12);
+  const [products, supabase] = await Promise.all([
+    getPublicSeasonalProducts(12),
+    createClient(),
+  ]);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const wishlistIds = user ? await getWishlistProductIds(user.id) : new Set<string>();
+
   const reviewStats = await getProductReviewStats(products.map((p) => p.id));
   const transformedProducts = products.map((p) => {
     const stats = reviewStats.get(p.id);
-    return transformProductToCardData({ ...p, rating: stats?.rating, review_count: stats?.review_count });
+    const card = transformProductToCardData({ ...p, rating: stats?.rating, review_count: stats?.review_count });
+    return { ...card, isInWishlist: wishlistIds.has(p.id) };
   });
   const t = messages.seasons;
 

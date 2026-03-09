@@ -2,6 +2,7 @@ import { PageLayout } from "@/components/layout/page-layout";
 import { CheckoutContent } from "@/components/checkout/checkout-content";
 import { getCartItems } from "@/lib/supabase/cart";
 import { getRequiredUser } from "@/lib/supabase/server";
+import { messages } from "@/lib/messages";
 
 async function CheckoutData() {
   const user = await getRequiredUser();
@@ -11,8 +12,9 @@ async function CheckoutData() {
 }
 
 export default function CheckoutPage() {
+  const t = messages.checkout;
   return (
-    <PageLayout title="Checkout">
+    <PageLayout title={t.title}>
       <CheckoutData />
     </PageLayout>
   );

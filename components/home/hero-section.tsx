@@ -1,23 +1,23 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles, Box } from "lucide-react";
 import { messages } from "@/lib/messages";
 
 export function HeroSection() {
   const h = messages.home;
   const c = messages.common;
   return (
-    <section className="relative w-full overflow-hidden min-h-[700px] lg:h-[850px] flex items-center">
+    <section className="relative w-full overflow-hidden min-h-[500px] sm:min-h-[600px] md:min-h-[700px] lg:h-[850px] flex items-center">
       {/* Background: light theme = heroWhite, dark theme = heroBlack */}
-      <div className="hidden md:block absolute inset-0">
+      <div className="absolute inset-0">
         <Image
           src="/heroWhite.webp"
           alt="3D Printers"
           fill
           quality={75}
-          className="object-center dark:hidden"
-          sizes="(max-width: 1024px) 100vw, 1280px"
+          className="object-cover object-center dark:hidden"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 1280px"
           priority
           fetchPriority="high"
         />
@@ -26,8 +26,8 @@ export function HeroSection() {
           alt="3D Printers"
           fill
           quality={75}
-          className="object-center hidden dark:block"
-          sizes="(max-width: 1024px) 100vw, 1280px"
+          className="object-cover object-center hidden dark:block"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 1280px"
         />
         {/* Overlays: stronger center wash for text, gradient to blend with theme */}
         <div
@@ -54,9 +54,10 @@ export function HeroSection() {
                 {h.headlineHighlight}
               </span>
             </h1>
-            <p className="text-sm sm:text-lg md:text-xl text-hero-subhead font-medium max-w-2xl mx-auto mb-6 sm:mb-8 px-4 sm:px-0">
-              {h.subhead}
-            </p>
+            <div className="flex items-center justify-center gap-2 text-sm sm:text-lg md:text-xl text-hero-subhead font-medium max-w-2xl mx-auto mb-6 sm:mb-8 px-4 sm:px-0">
+              <Box className="h-5 w-5 sm:h-6 sm:w-6 rotate-12 text-accent-primary-dark" />
+              <span>{h.subhead}</span>
+            </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 lg:gap-2 justify-center items-center px-8 sm:px-0">
             <Button size="lg" className="bg-accent-primary-dark hover:bg-accent-primary-dark/90 text-white w-full sm:w-auto max-w-xs sm:max-w-none" asChild>

@@ -27,6 +27,9 @@ export interface ProductDetailFormProps {
     color: string;
     size: string; // Admin-defined size label (e.g. "10cm")
   }) => void;
+  averageRating?: number;
+  totalReviews?: number;
+  isInWishlist?: boolean;
 }
 
 /**
@@ -34,6 +37,9 @@ export interface ProductDetailFormProps {
  */
 export interface AnimatedProductPageContentProps {
   product: Product & { image: string };
+  averageRating?: number;
+  totalReviews?: number;
+  isInWishlist?: boolean;
 }
 
 /**

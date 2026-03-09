@@ -85,49 +85,50 @@ export function ProductReviewsList({
 
   return (
     <div className="space-y-6">
-      {/* Rating Summary - Only show if there are reviews */}
-      {reviews.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-12">
-          {/* Left: Overall Rating */}
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              {renderStars(Math.round(averageRating), "lg")}
-              <span className="text-2xl font-bold">
-                {averageRating.toFixed(2)} {t.outOf5}
-              </span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>{t.basedOn} {totalReviews} {totalReviews === 1 ? t.review : t.reviews}</span>
-              <CheckCircle2 className="h-4 w-4 text-green-500" />
-            </div>
+      {/* Rating Summary - always show, even if there are no reviews */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-12">
+        {/* Left: Overall Rating */}
+        <div>
+          <div className="flex items-center gap-3 mb-2">
+            {renderStars(Math.round(averageRating), "lg")}
+            <span className="text-2xl font-bold">
+              {averageRating.toFixed(2)} {t.outOf5}
+            </span>
           </div>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span>
+              {t.basedOn} {totalReviews} {totalReviews === 1 ? t.review : t.reviews}
+            </span>
+            {totalReviews > 0 && <CheckCircle2 className="h-4 w-4 text-green-500" />}
+          </div>
+          {totalReviews === 0 && (
+            <div className="mt-1 text-xs text-muted-foreground/80">
+              {t.noReviewsYet}
+            </div>
+          )}
+        </div>
 
-          {/* Right: Rating Breakdown */}
-          <div className="space-y-2">
-            {ratingDistribution.map(({ stars, count }) => {
-              const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0;
-              return (
-                <div key={stars} className="flex items-center gap-3">
-                  <span className="text-sm font-medium w-12">{stars} ★</span>
-                  <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-yellow-400 transition-all duration-300"
-                      style={{ width: `${percentage}%` }}
-                    />
-                  </div>
-                  <span className="text-sm text-muted-foreground w-12 text-right">
-                    {count}
-                  </span>
+        {/* Right: Rating Breakdown */}
+        <div className="space-y-2">
+          {ratingDistribution.map(({ stars, count }) => {
+            const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0;
+            return (
+              <div key={stars} className="flex items-center gap-3">
+                <span className="text-sm font-medium w-12">{stars} ★</span>
+                <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-yellow-400 transition-all duration-300"
+                    style={{ width: `${percentage}%` }}
+                  />
                 </div>
-              );
-            })}
-          </div>
+                <span className="text-sm text-muted-foreground w-12 text-right">
+                  {count}
+                </span>
+              </div>
+            );
+          })}
         </div>
-      ) : (
-        <div className="text-center py-4 text-muted-foreground">
-          {t.noReviewsYet}
-        </div>
-      )}
+      </div>
 
       {/* Write Review Button and Sort Options */}
       <div className="flex items-center justify-between border-t border-accent-primary/30 pt-4">

@@ -102,7 +102,7 @@ export function SignUpForm({
                 <Input
                   id="email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder={t.emailPlaceholder}
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -160,7 +160,7 @@ export function SignUpForm({
               >
                 <Image
                   src="/googles-logo.png"
-                  alt="Google logo"
+                  alt="Logo Google"
                   width={24}
                   height={24}
                 />
