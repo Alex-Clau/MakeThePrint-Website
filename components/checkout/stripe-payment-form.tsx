@@ -38,7 +38,8 @@ export function StripePaymentForm({
             setMessage(t.paymentProcessing);
             break;
           case "requires_payment_method":
-            setMessage(t.paymentNotSuccessful);
+            // Initial state before user enters card – don't show error
+            setMessage(null);
             break;
           default:
             setMessage(t.somethingWentWrong);

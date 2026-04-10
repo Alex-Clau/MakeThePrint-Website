@@ -3,10 +3,10 @@
  */
 
 /** Subtotal (RON) above which shipping is free. */
-export const FREE_SHIPPING_THRESHOLD_RON = 50;
+export const FREE_SHIPPING_THRESHOLD_RON = 500;
 
 /** Shipping fee (RON) when below free-shipping threshold. */
-export const SHIPPING_FEE_RON = 9.99;
+export const SHIPPING_FEE_RON = 15;
 
 /**
  * Returns shipping cost in RON for a given subtotal.

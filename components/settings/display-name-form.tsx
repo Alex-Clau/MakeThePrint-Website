@@ -10,25 +10,26 @@ import { updateUserProfileClient } from "@/lib/supabase/user-profiles-client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
-import { ProfileFormProps } from "@/types/account";
 import { messages } from "@/lib/messages";
 
-export function ProfileForm({ initialData, userId }: ProfileFormProps) {
+export function DisplayNameForm({
+  initialDisplayName,
+  userId,
+}: {
+  initialDisplayName: string;
+  userId: string;
+}) {
   const router = useRouter();
   const t = messages.account;
   const a = messages.auth;
-  const [formData, setFormData] = useState({
-    email: initialData.email || "",
-    full_name: initialData.full_name || "",
-    phone: initialData.phone || "",
-  });
+  const [displayName, setDisplayName] = useState(initialDisplayName);
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSaving(true);
     try {
-      await updateUserProfileClient(userId, formData);
+      await updateUserProfileClient(userId, { full_name: displayName.trim() || undefined });
       toast.success(t.profileUpdated);
       router.refresh();
     } catch (error: unknown) {
@@ -43,42 +44,19 @@ export function ProfileForm({ initialData, userId }: ProfileFormProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <User className="h-5 w-5" />
-          {t.profileInfo}
+          {t.displayName ?? "Nume afișat"}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="email">{a.email}</Label>
+            <Label htmlFor="displayName">{t.displayNameLabel ?? "Numele afișat la recenzii"}</Label>
             <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-              required
-            />
-          </div>
-          <div>
-            <Label htmlFor="full_name">{t.fullName}</Label>
-            <Input
-              id="full_name"
-              value={formData.full_name}
-              onChange={(e) =>
-                setFormData({ ...formData, full_name: e.target.value })
-              }
-            />
-          </div>
-          <div>
-            <Label htmlFor="phone">{t.phone}</Label>
-            <Input
-              id="phone"
-              type="tel"
-              value={formData.phone}
-              onChange={(e) =>
-                setFormData({ ...formData, phone: e.target.value })
-              }
+              id="displayName"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              placeholder={t.displayNamePlaceholder ?? "ex. Ion Popescu"}
+              className="mt-2"
             />
           </div>
           <Button type="submit" disabled={isSaving}>
@@ -89,4 +67,3 @@ export function ProfileForm({ initialData, userId }: ProfileFormProps) {
     </Card>
   );
 }
-

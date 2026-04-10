@@ -9,7 +9,6 @@ import Link from "next/link";
 import { CheckoutForms } from "./checkout-forms";
 import { OrderSummary } from "./order-summary";
 import { StripePaymentWrapper } from "./stripe-payment-wrapper";
-import { CartItem } from "@/types/cart";
 import { AddressFormData } from "@/types/address";
 import { addShippingAddressClient } from "@/lib/supabase/user-profiles-client";
 import { toast } from "sonner";
@@ -19,14 +18,19 @@ import { CheckoutContentProps } from "@/types/checkout";
 import { getShippingCost } from "@/lib/constants/shipping";
 import { messages } from "@/lib/messages";
 
-export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
+export function CheckoutContent({
+  cartItems,
+  userId,
+  savedAddresses = [],
+  userEmail,
+}: CheckoutContentProps) {
   const router = useRouter();
   const cartT = messages.cart;
   const checkoutT = messages.checkout;
   const c = messages.common;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
+  const [, setPaymentIntentId] = useState<string | null>(null);
   const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
   const [isLoadingPayment, setIsLoadingPayment] = useState(false);
   const [formData, setFormData] = useState<{
@@ -36,29 +40,13 @@ export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
   const formDataRef = useRef(formData);
   formDataRef.current = formData;
 
-  if (cartItems.length === 0) {
-    return (
-      <Card className="p-12 text-center">
-        <ShoppingBag className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-        <h2 className="text-2xl font-bold mb-2">{cartT.empty}</h2>
-        <p className="text-muted-foreground mb-6">{cartT.emptyHint}</p>
-        <Button asChild>
-          <Link href="/products">{c.browseProducts}</Link>
-        </Button>
-      </Card>
-    );
-  }
-
   const subtotal = cartItems.reduce((sum, item) => {
-    // Preset (configurable): line total is totalPrice from customizations
+    // Preset (configurable): line total is totalPrice * quantity
     if (item.customizations?.totalPrice != null) {
-      return sum + item.customizations.totalPrice;
+      return sum + item.customizations.totalPrice * item.quantity;
     }
     return sum + (item.products?.price || 0) * item.quantity;
   }, 0);
-  const shipping = getShippingCost(subtotal);
-  const tax = subtotal * 0.1;
-  const total = subtotal + shipping + tax;
 
   // Validate email format
   const isValidEmail = (email: string | undefined) => {
@@ -79,15 +67,34 @@ export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
     formData.shipping.zip?.trim() !== "" &&
     formData.shipping.country?.trim() !== "";
 
+  const shippingCost = getShippingCost(subtotal);
+  const shipping = isAddressComplete ? shippingCost : 0;
+  const total = isAddressComplete ? subtotal + shippingCost : subtotal;
+
+  const clearPaymentState = () => {
+    setClientSecret(null);
+    setPaymentIntentId(null);
+    setPendingOrderId(null);
+  };
+
+  const handleFetchError = async (
+    res: Response,
+    fallbackMessage: string
+  ): Promise<boolean> => {
+    const { message, code } = await getApiErrorBody(res);
+    toast.error(message || fallbackMessage);
+    clearPaymentState();
+    if (code === "UNAUTHORIZED") router.push("/auth/login?redirect=/checkout");
+    return true;
+  };
+
   // Create pending order then payment intent when address is complete (for webhook backup).
   // Depend only on total, cart length, and isAddressComplete so we don't create duplicate orders on every form keystroke.
   useEffect(() => {
     const setupPayment = async () => {
       const currentFormData = formDataRef.current;
       if (cartItems.length === 0 || !isAddressComplete || !currentFormData?.shipping) {
-        setClientSecret(null);
-        setPaymentIntentId(null);
-        setPendingOrderId(null);
+        clearPaymentState();
         return;
       }
 
@@ -112,12 +119,7 @@ export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
         });
 
         if (!pendingRes.ok) {
-          const { message, code } = await getApiErrorBody(pendingRes);
-          toast.error(message || checkoutT.failedCreateOrder);
-          setClientSecret(null);
-          setPaymentIntentId(null);
-          setPendingOrderId(null);
-          if (code === "UNAUTHORIZED") router.push("/auth/login?redirect=/checkout");
+          await handleFetchError(pendingRes, checkoutT.failedCreateOrder);
           return;
         }
 
@@ -135,12 +137,7 @@ export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
         });
 
         if (!intentRes.ok) {
-          const { message, code } = await getApiErrorBody(intentRes);
-          toast.error(message || checkoutT.failedCreatePaymentIntent);
-          setClientSecret(null);
-          setPaymentIntentId(null);
-          setPendingOrderId(null);
-          if (code === "UNAUTHORIZED") router.push("/auth/login?redirect=/checkout");
+          await handleFetchError(intentRes, checkoutT.failedCreatePaymentIntent);
           return;
         }
 
@@ -149,9 +146,7 @@ export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
         setPaymentIntentId(data.paymentIntentId);
       } catch (error: unknown) {
         toast.error(getUserFriendlyError(error) || checkoutT.failedInitializePayment);
-        setClientSecret(null);
-        setPaymentIntentId(null);
-        setPendingOrderId(null);
+        clearPaymentState();
       } finally {
         setIsLoadingPayment(false);
       }
@@ -192,7 +187,7 @@ export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
 
       if (formData.saveAddress) {
         try {
-          const { email, ...addressToSave } = formData.shipping;
+          const { ...addressToSave } = formData.shipping;
           await addShippingAddressClient(userId, addressToSave);
         } catch (error: unknown) {
           toast.error(getUserFriendlyError(error) || checkoutT.failedSaveAddressOrderPlaced);
@@ -212,6 +207,19 @@ export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
     toast.error(error || checkoutT.paymentFailedTryAgain);
   };
 
+  if (cartItems.length === 0) {
+    return (
+      <Card className="p-12 text-center">
+        <ShoppingBag className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+        <h2 className="text-2xl font-bold mb-2">{cartT.empty}</h2>
+        <p className="text-muted-foreground mb-6">{cartT.emptyHint}</p>
+        <Button asChild>
+          <Link href="/products">{c.browseProducts}</Link>
+        </Button>
+      </Card>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
       <div className="lg:col-span-2 space-y-6">
@@ -222,6 +230,8 @@ export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
               saveAddress: data.saveAddress,
             });
           }}
+          savedAddresses={savedAddresses}
+          userEmail={userEmail}
         />
         {!isAddressComplete ? (
           <Card>
@@ -254,8 +264,8 @@ export function CheckoutContent({ cartItems, userId }: CheckoutContentProps) {
           cartItems={cartItems}
           subtotal={subtotal}
           shipping={shipping}
-          tax={tax}
           total={total}
+          showShipping={!!isAddressComplete}
         />
       </div>
     </div>

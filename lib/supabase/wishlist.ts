@@ -33,7 +33,7 @@ export async function getWishlist(userId: string): Promise<WishlistContentProps[
   const items: WishlistContentProps["items"] = (data ?? []).map((item: any) => ({
     id: item.id,
     product_id: item.product_id,
-    products: Array.isArray(item.products) ? item.products[0] : item.products,
+    products: item.products,
   }));
 
   return items;

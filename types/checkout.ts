@@ -1,14 +1,16 @@
 import { CartItem } from "./cart";
 
+import { AddressFormData } from "./address";
+
 /**
  * Checkout Content component props
  */
 export interface CheckoutContentProps {
   cartItems: CartItem[];
   userId: string;
+  savedAddresses?: AddressFormData[];
+  userEmail?: string;
 }
-
-import { AddressFormData } from "./address";
 
 /**
  * Checkout Forms component props
@@ -18,6 +20,8 @@ export interface CheckoutFormsProps {
     shipping: AddressFormData & { email?: string };
     saveAddress: boolean;
   }) => void;
+  savedAddresses?: AddressFormData[];
+  userEmail?: string;
 }
 
 /**
@@ -27,8 +31,8 @@ export interface OrderSummaryProps {
   cartItems: CartItem[];
   subtotal: number;
   shipping: number;
-  tax: number;
   total: number;
+  showShipping?: boolean;
 }
 
 /**

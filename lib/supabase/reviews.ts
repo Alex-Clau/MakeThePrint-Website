@@ -2,6 +2,28 @@ import { createClient } from "./server";
 import { handleSupabaseError } from "../utils/supabase-errors";
 import type { Review } from "@/types/product-components";
 
+/** Resolve user_profiles from Supabase join (PostgREST many-to-one returns object, not array) */
+function resolveUserProfiles(raw: unknown): Review["user_profiles"] {
+  if (!raw || typeof raw !== "object") return undefined;
+  const p = raw as { full_name?: string; email?: string };
+  return {
+    full_name: p.full_name ?? undefined,
+    email: p.email ?? undefined,
+  };
+}
+
+function mapReviewRow(item: Record<string, unknown>): Review {
+  return {
+    id: item.id as string,
+    rating: item.rating as number,
+    comment: (item.comment as string) ?? undefined,
+    created_at: item.created_at as string,
+    updated_at: (item.updated_at as string) ?? undefined,
+    user_id: item.user_id as string,
+    user_profiles: resolveUserProfiles(item.user_profiles),
+  };
+}
+
 /**
  * Get aggregate rating and review count for multiple products (for listing cards).
  */
@@ -37,10 +59,110 @@ export async function getProductReviewStats(productIds: string[]): Promise<
   return result;
 }
 
+export type ReviewSort = "newest" | "oldest" | "highest" | "lowest";
+
+function getOrderForSort(sort: ReviewSort): { column: string; ascending: boolean }[] {
+  switch (sort) {
+    case "newest":
+      return [{ column: "created_at", ascending: false }];
+    case "oldest":
+      return [{ column: "created_at", ascending: true }];
+    case "highest":
+      return [{ column: "rating", ascending: false }, { column: "created_at", ascending: false }];
+    case "lowest":
+      return [{ column: "rating", ascending: true }, { column: "created_at", ascending: false }];
+    default:
+      return [{ column: "created_at", ascending: false }];
+  }
+}
+
 /**
- * Get reviews for a product, normalized to the Review type used in components.
+ * Get paginated reviews for a product.
  */
-export async function getProductReviews(productId: string): Promise<Review[]> {
+export async function getProductReviewsPaginated(
+  productId: string,
+  page: number,
+  limit: number,
+  sort: ReviewSort = "newest"
+): Promise<{ reviews: Review[]; total: number }> {
+  const supabase = await createClient();
+  const order = getOrderForSort(sort);
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+
+  let query = supabase
+    .from("product_reviews")
+    .select(
+      `
+      id,
+      user_id,
+      product_id,
+      rating,
+      comment,
+      created_at,
+      updated_at,
+      user_profiles (
+        id,
+        full_name,
+        email
+      )
+    `,
+      { count: "exact" }
+    )
+    .eq("product_id", productId);
+
+  for (const o of order) {
+    query = query.order(o.column, { ascending: o.ascending });
+  }
+
+  const { data, error, count } = await query.range(from, to);
+
+  if (error) {
+    throw handleSupabaseError(error);
+  }
+
+  const reviews: Review[] = (data ?? []).map((item) => mapReviewRow(item as Record<string, unknown>));
+
+  return { reviews, total: count ?? 0 };
+}
+
+/**
+ * Get rating stats for a single product (average, total, distribution).
+ */
+export async function getProductReviewStatsForProduct(productId: string): Promise<{
+  averageRating: number;
+  totalReviews: number;
+  distribution: Record<number, number>;
+}> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("product_reviews")
+    .select("rating")
+    .eq("product_id", productId);
+
+  if (error) {
+    throw handleSupabaseError(error);
+  }
+
+  const distribution: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  let sum = 0;
+  for (const row of data ?? []) {
+    distribution[row.rating as number] = (distribution[row.rating as number] ?? 0) + 1;
+    sum += row.rating;
+  }
+  const totalReviews = data?.length ?? 0;
+  const averageRating = totalReviews > 0 ? Math.round((sum / totalReviews) * 100) / 100 : 0;
+
+  return { averageRating, totalReviews, distribution };
+}
+
+/**
+ * Get the current user's review for a product (if any).
+ */
+export async function getUserReview(
+  productId: string,
+  userId: string
+): Promise<Review | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("product_reviews")
@@ -61,28 +183,12 @@ export async function getProductReviews(productId: string): Promise<Review[]> {
     `
     )
     .eq("product_id", productId)
-    .order("created_at", { ascending: false });
+    .eq("user_id", userId)
+    .maybeSingle();
 
-  if (error) {
-    throw handleSupabaseError(error);
-  }
+  if (error || !data) return null;
 
-  const reviews: Review[] = (data ?? []).map((item: any) => ({
-    id: item.id,
-    rating: item.rating,
-    comment: item.comment ?? undefined,
-    created_at: item.created_at,
-    updated_at: item.updated_at ?? undefined,
-    user_id: item.user_id,
-    user_profiles: Array.isArray(item.user_profiles) && item.user_profiles.length > 0
-      ? {
-          full_name: item.user_profiles[0]?.full_name ?? undefined,
-          email: item.user_profiles[0]?.email ?? undefined,
-        }
-      : undefined,
-  }));
-
-  return reviews;
+  return mapReviewRow(data as Record<string, unknown>);
 }
 
 /**

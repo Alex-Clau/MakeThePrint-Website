@@ -19,7 +19,7 @@ export function AddressForm({ onSave, initialData, onCancel }: AddressFormProps)
     city: initialData?.city || "",
     state: initialData?.state || "",
     zip: initialData?.zip || "",
-    country: initialData?.country || "United States",
+    country: initialData?.country || "Romania",
     phone: initialData?.phone || "",
   });
 

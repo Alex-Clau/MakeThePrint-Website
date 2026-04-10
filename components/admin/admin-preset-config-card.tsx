@@ -37,6 +37,7 @@ export function AdminPresetConfigCard({ formData, setFormData }: AdminPresetConf
     });
   };
 
+  // Admin UI only supports array format; Record format from DB would yield [] here
   const sizePrices = Array.isArray(presetConfig?.sizePrices) ? presetConfig.sizePrices : [];
   const addSizePrice = () => {
     setFormData({

@@ -57,7 +57,7 @@ export function AccountMenu() {
         </Card>
       </Link>
 
-      <Link href="/account/settings">
+      <Link href="/account/profile">
         <Card className="hover:shadow-lg transition-all cursor-pointer h-full">
           <CardContent className="p-4 sm:p-6">
             <div className="flex items-center gap-3 sm:gap-4">
@@ -65,8 +65,8 @@ export function AccountMenu() {
                 <Settings className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
               </div>
               <div className="min-w-0">
-                <p className="font-semibold text-sm sm:text-base">{t.settings}</p>
-                <p className="text-xs sm:text-sm text-muted-foreground">{t.accountSettings}</p>
+                <p className="font-semibold text-sm sm:text-base">{t.profile}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">{t.profileDescription}</p>
               </div>
             </div>
           </CardContent>

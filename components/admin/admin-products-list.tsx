@@ -1,36 +1,53 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2, Eye } from "lucide-react";
-import { deleteProductAction} from "@/app/(auth)/admin/actions";
+import { deleteProductAction } from "@/app/(auth)/admin/actions";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { messages } from "@/lib/messages";
 import type { Product } from "@/types/product";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export function AdminProductsList({ products }: { products: Product[] }) {
   const router = useRouter();
   const t = messages.admin;
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [optimisticProducts, setOptimisticProducts] = useState(products);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(t.confirmDelete.replace("{name}", name))) {
-      return;
-    }
+  useEffect(() => {
+    setOptimisticProducts(products);
+  }, [products]);
 
-    // Optimistic update
-    setDeletingId(id);
-    setOptimisticProducts(optimisticProducts.filter((p) => p.id !== id));
+  const handleDeleteClick = (id: string, name: string) => {
+    setDeleteTarget({ id, name });
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+
+    setDeletingId(deleteTarget.id);
+    setOptimisticProducts(optimisticProducts.filter((p) => p.id !== deleteTarget.id));
+    setDeleteTarget(null);
 
     try {
-      await deleteProductAction(id);
+      await deleteProductAction(deleteTarget.id);
       toast.success(t.productDeleted);
       router.refresh();
     } catch (error: unknown) {
@@ -135,7 +152,7 @@ export function AdminProductsList({ products }: { products: Product[] }) {
                     <Button
                       variant="destructive"
                       size="sm"
-                      onClick={() => handleDelete(product.id, product.name)}
+                      onClick={() => handleDeleteClick(product.id, product.name)}
                       disabled={deletingId === product.id}
                       className="w-full sm:w-auto"
                     >
@@ -149,6 +166,29 @@ export function AdminProductsList({ products }: { products: Product[] }) {
           </CardContent>
         </Card>
       ))}
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t.confirmDeleteTitle}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleteTarget
+                ? t.confirmDelete.replace("{name}", deleteTarget.name)
+                : ""}{" "}
+              Această acțiune nu poate fi anulată.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {t.delete}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

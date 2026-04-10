@@ -12,12 +12,16 @@ import { WishlistItemProps } from "@/types/wishlist";
 export function WishlistItem({ product, onRemove }: WishlistItemProps) {
   const displayName = getProductDisplayName(product);
   const w = messages.wishlist;
+  const imageUrl =
+    product.images && product.images.length > 0
+      ? product.images[0]
+      : "https://via.placeholder.com/400";
   return (
     <Card className="group overflow-hidden hover:shadow-lg transition-all">
       <Link href={`/products/${product.id}`}>
         <div className="relative aspect-square overflow-hidden bg-muted">
           <Image
-            src="/package.png"
+            src={imageUrl}
             alt={displayName}
             fill
             className="object-cover"

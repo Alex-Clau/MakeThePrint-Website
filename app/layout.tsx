@@ -7,13 +7,14 @@ import "./globals.css";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
-  : "http://localhost:3000";
+  : "http://maketheprint.store";
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Make The Print - Produse printate 3D de calitate",
+  title: "Make The Print",
   description:
-    "Descoperă colecția noastră de produse printate 3D de calitate. De la prototipuri funcționale la creații artistice, aducem precizie și inovație în fiecare print.",
+    "Descoperă colecția noastră de produse printate 3D de calitate.",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
