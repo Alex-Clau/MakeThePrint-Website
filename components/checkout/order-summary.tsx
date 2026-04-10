@@ -1,19 +1,19 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Lock } from "lucide-react";
 import { OrderSummaryProps } from "@/types/checkout";
 import { OrderItem } from "./order-item";
 import { messages } from "@/lib/messages";
+import { FREE_SHIPPING_THRESHOLD_RON } from "@/lib/constants/shipping";
 
 export function OrderSummary({
   cartItems,
   subtotal,
   shipping,
-  tax,
   total,
+  showShipping = false,
 }: OrderSummaryProps) {
   const cartT = messages.cart;
   const checkoutT = messages.checkout;
@@ -35,25 +35,25 @@ export function OrderSummary({
             <span className="text-muted-foreground">{cartT.subtotal}</span>
             <span>{subtotal.toFixed(2)} {c.ron}</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">{cartT.shipping}</span>
-            <span>
-              {shipping === 0 ? (
-                <span className="text-green-600">{cartT.free}</span>
-              ) : (
-                `${shipping.toFixed(2)} ${c.ron}`
+          {showShipping && (
+            <>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">{cartT.shipping}</span>
+                <span>
+                  {shipping === 0 ? (
+                    <span className="text-green-600">{cartT.free}</span>
+                  ) : (
+                    `${shipping.toFixed(2)} ${c.ron}`
+                  )}
+                </span>
+              </div>
+              {subtotal < FREE_SHIPPING_THRESHOLD_RON && (
+                <p className="text-xs text-muted-foreground">
+                  {cartT.freeShippingNote.replace("{amount}", (FREE_SHIPPING_THRESHOLD_RON - subtotal).toFixed(2))}
+                </p>
               )}
-            </span>
-          </div>
-          {subtotal < 50 && (
-            <p className="text-xs text-muted-foreground">
-              {cartT.freeShippingNote.replace("{amount}", (50 - subtotal).toFixed(2))}
-            </p>
+            </>
           )}
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">{checkoutT.tax}</span>
-            <span>{tax.toFixed(2)} {c.ron}</span>
-          </div>
         </div>
         <Separator />
         <div className="flex justify-between font-bold text-lg">

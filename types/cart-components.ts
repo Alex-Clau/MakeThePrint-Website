@@ -10,11 +10,11 @@ export interface CartItemsListProps {
 }
 
 /**
- * Cart Summary component props
+ * Cart Summary component props.
+ * Shipping is not shown in cart; total = subtotal.
  */
 export interface CartSummaryProps {
   subtotal: number;
-  shipping: number;
   total: number;
 }
 

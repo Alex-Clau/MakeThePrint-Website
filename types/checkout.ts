@@ -31,8 +31,8 @@ export interface OrderSummaryProps {
   cartItems: CartItem[];
   subtotal: number;
   shipping: number;
-  tax: number;
   total: number;
+  showShipping?: boolean;
 }
 
 /**

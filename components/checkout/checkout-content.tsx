@@ -9,7 +9,6 @@ import Link from "next/link";
 import { CheckoutForms } from "./checkout-forms";
 import { OrderSummary } from "./order-summary";
 import { StripePaymentWrapper } from "./stripe-payment-wrapper";
-import { CartItem } from "@/types/cart";
 import { AddressFormData } from "@/types/address";
 import { addShippingAddressClient } from "@/lib/supabase/user-profiles-client";
 import { toast } from "sonner";
@@ -31,7 +30,7 @@ export function CheckoutContent({
   const c = messages.common;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
+  const [, setPaymentIntentId] = useState<string | null>(null);
   const [pendingOrderId, setPendingOrderId] = useState<string | null>(null);
   const [isLoadingPayment, setIsLoadingPayment] = useState(false);
   const [formData, setFormData] = useState<{
@@ -41,19 +40,6 @@ export function CheckoutContent({
   const formDataRef = useRef(formData);
   formDataRef.current = formData;
 
-  if (cartItems.length === 0) {
-    return (
-      <Card className="p-12 text-center">
-        <ShoppingBag className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-        <h2 className="text-2xl font-bold mb-2">{cartT.empty}</h2>
-        <p className="text-muted-foreground mb-6">{cartT.emptyHint}</p>
-        <Button asChild>
-          <Link href="/products">{c.browseProducts}</Link>
-        </Button>
-      </Card>
-    );
-  }
-
   const subtotal = cartItems.reduce((sum, item) => {
     // Preset (configurable): line total is totalPrice * quantity
     if (item.customizations?.totalPrice != null) {
@@ -61,9 +47,6 @@ export function CheckoutContent({
     }
     return sum + (item.products?.price || 0) * item.quantity;
   }, 0);
-  const shipping = getShippingCost(subtotal);
-  const tax = subtotal * 0.1;
-  const total = subtotal + shipping + tax;
 
   // Validate email format
   const isValidEmail = (email: string | undefined) => {
@@ -83,6 +66,10 @@ export function CheckoutContent({
     formData.shipping.state?.trim() !== "" &&
     formData.shipping.zip?.trim() !== "" &&
     formData.shipping.country?.trim() !== "";
+
+  const shippingCost = getShippingCost(subtotal);
+  const shipping = isAddressComplete ? shippingCost : 0;
+  const total = isAddressComplete ? subtotal + shippingCost : subtotal;
 
   const clearPaymentState = () => {
     setClientSecret(null);
@@ -200,7 +187,7 @@ export function CheckoutContent({
 
       if (formData.saveAddress) {
         try {
-          const { email, ...addressToSave } = formData.shipping;
+          const { ...addressToSave } = formData.shipping;
           await addShippingAddressClient(userId, addressToSave);
         } catch (error: unknown) {
           toast.error(getUserFriendlyError(error) || checkoutT.failedSaveAddressOrderPlaced);
@@ -219,6 +206,19 @@ export function CheckoutContent({
   const handlePaymentError = (error: string) => {
     toast.error(error || checkoutT.paymentFailedTryAgain);
   };
+
+  if (cartItems.length === 0) {
+    return (
+      <Card className="p-12 text-center">
+        <ShoppingBag className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+        <h2 className="text-2xl font-bold mb-2">{cartT.empty}</h2>
+        <p className="text-muted-foreground mb-6">{cartT.emptyHint}</p>
+        <Button asChild>
+          <Link href="/products">{c.browseProducts}</Link>
+        </Button>
+      </Card>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
@@ -264,8 +264,8 @@ export function CheckoutContent({
           cartItems={cartItems}
           subtotal={subtotal}
           shipping={shipping}
-          tax={tax}
           total={total}
+          showShipping={!!isAddressComplete}
         />
       </div>
     </div>

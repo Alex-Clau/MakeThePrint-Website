@@ -14,7 +14,6 @@ import { CartItemsList } from "./cart-items-list";
 import { CartSummary } from "./cart-summary";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
-import { getShippingCost } from "@/lib/constants/shipping";
 import { messages } from "@/lib/messages";
 import {
   AlertDialog,
@@ -85,8 +84,7 @@ export function CartContent({ items: initialItems }: CartContentProps) {
     }
     return sum + (item.products?.price ?? 0) * item.quantity;
   }, 0);
-  const shipping = getShippingCost(subtotal);
-  const total = subtotal + shipping;
+  const total = subtotal;
 
   if (items.length === 0) {
     return (
@@ -112,7 +110,7 @@ export function CartContent({ items: initialItems }: CartContentProps) {
           />
         </div>
         <div className="lg:col-span-1">
-          <CartSummary subtotal={subtotal} shipping={shipping} total={total} />
+          <CartSummary subtotal={subtotal} total={total} />
         </div>
       </div>
 

@@ -1,0 +1,21 @@
+{
+  "short_name": "Make The Print",
+  "name": "Make The Print",
+  "lang": "ro",
+  "icons": [
+    {
+      "src": "/smallLogo.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/smallLogo.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#2563eb",
+  "background_color": "#ffffff"
+}

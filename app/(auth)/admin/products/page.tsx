@@ -12,7 +12,12 @@ async function ProductsContent({
 }: { type?: string; category?: string }) {
   try {
     const products: Product[] = await getAdminProducts({ type, category });
-    return <AdminProductsList products={products} />;
+    return (
+      <AdminProductsList
+        key={`${type || "all"}-${category || "all"}`}
+        products={products}
+      />
+    );
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to load products";
     return (

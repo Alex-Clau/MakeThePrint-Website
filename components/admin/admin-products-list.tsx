@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
@@ -30,6 +30,10 @@ export function AdminProductsList({ products }: { products: Product[] }) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [optimisticProducts, setOptimisticProducts] = useState(products);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+
+  useEffect(() => {
+    setOptimisticProducts(products);
+  }, [products]);
 
   const handleDeleteClick = (id: string, name: string) => {
     setDeleteTarget({ id, name });

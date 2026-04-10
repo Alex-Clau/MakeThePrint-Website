@@ -7,7 +7,7 @@ import Link from "next/link";
 import { CartSummaryProps } from "@/types/cart-components";
 import { messages } from "@/lib/messages";
 
-export function CartSummary({ subtotal, shipping, total }: CartSummaryProps) {
+export function CartSummary({ subtotal, total }: CartSummaryProps) {
   const t = messages.cart;
   const c = messages.common;
   return (
@@ -21,21 +21,6 @@ export function CartSummary({ subtotal, shipping, total }: CartSummaryProps) {
             <span className="text-muted-foreground">{t.subtotal}</span>
             <span>{subtotal.toFixed(2)} {c.ron}</span>
           </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">{t.shipping}</span>
-            <span>
-              {shipping === 0 ? (
-                <span className="text-green-600">{t.free}</span>
-              ) : (
-                `${shipping.toFixed(2)} ${c.ron}`
-              )}
-            </span>
-          </div>
-          {subtotal < 50 && (
-            <p className="text-xs text-muted-foreground">
-              {t.freeShippingNote.replace("{amount}", (50 - subtotal).toFixed(2))}
-            </p>
-          )}
         </div>
         <div className="border-t pt-4">
           <div className="flex justify-between font-bold text-lg">
