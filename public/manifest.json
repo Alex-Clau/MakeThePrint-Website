@@ -4,12 +4,12 @@
   "lang": "ro",
   "icons": [
     {
-      "src": "/smallLogo.png",
+      "src": "/smallIcon.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "/smallLogo.png",
+      "src": "/smallIcon.png",
       "type": "image/png",
       "sizes": "512x512"
     }

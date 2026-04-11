@@ -283,7 +283,6 @@
     "signInToAdd": "Conectează-te pentru a adăuga produse la lista de dorințe"
   },
   "auth": {
-    "login": "Conectare",
     "loginDesc": "Introdu emailul pentru a te conecta la cont",
     "email": "Email",
     "emailPlaceholder": "ex. nume@exemplu.ro",
@@ -341,7 +340,8 @@
   },
   "error": {
     "title": "Ceva nu a mers bine!",
-    "description": "A apărut o eroare neașteptată. Te rugăm să încerci din nou sau să revii la pagina principală."
+    "description": "A apărut o eroare neașteptată. Te rugăm să încerci din nou sau să revii la pagina principală.",
+    "digestLabel": "Cod eroare"
   },
   "products": {
     "title": "Produse Customizabile",
