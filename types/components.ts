@@ -43,14 +43,6 @@ export interface AnimatedProductPageContentProps {
 }
 
 /**
- * AnimatedProductImage component props
- */
-export interface AnimatedProductImageProps {
-  src: string;
-  alt: string;
-}
-
-/**
  * ProductListItem component props
  */
 export interface ProductListItemProps {

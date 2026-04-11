@@ -1,11 +1,12 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { Sparkles, Mail, MessageCircle } from "lucide-react";
 import { messages } from "@/lib/messages";
 
 export function CustomPrintingSection() {
   const t = messages.home;
+  const phoneDigits = process.env.NEXT_PUBLIC_WHATSAPP_PHONE?.replace(/\D/g, "") ?? "";
+  const waHref = `https://wa.me/${phoneDigits}`;
+
   return (
     <section className="mx-3 py-12 sm:py-16 lg:py-24 bg-gradient-to-br from-accent-primary-light/10 via-background to-accent-primary-light/5 border-t border-accent-primary/30">
       <div className="max-w-4xl mx-auto px-5 sm:px-4 lg:px-8">
@@ -55,16 +56,16 @@ export function CustomPrintingSection() {
                   {t.whatsapp}
                 </h3>
                 <p className="text-sm text-muted-foreground mb-4">{t.whatsappDesc}</p>
-                <Button
-                  asChild
-                  variant="outline"
-                  className="border-accent-primary-dark/30 hover:bg-accent-primary/10 w-full sm:w-auto"
-                >
-                  <a href="https://wa.me/1234567890" target="_blank" rel="noopener noreferrer">
-                    {t.messageOnWhatsApp}
-                    <MessageCircle className="ml-2 h-4 w-4" />
-                  </a>
-                </Button>
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="border-accent-primary-dark/30 hover:bg-accent-primary/10 w-full sm:w-auto"
+                  >
+                    <a href={waHref} target="_blank" rel="noopener noreferrer">
+                      {t.messageOnWhatsApp}
+                      <MessageCircle className="ml-2 h-4 w-4" />
+                    </a>
+                  </Button>
               </div>
             </div>
           </div>
@@ -77,4 +78,3 @@ export function CustomPrintingSection() {
     </section>
   );
 }
-

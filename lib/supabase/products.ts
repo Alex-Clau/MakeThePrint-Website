@@ -105,29 +105,6 @@ export async function getPublicFeaturedProducts(limit = 8) {
   return getProducts({ featured: true, limit });
 }
 
-type HomepageFeaturedProduct = Pick<
-  Product,
-  "id" | "name" | "price" | "category" | "featured" | "images"
->;
-
-export async function getHomepageFeaturedProducts(
-  limit = 8,
-): Promise<HomepageFeaturedProduct[]> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("products")
-    .select("id, name, price, category, featured, images")
-    .eq("featured", true)
-    .order("created_at", { ascending: false })
-    .limit(limit);
-
-  if (error) {
-    throw handleSupabaseError(error);
-  }
-
-  return (data ?? []) as HomepageFeaturedProduct[];
-}
-
 /**
  * Get products for admin list with optional type/category filters.
  * Throws on error (same as getProducts, getProductById, etc.).

@@ -1,5 +1,3 @@
-"use client";
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Package, Heart, Zap, TrendingUp } from "lucide-react";
 import { messages } from "@/lib/messages";
