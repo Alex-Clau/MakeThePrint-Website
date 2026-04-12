@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
+import { signInWithGoogle } from "@/lib/auth/client-helpers";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -56,12 +57,7 @@ export function LoginForm({
     setError(null);
 
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback?next=/account`,
-        },
-      });
+      const { error } = await signInWithGoogle(supabase);
       if (error) throw error;
     } catch (error: unknown) {
       setError(getUserFriendlyError(error) || t.errorOccurred);

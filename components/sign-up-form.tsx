@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
+import { SIGNUP_EMAIL_SESSION_KEY, signInWithGoogle } from "@/lib/auth/client-helpers";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -60,7 +61,12 @@ export function SignUpForm({
         setIsLoading(false);
         return;
       }
-      router.push(`/auth/sign-up-success?email=${encodeURIComponent(email)}`);
+      try {
+        sessionStorage.setItem(SIGNUP_EMAIL_SESSION_KEY, email);
+      } catch {
+        // private mode / blocked storage — page still works without resend target
+      }
+      router.push("/auth/sign-up-success");
     } catch (err: unknown) {
       setError(getUserFriendlyError(err) || t.errorOccurred);
     } finally {
@@ -74,12 +80,7 @@ export function SignUpForm({
     setError(null);
 
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback?next=/account`,
-        },
-      });
+      const { error } = await signInWithGoogle(supabase);
       if (error) throw error;
     } catch (error: unknown) {
       setError(getUserFriendlyError(error) || t.errorOccurred);
