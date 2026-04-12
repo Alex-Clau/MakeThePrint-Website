@@ -347,7 +347,10 @@
   "products": {
     "title": "Produse Customizabile",
     "subhead": "Produse personalizate create cu atenție.",
-    "showingCount": "Se afișează {count} produse"
+    "showingCount": "Se afișează {count} produse",
+    "loadingMore": "Se încarcă mai multe produse…",
+    "loadMoreFailed": "Nu s-au putut încărca mai multe produse.",
+    "endOfList": "Ai ajuns la finalul listei de produse."
   },
   "seasons": {
     "title": "Colecții sezoniere",

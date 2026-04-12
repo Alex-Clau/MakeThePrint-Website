@@ -109,16 +109,6 @@ export async function updateOrderStatusAction(
 }
 
 /**
- * Revalidate pages that display product cards (and wishlist state).
- * Call after client-side wishlist add/remove so navigation to those routes shows fresh data.
- */
-export async function revalidateWishlistPaths() {
-  revalidatePath("/");
-  revalidatePath("/products");
-  revalidatePath("/collections");
-}
-
-/**
  * Form action for admin order status update
  */
 export async function updateOrderStatusFormAction(formData: FormData) {

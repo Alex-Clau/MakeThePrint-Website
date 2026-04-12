@@ -2,26 +2,13 @@ import { Suspense } from "react";
 import { PageLayout } from "@/components/layout/page-layout";
 import { ProductsInfiniteList } from "@/components/product/products-infinite-list";
 import { ProductsGridSkeleton } from "@/components/skeletons/products-grid-skeleton";
-import { getPublicCustomProductsPage } from "@/lib/supabase/products";
-import { getProductReviewStats } from "@/lib/supabase/reviews";
-import { transformProductToCardData } from "@/lib/utils/products";
+import { fetchCustomProductCardsPage } from "@/lib/catalog/fetch-custom-product-cards-page";
 import { messages } from "@/lib/messages";
 
 async function ProductsList() {
   const pageSize = 8;
-  const { products, hasMore } = await getPublicCustomProductsPage({
-    page: 1,
-    pageSize,
-  });
-  const reviewStats = await getProductReviewStats(products.map((p) => p.id));
-  const transformedProducts = products.map((p) => {
-    const stats = reviewStats.get(p.id);
-    return transformProductToCardData({
-      ...p,
-      rating: stats?.rating,
-      review_count: stats?.review_count,
-    });
-  });
+  const { products: transformedProducts, hasMore } =
+    await fetchCustomProductCardsPage({ page: 1, pageSize });
   return (
     <ProductsInfiniteList
       initialProducts={transformedProducts}

@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ProductCard } from "@/components/product/product-card";
-import type { Product, ProductCardData } from "@/types/product";
-import { createClient } from "@/lib/supabase/client";
+import type { ProductCardData } from "@/types/product";
+import { messages } from "@/lib/messages";
+import { getApiErrorBody } from "@/lib/utils/api-error";
 
 type ProductsInfiniteListProps = {
   initialProducts: ProductCardData[];
@@ -12,12 +13,20 @@ type ProductsInfiniteListProps = {
   initialHasMore: boolean;
 };
 
+type CatalogApiResponse = {
+  products: ProductCardData[];
+  hasMore: boolean;
+  page: number;
+  pageSize: number;
+};
+
 export function ProductsInfiniteList({
   initialProducts,
   initialPage,
   pageSize,
   initialHasMore,
 }: ProductsInfiniteListProps) {
+  const t = messages.products;
   const [products, setProducts] = useState<ProductCardData[]>(initialProducts);
   const [wishlistIds, setWishlistIds] = useState<Set<string>>(new Set());
   const [hasMore, setHasMore] = useState(initialHasMore);
@@ -28,94 +37,104 @@ export function ProductsInfiniteList({
   const loadingRef = useRef(false);
   const hasMoreRef = useRef(initialHasMore);
 
-  useEffect(() => {
-    let cancelled = false;
+  const refreshWishlistIds = useCallback(() => {
     fetch("/api/wishlist/ids")
-      .then((res) => res.json())
-      .then((data) => {
-        if (!cancelled) {
-          setWishlistIds(new Set((data.productIds ?? []) as string[]));
+      .then(async (res) => {
+        if (!res.ok) {
+          console.error("[wishlist/ids] refresh", res.status);
+          return;
         }
+        const data = (await res.json()) as { productIds?: string[] };
+        setWishlistIds(new Set(data.productIds ?? []));
       })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
+      .catch((e) => {
+        console.error("[wishlist/ids] refresh", e);
+      });
   }, []);
 
   useEffect(() => {
-    const handleWishlistUpdated = () => {
-      fetch("/api/wishlist/ids")
-        .then((res) => res.json())
-        .then((data) => setWishlistIds(new Set((data.productIds ?? []) as string[])))
-        .catch(() => {});
-    };
-    window.addEventListener("wishlist-updated", handleWishlistUpdated);
-    return () => window.removeEventListener("wishlist-updated", handleWishlistUpdated);
+    const ac = new AbortController();
+    fetch("/api/wishlist/ids", { signal: ac.signal })
+      .then(async (res) => {
+        if (!res.ok) {
+          console.error("[wishlist/ids] initial", res.status);
+          return;
+        }
+        const data = (await res.json()) as { productIds?: string[] };
+        setWishlistIds(new Set(data.productIds ?? []));
+      })
+      .catch((e: unknown) => {
+        if (e instanceof DOMException && e.name === "AbortError") return;
+        console.error("[wishlist/ids] initial", e);
+      });
+    return () => ac.abort();
   }, []);
 
   useEffect(() => {
-    if (!sentinelRef.current) return;
+    window.addEventListener("wishlist-updated", refreshWishlistIds);
+    return () => window.removeEventListener("wishlist-updated", refreshWishlistIds);
+  }, [refreshWishlistIds]);
 
-    const observer = new IntersectionObserver(async (entries) => {
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node) return;
+
+    let cancelled = false;
+
+    const observer = new IntersectionObserver((entries) => {
       const [entry] = entries;
       if (!entry.isIntersecting || loadingRef.current || !hasMoreRef.current) return;
 
-      loadingRef.current = true;
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const nextPage = pageRef.current + 1;
-        const supabase = createClient();
-        const from = (nextPage - 1) * pageSize;
-        const to = from + pageSize - 1;
-
-        const { data, error, count } = await supabase
-          .from("products")
-          .select(
-            "id, name, description, price, product_type, category, custom_config, featured, images, created_at, updated_at",
-            { count: "exact" },
-          )
-          .eq("product_type", "custom")
-          .order("created_at", { ascending: false })
-          .range(from, to);
-
-        if (error) {
-          throw error;
+      void (async () => {
+        loadingRef.current = true;
+        if (!cancelled) {
+          setIsLoading(true);
+          setError(null);
         }
 
-        const productsData = (data ?? []) as Product[];
-        const total = count ?? productsData.length ?? 0;
-        const hasMore = total ? to + 1 < total : productsData.length === pageSize;
+        try {
+          const nextPage = pageRef.current + 1;
+          const params = new URLSearchParams({
+            page: String(nextPage),
+            page_size: String(pageSize),
+          });
+          const res = await fetch(`/api/products/catalog?${params.toString()}`);
 
-        const cardData: ProductCardData[] = productsData.map((p) => ({
-          id: p.id,
-          name: p.name,
-          price: p.price,
-          image: p.images?.[0] ?? "",
-          category: p.category,
-          featured: p.featured,
-        }));
+          if (!res.ok) {
+            const { message } = await getApiErrorBody(res);
+            throw new Error(message);
+          }
 
-        setProducts((prev) => [...prev, ...cardData]);
-        pageRef.current = nextPage;
-        hasMoreRef.current = hasMore;
-        setHasMore(hasMore);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Failed to load more products");
-      } finally {
-        loadingRef.current = false;
-        setIsLoading(false);
-      }
+          const body = (await res.json()) as CatalogApiResponse;
+          const cardData = body.products;
+
+          if (cancelled) return;
+
+          setProducts((prev) => [...prev, ...cardData]);
+          pageRef.current = nextPage;
+          const nextHasMore = body.hasMore;
+          hasMoreRef.current = nextHasMore;
+          setHasMore(nextHasMore);
+        } catch (e) {
+          if (!cancelled) {
+            setError(e instanceof Error ? e.message : t.loadMoreFailed);
+          }
+        } finally {
+          loadingRef.current = false;
+          if (!cancelled) {
+            setIsLoading(false);
+          }
+        }
+      })();
     });
 
-    observer.observe(sentinelRef.current);
+    observer.observe(node);
 
     return () => {
+      cancelled = true;
       observer.disconnect();
     };
-  }, [pageSize]);
+  }, [pageSize, t.loadMoreFailed]);
 
   return (
     <>
@@ -131,7 +150,7 @@ export function ProductsInfiniteList({
       <div ref={sentinelRef} className="h-10" />
       {isLoading && (
         <p className="mt-4 text-center text-sm text-muted-foreground">
-          Se încarcă mai multe produse...
+          {t.loadingMore}
         </p>
       )}
       {error && (
@@ -141,10 +160,9 @@ export function ProductsInfiniteList({
       )}
       {!hasMore && (
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          Ai ajuns la finalul listei de produse.
+          {t.endOfList}
         </p>
       )}
     </>
   );
 }
-
