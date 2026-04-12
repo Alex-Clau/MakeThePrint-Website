@@ -1,50 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { LogoutButton } from "./logout-button";
 import { User } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 import { messages } from "@/lib/messages";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useSupabaseUser } from "@/lib/supabase/use-supabase-user";
 
 export function AuthButtonClient() {
   const c = messages.common;
   const a = messages.auth;
-  const [user, setUser] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    async function checkAuth() {
-      try {
-        const supabase = createClient();
-        const {
-          data: { user: authUser },
-        } = await supabase.auth.getUser();
-        setUser(authUser);
-      } catch (_error: unknown) {
-        // Silently fail - auth check failures are non-critical
-        setUser(null);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    checkAuth();
-
-    // Listen for auth changes
-    const supabase = createClient();
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user || null);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+  const { user, isLoading } = useSupabaseUser();
 
   if (isLoading) {
     return (
@@ -67,13 +34,12 @@ export function AuthButtonClient() {
     </div>
   ) : (
     <div className="flex gap-2">
-      <Button asChild size="sm" variant={"outline"}>
+      <Button asChild size="sm" variant="outline">
         <Link href="/auth/login">{a.signIn}</Link>
       </Button>
-      <Button asChild size="sm" variant={"default"}>
+      <Button asChild size="sm" variant="default">
         <Link href="/auth/sign-up">{a.signUp}</Link>
       </Button>
     </div>
   );
 }
-
