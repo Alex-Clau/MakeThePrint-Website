@@ -45,7 +45,7 @@ export interface OrderDetailHeaderProps {
  * Order Shipping Info component props
  */
 export interface OrderShippingInfoProps {
-  shippingAddress: Record<string, any>;
+  shippingAddress: OrderShippingAddress;
   trackingNumber?: string;
 }
 

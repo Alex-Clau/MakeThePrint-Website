@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -20,7 +20,10 @@ export function CustomLettersForm({
 }: CustomLettersFormProps) {
   const t = messages.product;
   const c = messages.common;
-  const sizeLabels = getSizeLabels(customConfig.sizePrices);
+  const sizeLabels = useMemo(
+    () => getSizeLabels(customConfig.sizePrices),
+    [customConfig.sizePrices]
+  );
   const firstSize = sizeLabels[0] ?? "";
 
   const [font, setFont] = useState(customConfig.defaultFont || availableFonts[0] || "");
@@ -64,7 +67,20 @@ export function CustomLettersForm({
         });
       }
     }
-  }, [sizeLabels.join(","), size, customConfig.sizePrices, customConfig.outdoorPrice, customConfig.ledStripPrice, customConfig.colorPrice, showOutdoorOption, showLedStripOption, showColorOption, isOutdoor, isLedStrip, isColor, text, font, color]);
+  }, [
+    sizeLabels,
+    size,
+    customConfig,
+    showOutdoorOption,
+    showLedStripOption,
+    showColorOption,
+    isOutdoor,
+    isLedStrip,
+    isColor,
+    text,
+    font,
+    color,
+  ]);
 
   const colors = customConfig.colors || ["black", "white"];
   const pricing = computePresetCustomizationPrice(customConfig, {

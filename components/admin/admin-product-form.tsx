@@ -57,7 +57,7 @@ export function AdminProductForm({product, initialType = "seasonal"}: AdminProdu
         custom_config: getDefaultConfig("preset"),
       }));
     }
-  }, [formData.product_type]);
+  }, [formData.product_type, formData.category]);
 
   useEffect(() => {
     if (formData.product_type === "custom" && !product) {

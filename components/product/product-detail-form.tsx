@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { CustomLettersForm } from "./custom-letters-form";
 import { ProductCardActions } from "./product-card-actions";
-import { KeychainConfig } from "@/types/product";
+import type { CustomProductConfig, KeychainConfig } from "@/types/product";
 import { getProductDisplayName, isPresetLettersConfig } from "@/lib/utils/products";
 import { messages } from "@/lib/messages";
 import { CART_UPDATED_EVENT } from "@/lib/cart/events";
@@ -43,6 +43,9 @@ export function ProductDetailForm({
   const inquireConfig = isInquire && product.custom_config && "whatsappNumber" in product.custom_config
     ? (product.custom_config as KeychainConfig)
     : null;
+
+  const lettersCustomConfig: CustomProductConfig =
+    customProductConfig ?? { sizePrices: [] };
 
   const [customConfig, setCustomConfig] = useState<{
     text: string;
@@ -264,7 +267,7 @@ export function ProductDetailForm({
           </div>
           <CustomLettersForm
             availableFonts={customProductConfig?.fonts ?? []}
-            customConfig={product.custom_config || {}}
+            customConfig={lettersCustomConfig}
             text={previewText}
             onLetterTextChange={(text) =>
               onPreviewChange?.({

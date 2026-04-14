@@ -29,8 +29,8 @@ export async function upsertUserProfile(profile: {
   email?: string;
   full_name?: string;
   phone?: string;
-  shipping_addresses?: Record<string, any>[];
-  preferences?: Record<string, any>;
+  shipping_addresses?: Record<string, unknown>[];
+  preferences?: Record<string, unknown>;
 }) {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -62,8 +62,8 @@ export async function updateUserProfile(
     email: string;
     full_name: string;
     phone: string;
-    shipping_addresses: Record<string, any>[];
-    preferences: Record<string, any>;
+    shipping_addresses: Record<string, unknown>[];
+    preferences: Record<string, unknown>;
   }>
 ) {
   const supabase = await createClient();

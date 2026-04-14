@@ -8,6 +8,7 @@ import { getOrderById } from "@/lib/supabase/orders";
 import { getRequiredUser } from "@/lib/supabase/server";
 import { messages } from "@/lib/messages";
 import type { OrderConfirmationParams } from "@/types/pages";
+import type { OrderShippingAddress } from "@/types/order";
 
 async function OrderConfirmationContent({ orderId }: { orderId: string }) {
   const user = await getRequiredUser();
@@ -26,6 +27,12 @@ async function OrderConfirmationContent({ orderId }: { orderId: string }) {
     hour: "2-digit",
     minute: "2-digit",
   });
+
+  const shipping = order.shipping_address as OrderShippingAddress;
+  const confirmationEmail =
+    typeof shipping?.email === "string" && shipping.email.trim().length > 0
+      ? shipping.email
+      : undefined;
 
   return (
     <Card className="max-w-2xl mx-auto">
@@ -68,7 +75,7 @@ async function OrderConfirmationContent({ orderId }: { orderId: string }) {
             </div>
           </div>
 
-          {(order.shipping_address as any)?.email && (
+          {confirmationEmail && (
             <div className="flex items-center gap-3 p-4 border rounded-lg">
               <Mail className="h-5 w-5 text-muted-foreground" />
               <div>
@@ -76,7 +83,7 @@ async function OrderConfirmationContent({ orderId }: { orderId: string }) {
                   {t.confirmationEmailSent}
                 </p>
                 <p className="font-semibold">
-                  {(order.shipping_address as any).email}
+                  {confirmationEmail}
                 </p>
               </div>
             </div>
