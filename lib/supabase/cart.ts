@@ -68,62 +68,6 @@ export async function getCartItems(userId: string): Promise<CartContentProps["it
 }
 
 /**
- * Add item to cart (or update quantity if exists)
- */
-export async function addToCart(item: {
-  user_id: string;
-  product_id: string;
-  quantity: number;
-  material?: string;
-  customizations?: Record<string, unknown>;
-}) {
-  const supabase = await createClient();
-
-  // Check if item already exists with same material and customizations
-  const {data: existingItem} = await supabase
-    .from("cart")
-    .select("id, quantity")
-    .eq("user_id", item.user_id)
-    .eq("product_id", item.product_id)
-    .eq("material", item.material || "")
-    .eq("customizations", JSON.stringify(item.customizations || {}))
-    .maybeSingle();
-
-  if (existingItem) {
-    // Update quantity
-    const {data, error} = await supabase
-      .from("cart")
-      .update({
-        quantity: existingItem.quantity + item.quantity,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", existingItem.id)
-      .select()
-      .single();
-
-    if (error) {
-      throw handleSupabaseError(error);
-    }
-    return data;
-  } else {
-    // Insert new item
-    const {data, error} = await supabase
-      .from("cart")
-      .insert({
-        ...item,
-        customizations: item.customizations || {},
-      })
-      .select()
-      .single();
-
-    if (error) {
-      throw handleSupabaseError(error);
-    }
-    return data;
-  }
-}
-
-/**
  * Update cart item quantity
  */
 export async function updateCartItem(

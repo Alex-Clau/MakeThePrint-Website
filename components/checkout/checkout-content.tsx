@@ -40,6 +40,8 @@ export function CheckoutContent({
   } | null>(null);
   const formDataRef = useRef(formData);
   formDataRef.current = formData;
+  /** Bumps on each effect run so stale async work does not toast, clear state, or overwrite clientSecret. */
+  const checkoutSetupGenerationRef = useRef(0);
 
   const subtotal = getCartSubtotal(cartItems);
 
@@ -86,14 +88,21 @@ export function CheckoutContent({
   // Create pending order then payment intent when address is complete (for webhook backup).
   // Depend only on total, cart length, and isAddressComplete so we don't create duplicate orders on every form keystroke.
   useEffect(() => {
+    const setupId = ++checkoutSetupGenerationRef.current;
+
     const setupPayment = async () => {
       const currentFormData = formDataRef.current;
       if (cartItems.length === 0 || !isAddressComplete || !currentFormData?.shipping) {
-        clearPaymentState();
+        if (setupId === checkoutSetupGenerationRef.current) {
+          clearPaymentState();
+          setIsLoadingPayment(false);
+        }
         return;
       }
 
-      setIsLoadingPayment(true);
+      if (setupId === checkoutSetupGenerationRef.current) {
+        setIsLoadingPayment(true);
+      }
       try {
         const pendingRes = await fetch("/api/orders/create-pending", {
           method: "POST",
@@ -103,12 +112,16 @@ export function CheckoutContent({
           }),
         });
 
+        if (setupId !== checkoutSetupGenerationRef.current) return;
+
         if (!pendingRes.ok) {
           await handleFetchError(pendingRes, checkoutT.failedCreateOrder);
           return;
         }
 
         const { orderId } = await pendingRes.json();
+        if (setupId !== checkoutSetupGenerationRef.current) return;
+
         setPendingOrderId(orderId);
 
         const intentRes = await fetch("/api/stripe/create-payment-intent", {
@@ -119,23 +132,30 @@ export function CheckoutContent({
           }),
         });
 
+        if (setupId !== checkoutSetupGenerationRef.current) return;
+
         if (!intentRes.ok) {
           await handleFetchError(intentRes, checkoutT.failedCreatePaymentIntent);
           return;
         }
 
         const data = await intentRes.json();
+        if (setupId !== checkoutSetupGenerationRef.current) return;
+
         setClientSecret(data.clientSecret);
         setPaymentIntentId(data.paymentIntentId);
       } catch (error: unknown) {
+        if (setupId !== checkoutSetupGenerationRef.current) return;
         toast.error(getUserFriendlyError(error) || checkoutT.failedInitializePayment);
         clearPaymentState();
       } finally {
-        setIsLoadingPayment(false);
+        if (setupId === checkoutSetupGenerationRef.current) {
+          setIsLoadingPayment(false);
+        }
       }
     };
 
-    setupPayment();
+    void setupPayment();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [total, cartItems.length, isAddressComplete]);
 

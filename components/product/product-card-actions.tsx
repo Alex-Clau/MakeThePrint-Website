@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { ProductCardActionsProps } from "@/types/product-components";
 import { messages } from "@/lib/messages";
+import { WISHLIST_UPDATED_EVENT } from "@/lib/wishlist/events";
 
 export function ProductCardActions({
   productId,
@@ -63,7 +64,7 @@ export function ProductCardActions({
       }
       router.refresh();
       await revalidateWishlistPaths();
-      window.dispatchEvent(new CustomEvent("wishlist-updated"));
+      window.dispatchEvent(new CustomEvent(WISHLIST_UPDATED_EVENT));
     } catch (error: unknown) {
       toast.error(getUserFriendlyError(error));
     } finally {

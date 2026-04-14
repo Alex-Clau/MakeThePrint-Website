@@ -19,17 +19,19 @@ export async function POST(request: NextRequest) {
     const { orderId } = body;
 
     if (!orderId || typeof orderId !== "string") {
-      return NextResponse.json(
-        { error: "orderId is required for payment" },
-        { status: 400 }
-      );
+      return apiErrorResponse("orderId is required for payment", 400, "BAD_REQUEST");
     }
 
     let order: { id: string; total_amount: number; payment_status: string };
     try {
       order = await getOrderForPayment(orderId, user.id);
-    } catch {
-      return apiErrorResponse("Order not found", 404, "NOT_FOUND");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "";
+      if (msg === "Order not found") {
+        return apiErrorResponse("Order not found", 404, "NOT_FOUND");
+      }
+      const { message } = normalizeToApiError(err);
+      return apiErrorResponse(message, 500);
     }
 
     if (order.payment_status === "paid") {

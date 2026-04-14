@@ -6,6 +6,7 @@ import type { ProductCardData } from "@/types/product";
 import { messages } from "@/lib/messages";
 import { fetchWishlistProductIdsFromApi } from "@/lib/supabase/wishlist-client";
 import { getApiErrorBody } from "@/lib/utils/api-error";
+import { WISHLIST_UPDATED_EVENT } from "@/lib/wishlist/events";
 
 type ProductsInfiniteListProps = {
   initialProducts: ProductCardData[];
@@ -57,8 +58,8 @@ export function ProductsInfiniteList({
   }, []);
 
   useEffect(() => {
-    window.addEventListener("wishlist-updated", refreshWishlistIds);
-    return () => window.removeEventListener("wishlist-updated", refreshWishlistIds);
+    window.addEventListener(WISHLIST_UPDATED_EVENT, refreshWishlistIds);
+    return () => window.removeEventListener(WISHLIST_UPDATED_EVENT, refreshWishlistIds);
   }, [refreshWishlistIds]);
 
   useEffect(() => {

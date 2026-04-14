@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ProductCard } from "@/components/product/product-card";
 import { fetchWishlistProductIdsFromApi } from "@/lib/supabase/wishlist-client";
 import type { ProductCardData } from "@/types/product";
+import { WISHLIST_UPDATED_EVENT } from "@/lib/wishlist/events";
 
 type Props = {
   cards: ProductCardData[];
@@ -21,8 +22,8 @@ export function FeaturedProductsWishlistClient({ cards, wishlistProductIds }: Pr
         }
       });
     };
-    window.addEventListener("wishlist-updated", sync);
-    return () => window.removeEventListener("wishlist-updated", sync);
+    window.addEventListener(WISHLIST_UPDATED_EVENT, sync);
+    return () => window.removeEventListener(WISHLIST_UPDATED_EVENT, sync);
   }, []);
 
   return (
