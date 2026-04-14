@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { CART_UPDATED_EVENT } from "@/lib/cart/events";
 
 export function CartCount() {
   const [count, setCount] = useState(0);
@@ -33,10 +34,10 @@ export function CartCount() {
     const handleCartUpdate = () => {
       void fetchCartCount();
     };
-    window.addEventListener("cart-updated", handleCartUpdate);
+    window.addEventListener(CART_UPDATED_EVENT, handleCartUpdate);
 
     return () => {
-      window.removeEventListener("cart-updated", handleCartUpdate);
+      window.removeEventListener(CART_UPDATED_EVENT, handleCartUpdate);
     };
   }, []);
 

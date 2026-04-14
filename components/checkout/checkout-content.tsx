@@ -17,6 +17,7 @@ import { getApiErrorBody } from "@/lib/utils/api-error";
 import { CheckoutContentProps } from "@/types/checkout";
 import { getShippingCost } from "@/lib/constants/shipping";
 import { messages } from "@/lib/messages";
+import { getCartSubtotal } from "@/lib/cart/pricing";
 
 export function CheckoutContent({
   cartItems,
@@ -40,13 +41,7 @@ export function CheckoutContent({
   const formDataRef = useRef(formData);
   formDataRef.current = formData;
 
-  const subtotal = cartItems.reduce((sum, item) => {
-    // Preset (configurable): line total is totalPrice * quantity
-    if (item.customizations?.totalPrice != null) {
-      return sum + item.customizations.totalPrice * item.quantity;
-    }
-    return sum + (item.products?.price || 0) * item.quantity;
-  }, 0);
+  const subtotal = getCartSubtotal(cartItems);
 
   // Validate email format
   const isValidEmail = (email: string | undefined) => {
@@ -100,21 +95,11 @@ export function CheckoutContent({
 
       setIsLoadingPayment(true);
       try {
-        const orderItems = cartItems.map((item) => ({
-          product_id: item.product_id,
-          quantity: item.quantity,
-          price: item.customizations?.totalPrice ?? item.products.price,
-          material: item.material,
-          customizations: item.customizations ?? {},
-        }));
-
         const pendingRes = await fetch("/api/orders/create-pending", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            total_amount: total,
             shipping_address: currentFormData.shipping,
-            order_items: orderItems,
           }),
         });
 

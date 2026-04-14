@@ -6,7 +6,7 @@ import { getRequiredUser } from "@/lib/supabase/server";
 async function CartItems() {
   const user = await getRequiredUser();
   const items = await getCartItems(user.id);
-  return <CartContent items={items} userId={user.id} />;
+  return <CartContent items={items} />;
 }
 
 export default function CartPage() {

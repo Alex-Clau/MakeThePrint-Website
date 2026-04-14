@@ -15,6 +15,7 @@ import { ProductCardActions } from "./product-card-actions";
 import { KeychainConfig } from "@/types/product";
 import { getProductDisplayName, isPresetLettersConfig } from "@/lib/utils/products";
 import { messages } from "@/lib/messages";
+import { CART_UPDATED_EVENT } from "@/lib/cart/events";
 
 export function ProductDetailForm({
   product,
@@ -130,7 +131,7 @@ export function ProductDetailForm({
 
       toast.success(t.addedToCart);
       // Dispatch custom event to refresh cart count
-      window.dispatchEvent(new CustomEvent("cart-updated"));
+      window.dispatchEvent(new CustomEvent(CART_UPDATED_EVENT));
       router.push("/cart");
     } catch (error: unknown) {
       toast.error(getUserFriendlyError(error));

@@ -1,7 +1,8 @@
-import { createClient } from "./server";
-import { createAdminClient } from "./admin";
-import { handleSupabaseError } from "../utils/supabase-errors";
-import type { CartContentProps } from "@/types/cart";
+import {createClient} from "./server";
+import {createAdminClient} from "./admin";
+import {handleSupabaseError} from "../utils/supabase-errors";
+import type {CartContentProps, CartItem} from "@/types/cart";
+import {resolveServerCartUnitPrice} from "@/lib/cart/server-pricing";
 
 /**
  * Get user's cart items, normalized to typed CartItem objects.
@@ -24,7 +25,9 @@ export async function getCartItems(userId: string): Promise<CartContentProps["it
         id,
         name,
         price,
-        images
+        images,
+        category,
+        custom_config
       )
     `
     )
@@ -34,19 +37,34 @@ export async function getCartItems(userId: string): Promise<CartContentProps["it
   if (error) {
     throw handleSupabaseError(error);
   }
-  const items: CartContentProps["items"] = (data ?? []).map((item: any) => ({
-    id: item.id,
-    user_id: item.user_id,
-    product_id: item.product_id,
-    quantity: item.quantity,
-    material: item.material,
-    customizations: item.customizations,
-    created_at: item.created_at,
-    updated_at: item.updated_at,
-    products: item.products,
-  }));
+  type RawCartItem = Omit<CartItem, "products" | "resolved_unit_price"> & {
+    products: CartItem["products"] | CartItem["products"][] | null;
+  };
 
-  return items;
+  return (data ?? []).map((item) => {
+    const typedItem = item as unknown as RawCartItem;
+    const product = Array.isArray(typedItem.products)
+      ? typedItem.products[0]
+      : typedItem.products;
+    if (!product) {
+      throw new Error(`Missing product for cart item ${typedItem.id}`);
+    }
+    return {
+      id: typedItem.id,
+      user_id: typedItem.user_id,
+      product_id: typedItem.product_id,
+      quantity: typedItem.quantity,
+      material: typedItem.material,
+      customizations: typedItem.customizations,
+      resolved_unit_price: resolveServerCartUnitPrice(
+        product,
+        typedItem.customizations
+      ),
+      created_at: typedItem.created_at,
+      updated_at: typedItem.updated_at,
+      products: product,
+    };
+  });
 }
 
 /**
@@ -57,7 +75,7 @@ export async function addToCart(item: {
   product_id: string;
   quantity: number;
   material?: string;
-  customizations?: Record<string, any>;
+  customizations?: Record<string, unknown>;
 }) {
   const supabase = await createClient();
 

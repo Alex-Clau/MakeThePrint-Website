@@ -15,6 +15,8 @@ import { CartSummary } from "./cart-summary";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { messages } from "@/lib/messages";
+import { CART_UPDATED_EVENT } from "@/lib/cart/events";
+import { getCartSubtotal } from "@/lib/cart/pricing";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,7 +46,7 @@ export function CartContent({ items: initialItems }: CartContentProps) {
         item.id === cartItemId ? { ...item, quantity: newQuantity } : item
       )
     );
-    window.dispatchEvent(new CustomEvent("cart-updated"));
+    window.dispatchEvent(new CustomEvent(CART_UPDATED_EVENT));
     updateCartItemClient(cartItemId, newQuantity).catch((error: unknown) => {
       setItems(prevItems);
       toast.error(getUserFriendlyError(error));
@@ -63,7 +65,7 @@ export function CartContent({ items: initialItems }: CartContentProps) {
     const removedItem = items.find((i) => i.id === cartItemId);
     const prevItems = items;
     setItems((current) => current.filter((item) => item.id !== cartItemId));
-    window.dispatchEvent(new CustomEvent("cart-updated"));
+    window.dispatchEvent(new CustomEvent(CART_UPDATED_EVENT));
 
     try {
       await removeFromCartClient(cartItemId);
@@ -71,19 +73,13 @@ export function CartContent({ items: initialItems }: CartContentProps) {
     } catch (error: unknown) {
       if (removedItem) {
         setItems(prevItems);
-        window.dispatchEvent(new CustomEvent("cart-updated"));
+        window.dispatchEvent(new CustomEvent(CART_UPDATED_EVENT));
       }
       toast.error(getUserFriendlyError(error));
     }
   };
 
-  const subtotal = items.reduce((sum, item) => {
-    // Preset (configurable): line total is totalPrice * quantity
-    if (item.customizations?.totalPrice != null) {
-      return sum + item.customizations.totalPrice * item.quantity;
-    }
-    return sum + (item.products?.price ?? 0) * item.quantity;
-  }, 0);
+  const subtotal = getCartSubtotal(items);
   const total = subtotal;
 
   if (items.length === 0) {
