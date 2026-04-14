@@ -8,27 +8,39 @@ import {
   type ReviewSort,
 } from "@/lib/supabase/reviews";
 
+const REVIEW_SORT_OPTIONS: ReadonlyArray<ReviewSort> = ["newest", "oldest", "highest", "lowest"];
+const MAX_REVIEW_COMMENT_LENGTH = 1000;
+
+function isValidReviewSort(value: string): value is ReviewSort {
+  return REVIEW_SORT_OPTIONS.includes(value as ReviewSort);
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const productId = searchParams.get("product_id");
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
     const limit = Math.min(20, Math.max(1, parseInt(searchParams.get("limit") ?? "5", 10)));
-    const sort = (searchParams.get("sort") ?? "newest") as ReviewSort;
+    const requestedSort = searchParams.get("sort") ?? "newest";
 
     if (!productId) {
-      return NextResponse.json({ error: "product_id is required" }, { status: 400 });
+      return apiErrorResponse("product_id is required", 400);
     }
+    if (!isValidReviewSort(requestedSort)) {
+      return apiErrorResponse("Invalid sort value", 400);
+    }
+    const sort = requestedSort;
 
     const supabase = await createClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
-    const [{ reviews, total }, stats] = await Promise.all([
-      getProductReviewsPaginated(productId, page, limit, sort),
-      getProductReviewStatsForProduct(productId),
-    ]);
+    const { reviews, total } = await getProductReviewsPaginated(productId, page, limit, sort);
+    const stats =
+      page === 1
+        ? await getProductReviewStatsForProduct(productId)
+        : { averageRating: 0, distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } as Record<number, number> };
 
     let userReview = null;
     if (user) {
@@ -79,13 +91,24 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { product_id, rating, comment } = body;
+    const { product_id, rating, comment } = body as {
+      product_id?: string;
+      rating?: unknown;
+      comment?: unknown;
+    };
 
-    if (!product_id || !rating) {
-      return NextResponse.json(
-        { error: "Product ID and rating are required" },
-        { status: 400 }
-      );
+    if (!product_id) {
+      return apiErrorResponse("Product ID is required", 400);
+    }
+    const parsedRating = Number(rating);
+    if (!Number.isInteger(parsedRating) || parsedRating < 1 || parsedRating > 5) {
+      return apiErrorResponse("Rating must be an integer between 1 and 5", 400);
+    }
+    if (comment != null && typeof comment !== "string") {
+      return apiErrorResponse("Comment must be a string", 400);
+    }
+    if (typeof comment === "string" && comment.length > MAX_REVIEW_COMMENT_LENGTH) {
+      return apiErrorResponse(`Comment must be ${MAX_REVIEW_COMMENT_LENGTH} characters or less`, 400);
     }
 
     // Check if user already reviewed this product
@@ -97,10 +120,7 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
 
     if (existingReview) {
-      return NextResponse.json(
-        { error: "You have already reviewed this product" },
-        { status: 400 }
-      );
+      return apiErrorResponse("You have already reviewed this product", 400);
     }
 
     // Create review
@@ -109,7 +129,7 @@ export async function POST(request: NextRequest) {
       .insert({
         user_id: user.id,
         product_id,
-        rating,
+        rating: parsedRating,
         comment: comment || null,
       })
       .select()
@@ -149,13 +169,31 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { review_id, rating, comment, product_id } = body;
+    const { review_id, rating, comment } = body as {
+      review_id?: string;
+      rating?: unknown;
+      comment?: unknown;
+    };
+
+    if (!review_id) {
+      return apiErrorResponse("review_id is required", 400);
+    }
+    const parsedRating = Number(rating);
+    if (!Number.isInteger(parsedRating) || parsedRating < 1 || parsedRating > 5) {
+      return apiErrorResponse("Rating must be an integer between 1 and 5", 400);
+    }
+    if (comment != null && typeof comment !== "string") {
+      return apiErrorResponse("Comment must be a string", 400);
+    }
+    if (typeof comment === "string" && comment.length > MAX_REVIEW_COMMENT_LENGTH) {
+      return apiErrorResponse(`Comment must be ${MAX_REVIEW_COMMENT_LENGTH} characters or less`, 400);
+    }
 
     // Update review
     const { data, error } = await supabase
       .from("product_reviews")
       .update({
-        rating,
+        rating: parsedRating,
         comment: comment || null,
         updated_at: new Date().toISOString(),
       })
@@ -190,32 +228,23 @@ export async function DELETE(request: NextRequest) {
     const reviewId = searchParams.get("review_id");
 
     if (!reviewId) {
-      return NextResponse.json(
-        { error: "Review ID is required" },
-        { status: 400 }
-      );
-    }
-
-    // Get product_id before deleting
-    const { data: review } = await supabase
-      .from("product_reviews")
-      .select("product_id")
-      .eq("id", reviewId)
-      .single();
-
-    if (!review) {
-      return apiErrorResponse("Review not found", 404, "NOT_FOUND");
+      return apiErrorResponse("Review ID is required", 400);
     }
 
     // Delete review
-    const { error } = await supabase
+    const { data: deletedReview, error } = await supabase
       .from("product_reviews")
       .delete()
       .eq("id", reviewId)
-      .eq("user_id", user.id);
+      .eq("user_id", user.id)
+      .select("id")
+      .maybeSingle();
 
     if (error) {
       throw handleSupabaseError(error);
+    }
+    if (!deletedReview) {
+      return apiErrorResponse("Review not found", 404, "NOT_FOUND");
     }
 
     return NextResponse.json({ success: true });

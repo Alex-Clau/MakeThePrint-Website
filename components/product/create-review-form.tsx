@@ -52,17 +52,16 @@ export function CreateReviewForm({
     setIsSubmitting(true);
     try {
       if (existingReview) {
-        await updateReviewClient(existingReview.id, userId, {
+        await updateReviewClient(existingReview.id, {
           rating,
           comment: comment || undefined,
-        }, productId);
+        });
         toast.success(t.reviewUpdated);
       } else {
         if (showDisplayNameField && displayName.trim()) {
           await updateUserProfileClient(userId, { full_name: displayName.trim() });
         }
         await createReviewClient({
-          user_id: userId,
           product_id: productId,
           rating,
           comment: comment || undefined,
@@ -87,7 +86,7 @@ export function CreateReviewForm({
     setShowDeleteDialog(false);
     setIsSubmitting(true);
     try {
-      await deleteReviewClient(existingReview.id, userId);
+      await deleteReviewClient(existingReview.id);
       toast.success(t.reviewDeleted);
       if (onClose) onClose();
       router.refresh();
@@ -178,7 +177,7 @@ export function CreateReviewForm({
                     <AlertDialogHeader>
                       <AlertDialogTitle>{t.confirmDeleteReview}</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Această acțiune nu poate fi anulată.
+                        This action cannot be undone.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

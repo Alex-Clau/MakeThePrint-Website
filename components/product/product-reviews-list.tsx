@@ -10,7 +10,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CheckCircle2, ChevronDown, Loader2 } from "lucide-react";
+import { ChevronDown, Loader2 } from "lucide-react";
 import { CreateReviewForm } from "./create-review-form";
 import { createClient } from "@/lib/supabase/client";
 import { ProductReviewsListProps } from "@/types/product-components";
@@ -64,8 +64,14 @@ export function ProductReviewsList({
       isFetchingRef.current = true;
       setIsLoading(true);
       try {
+        const query = new URLSearchParams({
+          product_id: productId,
+          page: String(pageNum),
+          limit: "5",
+          sort,
+        });
         const res = await fetch(
-          `/api/reviews?product_id=${productId}&page=${pageNum}&limit=5&sort=${sort}`
+          `/api/reviews?${query.toString()}`
         );
         const data = await res.json();
         if (!res.ok) throw new Error(data.error ?? "Failed to fetch");
@@ -139,21 +145,6 @@ export function ProductReviewsList({
     );
   };
 
-  const sortedReviews = [...reviews].sort((a, b) => {
-    switch (sortBy) {
-      case "newest":
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-      case "oldest":
-        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-      case "highest":
-        return b.rating - a.rating;
-      case "lowest":
-        return a.rating - b.rating;
-      default:
-        return 0;
-    }
-  });
-
   return (
     <div className="space-y-6">
       {/* Rating Summary */}
@@ -165,11 +156,8 @@ export function ProductReviewsList({
               {averageRating.toFixed(2)} {t.outOf5}
             </span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>
-              {t.basedOn} {totalReviews} {totalReviews === 1 ? t.review : t.reviews}
-            </span>
-            {totalReviews > 0 && <CheckCircle2 className="h-4 w-4 text-green-500" />}
+          <div className="text-sm text-muted-foreground">
+            {t.basedOn} {totalReviews} {totalReviews === 1 ? t.review : t.reviews}
           </div>
           {totalReviews === 0 && (
             <div className="mt-1 text-xs text-muted-foreground/80">
@@ -251,12 +239,9 @@ export function ProductReviewsList({
       {/* Reviews List */}
       {reviews.length > 0 && (
         <div className="space-y-4">
-          {sortedReviews.map((review) => {
+          {reviews.map((review) => {
             const reviewDate = new Date(review.created_at);
-            const userName =
-              review.user_profiles?.full_name ||
-              review.user_profiles?.email?.split("@")[0] ||
-              "Anonymous";
+            const userName = review.user_profiles?.full_name || "Anonymous";
 
             return (
               <Card key={review.id} className="border-accent-primary/20">

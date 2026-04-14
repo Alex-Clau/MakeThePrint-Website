@@ -4,10 +4,9 @@ import { getApiErrorBody } from "@/lib/utils/api-error";
 
 /**
  * Create a product review - Client-side
- * Uses API route to ensure product rating is updated
+ * Uses API route for authenticated writes
  */
 export async function createReviewClient(review: {
-  user_id: string;
   product_id: string;
   rating: number;
   comment?: string;
@@ -36,16 +35,14 @@ export async function createReviewClient(review: {
 
 /**
  * Update a review - Client-side
- * Uses API route to ensure product rating is updated
+ * Uses API route for authenticated writes
  */
 export async function updateReviewClient(
   reviewId: string,
-  userId: string,
   updates: {
     rating?: number;
     comment?: string;
-  },
-  productId: string
+  }
 ) {
   const response = await fetch("/api/reviews", {
     method: "PUT",
@@ -56,7 +53,6 @@ export async function updateReviewClient(
       review_id: reviewId,
       rating: updates.rating,
       comment: updates.comment,
-      product_id: productId,
     }),
   });
 
@@ -72,9 +68,9 @@ export async function updateReviewClient(
 
 /**
  * Delete a review - Client-side
- * Uses API route to ensure product rating is updated
+ * Uses API route for authenticated writes
  */
-export async function deleteReviewClient(reviewId: string, userId: string) {
+export async function deleteReviewClient(reviewId: string) {
   const response = await fetch(`/api/reviews?review_id=${reviewId}`, {
     method: "DELETE",
   });
