@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ProductCard } from "@/components/product/product-card";
+import { fetchWishlistProductIdsFromApi } from "@/lib/supabase/wishlist-client";
 import type { ProductCardData } from "@/types/product";
 
 type Props = {
@@ -14,14 +15,11 @@ export function FeaturedProductsWishlistClient({ cards, wishlistProductIds }: Pr
 
   useEffect(() => {
     const sync = () => {
-      void fetch("/api/wishlist/ids")
-        .then((res) => res.json())
-        .then((data: { productIds?: string[] }) => {
-          setWishlistIds(new Set(data.productIds ?? []));
-        })
-        .catch(() => {
-          /* keep last known ids */
-        });
+      void fetchWishlistProductIdsFromApi().then((result) => {
+        if (result.ok) {
+          setWishlistIds(new Set(result.productIds));
+        }
+      });
     };
     window.addEventListener("wishlist-updated", sync);
     return () => window.removeEventListener("wishlist-updated", sync);

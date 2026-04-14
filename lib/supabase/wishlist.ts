@@ -2,6 +2,8 @@ import { createClient } from "./server";
 import { handleSupabaseError } from "../utils/supabase-errors";
 import type { WishlistRow } from "@/types/wishlist";
 
+type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
+
 /**
  * Get user's wishlist, normalized for UI.
  */
@@ -106,10 +108,14 @@ export async function removeFromWishlist(userId: string, productId: string) {
 
 /**
  * Get all product IDs in user's wishlist (for batch checks).
+ * Pass `supabase` when you already have a server client (e.g. route after `getUser`) to avoid a second client.
  */
-export async function getWishlistProductIds(userId: string): Promise<Set<string>> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
+export async function getWishlistProductIds(
+  userId: string,
+  supabase?: SupabaseServerClient
+): Promise<Set<string>> {
+  const client = supabase ?? (await createClient());
+  const { data, error } = await client
     .from("wishlist")
     .select("product_id")
     .eq("user_id", userId);

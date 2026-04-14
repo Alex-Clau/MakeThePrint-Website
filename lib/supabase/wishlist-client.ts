@@ -2,6 +2,7 @@
 
 import { createClient } from "./client";
 import { handleSupabaseError } from "../utils/supabase-errors";
+import { getApiErrorBody } from "@/lib/utils/api-error";
 
 /**
  * Add product to wishlist - Client-side
@@ -54,5 +55,36 @@ export async function removeFromWishlistClient(
 
   if (error) throw handleSupabaseError(error);
   return { success: true };
+}
+
+const WISHLIST_IDS_PATH = "/api/wishlist/ids";
+
+/**
+ * Loads wishlist product IDs from the cookie-backed API route.
+ * On any failure, returns `{ ok: false }` so callers can keep the previous UI state.
+ */
+export async function fetchWishlistProductIdsFromApi(
+  init?: RequestInit
+): Promise<{ ok: true; productIds: string[] } | { ok: false }> {
+  try {
+    const res = await fetch(WISHLIST_IDS_PATH, init);
+    if (!res.ok) {
+      const { message } = await getApiErrorBody(res);
+      console.error("[fetchWishlistProductIdsFromApi]", res.status, message);
+      return { ok: false };
+    }
+    const data = (await res.json()) as { productIds?: unknown };
+    const raw = data.productIds;
+    const productIds = Array.isArray(raw)
+      ? raw.filter((id): id is string => typeof id === "string")
+      : [];
+    return { ok: true, productIds };
+  } catch (e) {
+    if (e instanceof DOMException && e.name === "AbortError") {
+      return { ok: false };
+    }
+    console.error("[fetchWishlistProductIdsFromApi]", e);
+    return { ok: false };
+  }
 }
 

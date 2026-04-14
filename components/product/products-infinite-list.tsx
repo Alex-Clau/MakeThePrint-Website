@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ProductCard } from "@/components/product/product-card";
 import type { ProductCardData } from "@/types/product";
 import { messages } from "@/lib/messages";
+import { fetchWishlistProductIdsFromApi } from "@/lib/supabase/wishlist-client";
 import { getApiErrorBody } from "@/lib/utils/api-error";
 
 type ProductsInfiniteListProps = {
@@ -38,35 +39,20 @@ export function ProductsInfiniteList({
   const hasMoreRef = useRef(initialHasMore);
 
   const refreshWishlistIds = useCallback(() => {
-    fetch("/api/wishlist/ids")
-      .then(async (res) => {
-        if (!res.ok) {
-          console.error("[wishlist/ids] refresh", res.status);
-          return;
-        }
-        const data = (await res.json()) as { productIds?: string[] };
-        setWishlistIds(new Set(data.productIds ?? []));
-      })
-      .catch((e) => {
-        console.error("[wishlist/ids] refresh", e);
-      });
+    void fetchWishlistProductIdsFromApi().then((result) => {
+      if (result.ok) {
+        setWishlistIds(new Set(result.productIds));
+      }
+    });
   }, []);
 
   useEffect(() => {
     const ac = new AbortController();
-    fetch("/api/wishlist/ids", { signal: ac.signal })
-      .then(async (res) => {
-        if (!res.ok) {
-          console.error("[wishlist/ids] initial", res.status);
-          return;
-        }
-        const data = (await res.json()) as { productIds?: string[] };
-        setWishlistIds(new Set(data.productIds ?? []));
-      })
-      .catch((e: unknown) => {
-        if (e instanceof DOMException && e.name === "AbortError") return;
-        console.error("[wishlist/ids] initial", e);
-      });
+    void fetchWishlistProductIdsFromApi({ signal: ac.signal }).then((result) => {
+      if (result.ok) {
+        setWishlistIds(new Set(result.productIds));
+      }
+    });
     return () => ac.abort();
   }, []);
 
