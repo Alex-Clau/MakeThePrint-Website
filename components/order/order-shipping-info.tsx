@@ -40,7 +40,7 @@ export function OrderShippingInfo({
         </div>
         {trackingNumber && (
           <div className="pt-4 border-t">
-            <p className="text-sm font-semibold mb-1">{t.trackingNumber}</p>
+            <p className="text-sm font-semibold mb-1">{t.awbLabel}</p>
             <p className="text-sm text-muted-foreground">{trackingNumber}</p>
           </div>
         )}

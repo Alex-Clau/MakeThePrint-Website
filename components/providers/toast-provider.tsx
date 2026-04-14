@@ -5,14 +5,14 @@ import { Toaster } from "sonner";
 export function ToastProvider() {
   return (
     <Toaster
-      position="top-center"
-      duration={2000}
+      position="top-right"
+      offset={{ top: "0.75rem", right: "0.75rem" }}
+      mobileOffset={{ top: "0.75rem", right: "0.75rem" }}
+      duration={2800}
+      gap={10}
       toastOptions={{
-        className: "!text-sm !px-3 !py-2 !max-w-[90vw] sm:!max-w-md",
-        style: {
-          fontSize: "0.875rem",
-          padding: "0.5rem 0.75rem",
-        },
+        className:
+          "!text-sm !leading-snug !px-4 !py-3 !min-h-0 !max-w-[min(22rem,calc(100vw-1.5rem))] sm:!text-[0.9375rem]",
       }}
       closeButton={false}
     />

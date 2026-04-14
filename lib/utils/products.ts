@@ -22,12 +22,12 @@ type ProductRowForFull = Pick<
 };
 
 /**
- * Get product display name
+ * Get product display name (empty string if missing or null product).
  */
-export function getProductDisplayName(product: {
-  name?: string;
-}): string {
-
+export function getProductDisplayName(
+  product: { name?: string } | null | undefined
+): string {
+  if (product == null) return "";
   return (product.name ?? "").trim() || "";
 }
 

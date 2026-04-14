@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getOrders } from "@/lib/supabase/orders";
 import { RecentOrdersProps } from "@/types/account";
 import { messages } from "@/lib/messages";
+import { orderStatusLabelRo } from "@/lib/utils/order-status-ui";
 
 const ORDER_DATE_OPTIONS: Intl.DateTimeFormatOptions = {
   year: "numeric",
@@ -61,8 +62,8 @@ export async function RecentOrders({ userId }: RecentOrdersProps) {
                     <p className="font-semibold text-sm sm:text-base">
                       {order.total_amount.toFixed(2)} {c.ron}
                     </p>
-                    <p className="text-xs sm:text-sm text-muted-foreground capitalize">
-                      {order.status}
+                    <p className="text-xs sm:text-sm text-muted-foreground">
+                      {orderStatusLabelRo(order.status)}
                     </p>
                   </div>
                   <Button variant="outline" size="sm" className="h-9 sm:h-10" asChild>

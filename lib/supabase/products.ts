@@ -106,33 +106,46 @@ export async function getPublicFeaturedProducts(limit = 8) {
 }
 
 /**
- * Get products for admin list with optional type/category filters.
- * Throws on error (same as getProducts, getProductById, etc.).
+ * Paginated admin catalog (same columns/filters as legacy list, for infinite scroll).
  */
-export async function getAdminProducts(filters?: {
+export async function getAdminProductsPage(params: {
+  page: number;
+  pageSize: number;
   type?: string;
   category?: string;
-}): Promise<Product[]> {
+}): Promise<{ products: Product[]; hasMore: boolean }> {
   const supabase = await createClient();
+  const { page, pageSize, type, category } = params;
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
   let query = supabase
     .from("products")
     .select(
-      "id, name, description, price, images, featured, created_at, product_type, category"
+      "id, name, description, price, images, featured, created_at, product_type, category",
+      { count: "exact" }
     )
     .order("created_at", { ascending: false });
 
-  if (filters?.type) {
-    query = query.eq("product_type", filters.type);
+  if (type) {
+    query = query.eq("product_type", type);
   }
-  if (filters?.category) {
-    query = query.eq("category", filters.category);
+  if (category) {
+    query = query.eq("category", category);
   }
 
-  const { data, error } = await query;
+  const { data, error, count } = await query.range(from, to);
   if (error) {
     throw handleSupabaseError(error);
   }
-  return (data ?? []) as Product[];
+
+  const total = count ?? 0;
+  const hasMore = total ? to + 1 < total : (data?.length ?? 0) === pageSize;
+
+  return {
+    products: (data ?? []) as Product[],
+    hasMore,
+  };
 }
 
 /**

@@ -48,16 +48,16 @@ async function DashboardContent() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold">{a.dashboardOverview}</h1>
-          <p className="text-muted-foreground mt-1">
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-start">
+        <div className="min-w-0 pr-2 sm:pr-4">
+          <h1 className="text-2xl sm:text-3xl font-bold">{a.dashboardOverview}</h1>
+          <p className="text-muted-foreground mt-1 text-sm sm:text-base">
             {a.manageProducts}
           </p>
         </div>
-        <Link href="/admin/products/new">
-          <Button size="lg">
-            <Package className="mr-2 h-5 w-5"/>
+        <Link href="/admin/products/new" className="shrink-0 self-stretch sm:self-auto sm:ml-4">
+          <Button size="sm" className="w-full sm:w-auto sm:h-10 sm:px-4 sm:text-sm">
+            <Package className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
             {a.addNewProduct}
           </Button>
         </Link>

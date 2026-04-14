@@ -69,12 +69,12 @@ export function TextPreview({
 
   const contentPad =
     padding === "compact"
-      ? "px-2 py-2 sm:px-2.5 sm:py-2.5"
+      ? "px-2 py-4 sm:px-3 sm:py-5"
       : "p-6 sm:p-8 lg:p-12";
-  const blockGap = padding === "compact" ? "space-y-1" : "space-y-3";
-  const metaRowPt = padding === "compact" ? "pt-0.5" : "pt-2";
+  const blockGap = padding === "compact" ? "space-y-2" : "space-y-3";
+  const metaRowPt = "pt-2";
   const metaGap =
-    padding === "compact" ? "gap-1.5 sm:gap-2" : "gap-3 sm:gap-4";
+    padding === "compact" ? "gap-2 sm:gap-2.5" : "gap-3 sm:gap-4";
 
   return (
     <Card
@@ -90,7 +90,7 @@ export function TextPreview({
               onChange={(e) => onTextChange(e.target.value)}
               placeholder={messages.product.enterYourText}
               maxLength={maxLength}
-              className={`w-full bg-transparent border-none outline-none resize-none text-center font-bold placeholder:text-muted-foreground/50 leading-tight ${padding === "compact" ? "py-0.5" : ""}`}
+              className={`w-full bg-transparent border-none outline-none resize-none text-center font-bold placeholder:text-muted-foreground/50 leading-tight ${padding === "compact" ? "py-1" : ""}`}
               style={{
                 fontFamily,
                 color: text ? colorValue : undefined,

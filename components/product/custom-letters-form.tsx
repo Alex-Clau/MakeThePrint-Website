@@ -121,7 +121,7 @@ export function CustomLettersForm({
   return (
     <div className="space-y-4 sm:space-y-6">
       {letterPreviewInForm && (
-        <div className="space-y-1">
+        <div className="space-y-2">
           <Label
             className="text-sm sm:text-base font-semibold block leading-tight mb-0"
             htmlFor="wall-letter-preview-input"

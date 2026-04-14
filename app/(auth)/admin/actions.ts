@@ -10,10 +10,16 @@ import {
   getProductById,
 } from "@/lib/supabase/products";
 import { isAdminOrderStatus } from "@/lib/constants/admin-order-status";
+import { messages } from "@/lib/messages";
 import type { CustomProductConfig, KeychainConfig } from "@/types/product";
 
 const ORDER_ID_UUID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Same shape as order status form — for admin product mutations and toasts. */
+export type AdminToastResult =
+  | { success: true; message: string }
+  | { success: false; message: string };
 
 /**
  * Check if current user is admin
@@ -54,14 +60,18 @@ export async function createProductAction(product: {
   product_type?: "custom" | "seasonal";
   category?: string;
   custom_config?: CustomProductConfig | KeychainConfig;
-}) {
-  await requireAdmin();
-  const data = await createProduct({
-    ...product,
-    images: product.images || [],
-  });
-  revalidatePath("/admin/products");
-  return data ?? null;
+}): Promise<AdminToastResult> {
+  try {
+    await requireAdmin();
+    await createProduct({
+      ...product,
+      images: product.images || [],
+    });
+    revalidatePath("/admin/products");
+    return { success: true, message: messages.admin.productCreated };
+  } catch {
+    return { success: false, message: messages.admin.adminActionFailed };
+  }
 }
 
 /**
@@ -79,24 +89,32 @@ export async function updateProductAction(
     category?: string;
     custom_config?: CustomProductConfig | KeychainConfig;
   }>
-) {
-  await requireAdmin();
-  await getProductById(id);
-  const data = await updateProduct(id, updates);
-  revalidatePath("/admin/products");
-  revalidatePath(`/admin/products/${id}/edit`);
-  revalidatePath(`/products/${id}`);
-  return data ?? null;
+): Promise<AdminToastResult> {
+  try {
+    await requireAdmin();
+    await getProductById(id);
+    await updateProduct(id, updates);
+    revalidatePath("/admin/products");
+    revalidatePath(`/admin/products/${id}/edit`);
+    revalidatePath(`/products/${id}`);
+    return { success: true, message: messages.admin.productUpdated };
+  } catch {
+    return { success: false, message: messages.admin.adminActionFailed };
+  }
 }
 
 /**
  * Server action to delete a product
  */
-export async function deleteProductAction(productId: string) {
-  await requireAdmin();
-  await deleteProduct(productId);
-  revalidatePath("/admin/products");
-  return { success: true };
+export async function deleteProductAction(productId: string): Promise<AdminToastResult> {
+  try {
+    await requireAdmin();
+    await deleteProduct(productId);
+    revalidatePath("/admin/products");
+    return { success: true, message: messages.admin.productDeleted };
+  } catch {
+    return { success: false, message: messages.admin.adminActionFailed };
+  }
 }
 
 /**
@@ -121,17 +139,28 @@ export async function updateOrderStatusAction(
   revalidatePath(`/admin/orders/${trimmedId}`);
 }
 
+export type UpdateOrderStatusFormResult =
+  | { success: true; message: string }
+  | { success: false; message: string };
+
 /**
- * Form action for admin order status update
+ * Form handler for admin order status update — returns a message for client toasts.
  */
-export async function updateOrderStatusFormAction(formData: FormData) {
-  const orderId = formData.get("orderId");
-  const status = formData.get("status");
-  const raw = formData.get("trackingNumber");
-  const trackingNumber =
-    raw === null || raw === undefined || raw === "" ? null : String(raw).trim() || null;
-  if (typeof orderId !== "string" || typeof status !== "string") {
-    throw new Error("Missing order id or status");
+export async function updateOrderStatusFormAction(
+  formData: FormData
+): Promise<UpdateOrderStatusFormResult> {
+  try {
+    const orderId = formData.get("orderId");
+    const status = formData.get("status");
+    const raw = formData.get("trackingNumber");
+    const trackingNumber =
+      raw === null || raw === undefined || raw === "" ? null : String(raw).trim() || null;
+    if (typeof orderId !== "string" || typeof status !== "string") {
+      return { success: false, message: messages.admin.adminActionFailed };
+    }
+    await updateOrderStatusAction(orderId, status, trackingNumber);
+    return { success: true, message: messages.admin.orderUpdateSuccess };
+  } catch {
+    return { success: false, message: messages.admin.adminActionFailed };
   }
-  await updateOrderStatusAction(orderId, status, trackingNumber);
 }

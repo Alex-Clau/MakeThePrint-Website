@@ -165,9 +165,8 @@ export function ProductDetailForm({
     }
   };
 
-  return (
-    <div className="space-y-4 sm:space-y-6 lg:space-y-8 mb-8">
-      {/* Product Name & Description */}
+  const heroBlock = (
+    <div>
       <div>
         <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 sm:mb-2 lg:mb-3 text-accent-primary-dark">
           {displayName}
@@ -176,8 +175,6 @@ export function ProductDetailForm({
           {product.description}
         </p>
       </div>
-
-      {/* Compact rating summary */}
       <div className="flex flex-wrap items-center gap-2 text-sm">
         <div className="flex items-center gap-1.5">
           {[...Array(5)].map((_, i) => (
@@ -201,7 +198,11 @@ export function ProductDetailForm({
           {r.basedOn} {totalReviews} {totalReviews === 1 ? r.review : r.reviews}
         </a>
       </div>
+    </div>
+  );
 
+  const purchaseBlock = (
+    <>
       {/* Inquire - Show inquiry/contact CTA only */}
       {isInquire ? (
         <div className="space-y-4">
@@ -374,6 +375,13 @@ export function ProductDetailForm({
           </div>
         </>
       )}
+    </>
+  );
+
+  return (
+    <div className="mb-8 space-y-4 sm:space-y-6 lg:space-y-8">
+      {heroBlock}
+      {purchaseBlock}
     </div>
   );
 }

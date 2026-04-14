@@ -7,6 +7,7 @@ import Link from "next/link";
 import { getOrders } from "@/lib/supabase/orders";
 import { getRequiredUser } from "@/lib/supabase/server";
 import { messages } from "@/lib/messages";
+import { orderStatusBadgeClassName, orderStatusLabelRo } from "@/lib/utils/order-status-ui";
 
 const ORDER_DATE_OPTIONS: Intl.DateTimeFormatOptions = {
   year: "numeric",
@@ -40,46 +41,38 @@ async function OrdersList() {
         return (
           <Card key={order.id}>
             <CardContent className="p-6">
-              <div className="flex flex-col gap-4">
-                <div className="flex items-start gap-3 sm:gap-4">
-                  <div className="p-2 sm:p-3 rounded-lg bg-primary/10 flex-shrink-0">
-                    {order.status === "delivered" ? (
-                      <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-                    ) : order.status === "confirmed" ? (
-                      <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-                    ) : (
-                      <Truck className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
-                      <h3 className="font-semibold text-base sm:text-lg">
-                        {t.orderHeading} #{order.id.slice(0, 8)}
-                      </h3>
-                      <Badge
-                        variant={
-                          order.status === "delivered"
-                            ? "default"
-                            : order.status === "shipped"
-                            ? "secondary"
-                            : order.status === "confirmed"
-                            ? "default"
-                            : "outline"
-                        }
-                        className="w-fit text-xs"
-                      >
-                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                      </Badge>
+              <div className="flex flex-col gap-3">
+                <div className="flex items-start justify-between gap-3 sm:gap-4">
+                  <div className="flex min-w-0 flex-1 items-start gap-3 sm:gap-4">
+                    <div className="rounded-lg bg-primary/10 p-2 sm:p-3 shrink-0">
+                      {order.status === "delivered" ? (
+                        <CheckCircle className="h-5 w-5 text-primary sm:h-6 sm:w-6" />
+                      ) : order.status === "confirmed" ? (
+                        <CheckCircle className="h-5 w-5 text-primary sm:h-6 sm:w-6" />
+                      ) : order.status === "shipped" ? (
+                        <Truck className="h-5 w-5 text-primary sm:h-6 sm:w-6" />
+                      ) : (
+                        <Truck className="h-5 w-5 text-primary sm:h-6 sm:w-6" />
+                      )}
                     </div>
-                    <p className="text-xs sm:text-sm text-muted-foreground">
-                      {t.placedOn} {orderDate}
-                    </p>
-                    <p className="text-sm sm:text-base font-semibold mt-1 sm:hidden">
-                      {order.total_amount.toFixed(2)} {c.ron}
-                    </p>
+                    <h3 className="pt-0.5 font-semibold text-base leading-snug sm:text-lg">
+                      {t.orderHeading} #{order.id.slice(0, 8)}
+                    </h3>
                   </div>
+                  <Badge
+                    variant="outline"
+                    className={`shrink-0 px-2.5 py-1 text-xs font-semibold sm:self-start ${orderStatusBadgeClassName(order.status)}`}
+                  >
+                    {orderStatusLabelRo(order.status)}
+                  </Badge>
                 </div>
-                <div className="flex items-center justify-between sm:justify-end gap-4 pt-2 border-t sm:border-0">
+                <p className="text-xs text-muted-foreground sm:text-sm">
+                  {t.placedOn} {orderDate}
+                </p>
+                <p className="text-sm font-semibold sm:hidden">
+                  {order.total_amount.toFixed(2)} {c.ron}
+                </p>
+                <div className="flex items-center justify-between gap-4 border-t pt-3 sm:justify-end sm:border-0 sm:pt-0">
                   <div className="hidden sm:block text-right">
                     <p className="text-xl sm:text-2xl font-bold">
                       {order.total_amount.toFixed(2)} {c.ron}

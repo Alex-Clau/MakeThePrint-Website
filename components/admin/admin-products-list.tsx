@@ -1,18 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Edit, Trash2, Eye } from "lucide-react";
 import { deleteProductAction } from "@/app/(auth)/admin/actions";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { messages } from "@/lib/messages";
 import type { Product } from "@/types/product";
+import { getApiErrorBody } from "@/lib/utils/api-error";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,16 +23,120 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-export function AdminProductsList({ products }: { products: Product[] }) {
+export type AdminProductsListProps = {
+  initialProducts: Product[];
+  initialPage: number;
+  pageSize: number;
+  initialHasMore: boolean;
+  type?: string;
+  category?: string;
+};
+
+type AdminProductsApiResponse = {
+  products: Product[];
+  hasMore: boolean;
+  page: number;
+  pageSize: number;
+};
+
+export function AdminProductsList({
+  initialProducts,
+  initialPage,
+  pageSize,
+  initialHasMore,
+  type,
+  category,
+}: AdminProductsListProps) {
   const router = useRouter();
   const t = messages.admin;
+  const catalog = messages.products;
+  const [products, setProducts] = useState<Product[]>(initialProducts);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [optimisticProducts, setOptimisticProducts] = useState(products);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+  const [hasMore, setHasMore] = useState(initialHasMore);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const pageRef = useRef(initialPage);
+  const loadingRef = useRef(false);
+  const hasMoreRef = useRef(initialHasMore);
 
   useEffect(() => {
-    setOptimisticProducts(products);
-  }, [products]);
+    setProducts(initialProducts);
+    pageRef.current = initialPage;
+    hasMoreRef.current = initialHasMore;
+    setHasMore(initialHasMore);
+    setError(null);
+  }, [initialProducts, initialPage, initialHasMore, type, category]);
+
+  const buildQuery = useCallback(
+    (page: number) => {
+      const p = new URLSearchParams({
+        page: String(page),
+        page_size: String(pageSize),
+      });
+      if (type) p.set("type", type);
+      if (category) p.set("category", category);
+      return p.toString();
+    },
+    [pageSize, type, category]
+  );
+
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node) return;
+
+    let cancelled = false;
+
+    const observer = new IntersectionObserver((entries) => {
+      const [entry] = entries;
+      if (!entry.isIntersecting || loadingRef.current || !hasMoreRef.current) return;
+
+      void (async () => {
+        loadingRef.current = true;
+        if (!cancelled) {
+          setIsLoading(true);
+          setError(null);
+        }
+
+        try {
+          const nextPage = pageRef.current + 1;
+          const res = await fetch(`/api/admin/products?${buildQuery(nextPage)}`);
+
+          if (!res.ok) {
+            const { message } = await getApiErrorBody(res);
+            throw new Error(message);
+          }
+
+          const body = (await res.json()) as AdminProductsApiResponse;
+          if (cancelled) return;
+
+          setProducts((prev) => [...prev, ...body.products]);
+          pageRef.current = nextPage;
+          const nextHasMore = body.hasMore;
+          hasMoreRef.current = nextHasMore;
+          setHasMore(nextHasMore);
+        } catch (e) {
+          if (!cancelled) {
+            setError(e instanceof Error ? e.message : catalog.loadMoreFailed);
+          }
+        } finally {
+          loadingRef.current = false;
+          if (!cancelled) {
+            setIsLoading(false);
+          }
+        }
+      })();
+    });
+
+    observer.observe(node);
+
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+    };
+  }, [buildQuery, catalog.loadMoreFailed]);
 
   const handleDeleteClick = (id: string, name: string) => {
     setDeleteTarget({ id, name });
@@ -42,23 +145,30 @@ export function AdminProductsList({ products }: { products: Product[] }) {
   const handleDeleteConfirm = async () => {
     if (!deleteTarget) return;
 
+    const snapshot = [...products];
     setDeletingId(deleteTarget.id);
-    setOptimisticProducts(optimisticProducts.filter((p) => p.id !== deleteTarget.id));
+    setProducts((prev) => prev.filter((p) => p.id !== deleteTarget.id));
+    const target = deleteTarget;
     setDeleteTarget(null);
 
     try {
-      await deleteProductAction(deleteTarget.id);
-      toast.success(t.productDeleted);
-      router.refresh();
-    } catch (error: unknown) {
-      setOptimisticProducts(products);
-      toast.error(getUserFriendlyError(error) || t.deleteFailed);
+      const result = await deleteProductAction(target.id);
+      if (result.success) {
+        toast.success(result.message);
+        router.refresh();
+      } else {
+        setProducts(snapshot);
+        toast.error(result.message);
+      }
+    } catch {
+      setProducts(snapshot);
+      toast.error(t.adminActionFailed);
     } finally {
       setDeletingId(null);
     }
   };
 
-  if (optimisticProducts.length === 0) {
+  if (products.length === 0) {
     return (
       <Card>
         <CardContent className="py-12 text-center">
@@ -73,7 +183,7 @@ export function AdminProductsList({ products }: { products: Product[] }) {
 
   return (
     <div className="space-y-4">
-      {optimisticProducts.map((product) => (
+      {products.map((product) => (
         <Card
           key={product.id}
           className={`overflow-hidden transition-all ${
@@ -82,8 +192,7 @@ export function AdminProductsList({ products }: { products: Product[] }) {
         >
           <CardContent className="p-0">
             <div className="flex flex-col md:flex-row">
-              {/* Product Image */}
-              <div className="relative w-full md:w-48 h-48 bg-muted flex-shrink-0">
+              <div className="relative h-48 w-full flex-shrink-0 bg-muted md:w-48">
                 {product.images && product.images.length > 0 ? (
                   <Image
                     src={product.images[0]}
@@ -92,41 +201,21 @@ export function AdminProductsList({ products }: { products: Product[] }) {
                     className="object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                  <div className="flex h-full w-full items-center justify-center text-muted-foreground">
                     {t.noImage}
                   </div>
                 )}
               </div>
 
-              {/* Product Details */}
               <div className="flex-1 p-4 sm:p-6">
-                <div className="flex flex-col sm:flex-row justify-between gap-4">
-                  <div className="space-y-2 flex-1">
-                    <div className="flex items-start gap-2 flex-wrap">
-                      <h3 className="text-lg font-semibold">{product.name}</h3>
-                      <div className="flex gap-2">
-                        {product.featured && (
-                          <Badge variant="default">{t.featured}</Badge>
-                        )}
-                        <Badge
-                          variant={
-                            product.product_type === "custom"
-                              ? "default"
-                              : "secondary"
-                          }
-                        >
-                          {product.product_type === "custom"
-                            ? t.custom
-                            : t.seasonal}
-                        </Badge>
-                        <Badge variant="outline">{product.category}</Badge>
-                      </div>
-                    </div>
-                    <p className="text-sm text-muted-foreground line-clamp-2">
+                <div className="flex flex-col justify-between gap-4 sm:flex-row">
+                  <div className="min-w-0 flex-1 space-y-2">
+                    <h3 className="text-lg font-semibold">{product.name}</h3>
+                    <p className="line-clamp-2 text-sm text-muted-foreground">
                       {product.description}
                     </p>
                     <div className="flex items-center gap-4 text-sm">
-                      <span className="font-bold text-lg">
+                      <span className="text-lg font-bold">
                         {product.price.toFixed(2)} RON
                       </span>
                       <span className="text-muted-foreground">
@@ -135,8 +224,7 @@ export function AdminProductsList({ products }: { products: Product[] }) {
                     </div>
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex sm:flex-col gap-2">
+                  <div className="flex gap-2 sm:flex-col">
                     <Link href={`/products/${product.id}`} target="_blank">
                       <Button variant="outline" size="sm" className="w-full sm:w-auto">
                         <Eye className="h-4 w-4 sm:mr-2" />
@@ -166,6 +254,15 @@ export function AdminProductsList({ products }: { products: Product[] }) {
           </CardContent>
         </Card>
       ))}
+
+      <div ref={sentinelRef} className="h-10" />
+      {isLoading && (
+        <p className="mt-2 text-center text-sm text-muted-foreground">{catalog.loadingMore}</p>
+      )}
+      {error && <p className="mt-2 text-center text-sm text-red-500">{error}</p>}
+      {!hasMore && products.length > 0 && (
+        <p className="mt-4 text-center text-xs text-muted-foreground">{catalog.endOfList}</p>
+      )}
 
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>

@@ -37,30 +37,23 @@ export function AnimatedProductPageContent({
     : [];
 
   return (
-    <div className="space-y-10 sm:space-y-12 relative z-10">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-10 items-start relative">
-        {/* Left Side - Product Image Gallery */}
-        <div className="relative flex flex-col items-stretch justify-start group">
-          <div className="w-full">
-            <ProductImageGallery
-              images={allImages.length > 1 ? allImages.slice(1) : []}
-              alt={displayName}
-              defaultImage={allImages[0] || undefined}
-            />
-          </div>
-        </div>
-
-        {/* Right Side - Product Info */}
-        <div>
-          <ProductDetailForm
-            product={product}
-            previewText={preview.text}
-            onPreviewChange={setPreview}
-            averageRating={averageRating}
-            totalReviews={totalReviews}
-            isInWishlist={isInWishlist}
+    <div className="relative z-10 space-y-10 sm:space-y-12">
+      <div className="relative grid grid-cols-1 items-start gap-6 sm:gap-8 lg:grid-cols-2 lg:gap-10">
+        <div className="group relative flex w-full flex-col items-stretch justify-start">
+          <ProductImageGallery
+            images={allImages.length > 1 ? allImages.slice(1) : []}
+            alt={displayName}
+            defaultImage={allImages[0] || undefined}
           />
         </div>
+        <ProductDetailForm
+          product={product}
+          previewText={preview.text}
+          onPreviewChange={setPreview}
+          averageRating={averageRating}
+          totalReviews={totalReviews}
+          isInWishlist={isInWishlist}
+        />
       </div>
     </div>
   );
