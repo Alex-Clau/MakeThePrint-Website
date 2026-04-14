@@ -8,6 +8,12 @@ import { getOrders } from "@/lib/supabase/orders";
 import { getRequiredUser } from "@/lib/supabase/server";
 import { messages } from "@/lib/messages";
 
+const ORDER_DATE_OPTIONS: Intl.DateTimeFormatOptions = {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+};
+
 async function OrdersList() {
   const user = await getRequiredUser();
   const t = messages.account;
@@ -29,11 +35,7 @@ async function OrdersList() {
   return (
     <div className="space-y-4">
       {orders.map((order) => {
-        const orderDate = new Date(order.created_at).toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        });
+        const orderDate = new Date(order.created_at).toLocaleDateString("ro-RO", ORDER_DATE_OPTIONS);
 
         return (
           <Card key={order.id}>
@@ -52,7 +54,7 @@ async function OrdersList() {
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
                       <h3 className="font-semibold text-base sm:text-lg">
-                        Order #{order.id.slice(0, 8)}
+                        {t.orderHeading} #{order.id.slice(0, 8)}
                       </h3>
                       <Badge
                         variant={

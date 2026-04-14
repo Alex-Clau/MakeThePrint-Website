@@ -28,7 +28,11 @@ export function AddressList({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
       {addresses.map((address, index) => (
-        <Card key={index}>
+        <Card
+          key={[index, address.firstName, address.lastName, address.address, address.zip]
+            .filter(Boolean)
+            .join("|")}
+        >
           <CardContent className="p-4 sm:p-6">
             <div className="space-y-2 mb-4">
               <p className="font-semibold text-lg">
@@ -52,7 +56,7 @@ export function AddressList({
                 variant="outline"
                 size="sm"
                 className="h-9 sm:h-10 text-xs sm:text-sm"
-                onClick={() => onEdit(index, address)}
+                onClick={() => onEdit(index)}
               >
                 <Edit className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                 {a.edit}

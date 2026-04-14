@@ -46,7 +46,7 @@ export interface AddressFormProps {
  */
 export interface AddressListProps {
   addresses: Address[];
-  onEdit: (index: number, address: Address) => void;
+  onEdit: (index: number) => void;
   onDelete: (index: number) => void;
 }
 
@@ -54,7 +54,13 @@ export interface AddressListProps {
  * Addresses Content component props
  */
 export interface AddressesContentProps {
-  addresses: any[];
+  addresses: Address[];
   userId: string;
+}
+
+/** Normalizes JSON from `user_profiles.shipping_addresses`. */
+export function shippingAddressesFromProfile(value: unknown): Address[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((entry): entry is Address => entry != null && typeof entry === "object");
 }
 

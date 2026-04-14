@@ -1,11 +1,11 @@
 import { createClient } from "./server";
 import { handleSupabaseError } from "../utils/supabase-errors";
-import type { WishlistContentProps } from "@/types/wishlist";
+import type { WishlistRow } from "@/types/wishlist";
 
 /**
- * Get user's wishlist, normalized to the shape expected by WishlistContent.
+ * Get user's wishlist, normalized for UI.
  */
-export async function getWishlist(userId: string): Promise<WishlistContentProps["items"]> {
+export async function getWishlist(userId: string): Promise<WishlistRow[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("wishlist")
@@ -30,13 +30,24 @@ export async function getWishlist(userId: string): Promise<WishlistContentProps[
     throw handleSupabaseError(error);
   }
 
-  const items: WishlistContentProps["items"] = (data ?? []).map((item: any) => ({
-    id: item.id,
-    product_id: item.product_id,
-    products: item.products,
-  }));
+  type WishlistJoinRow = {
+    id: string;
+    product_id: string;
+    products: WishlistRow["products"] | WishlistRow["products"][] | null;
+  };
 
-  return items;
+  return ((data ?? []) as WishlistJoinRow[])
+    .map((item) => {
+      const rel = item.products;
+      const product = Array.isArray(rel) ? rel[0] : rel;
+      if (!product?.id) return null;
+      return {
+        id: item.id,
+        product_id: item.product_id,
+        products: product,
+      } satisfies WishlistRow;
+    })
+    .filter((row): row is WishlistRow => row != null);
 }
 
 /**
@@ -46,12 +57,16 @@ export async function addToWishlist(userId: string, productId: string) {
   const supabase = await createClient();
 
   // Check if already in wishlist
-  const { data: existing } = await supabase
+  const { data: existing, error: existingError } = await supabase
     .from("wishlist")
     .select("id")
     .eq("user_id", userId)
     .eq("product_id", productId)
     .maybeSingle();
+
+  if (existingError) {
+    throw handleSupabaseError(existingError);
+  }
 
   if (existing) {
     return existing; // Already in wishlist

@@ -1,5 +1,6 @@
 import { createClient } from "./server";
 import { handleSupabaseError } from "../utils/supabase-errors";
+import type { AddressFormData } from "@/types/address";
 
 /**
  * Get user profile
@@ -87,16 +88,23 @@ export async function updateUserProfile(
  */
 export async function addShippingAddress(
   userId: string,
-  address: Record<string, any>
+  address: AddressFormData
 ) {
   const supabase = await createClient();
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from("user_profiles")
     .select("shipping_addresses")
     .eq("id", userId)
     .single();
 
-  const addresses = (profile?.shipping_addresses as any[]) || [];
+  if (profileError) {
+    throw handleSupabaseError(profileError);
+  }
+
+  const raw = profile?.shipping_addresses;
+  const addresses: AddressFormData[] = Array.isArray(raw)
+    ? [...(raw as AddressFormData[])]
+    : [];
   addresses.push(address);
 
   const { data, error } = await supabase

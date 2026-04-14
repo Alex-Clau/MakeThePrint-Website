@@ -133,7 +133,14 @@
     "saveChanges": "Salvează modificările",
     "myWishlist": "Lista mea de dorințe",
     "backToAccount": "Înapoi la cont",
-    "viewDetails": "Vezi detalii"
+    "viewDetails": "Vezi detalii",
+    "myAddressesPageTitle": "Adresele mele",
+    "recentOrders": "Comenzi recente",
+    "recentOrdersEmpty": "Nicio comandă încă. Începe cumpărăturile ca să vezi comenzile tale aici.",
+    "viewOrder": "Vezi",
+    "viewAllOrders": "Vezi toate comenzile",
+    "deleteAddressWarning": "Sigur vrei să ștergi această adresă? Această acțiune nu poate fi anulată.",
+    "orderHeading": "Comandă"
   },
   "cart": {
     "title": "Coșul tău",
@@ -281,6 +288,7 @@
   },
   "wishlist": {
     "confirmRemove": "Elimină din lista de dorințe?",
+    "confirmRemoveDescription": "Sigur vrei să elimini {name} din lista de dorințe?",
     "removedFromWishlist": "Scos din lista de dorințe",
     "emptyTitle": "Lista ta de dorințe este goală",
     "emptyHint": "Adaugă produse în lista de dorințe",

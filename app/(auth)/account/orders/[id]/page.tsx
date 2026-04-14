@@ -1,11 +1,10 @@
-import { redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { PageLayout } from "@/components/layout/page-layout";
 import { getOrderById } from "@/lib/supabase/orders";
 import { getRequiredUser } from "@/lib/supabase/server";
 import { OrderDetailHeader } from "@/components/order/order-detail-header";
 import { OrderItemsList } from "@/components/order/order-items-list";
 import { OrderShippingInfo } from "@/components/order/order-shipping-info";
-import { notFound } from "next/navigation";
 import type { OrderDetailPageParams } from "@/types/pages";
 
 async function OrderDetailContent({ orderId }: { orderId: string }) {
@@ -50,4 +49,3 @@ export default function OrderDetailPage({ params }: OrderDetailPageParams) {
     </PageLayout>
   );
 }
-

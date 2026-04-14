@@ -4,23 +4,14 @@ import { RecentOrders } from "@/components/account/recent-orders";
 import { AccountMenu } from "@/components/account/account-menu";
 import { messages } from "@/lib/messages";
 
-async function AccountContent() {
-  const user = await getRequiredUser();
-
-  return (
-    <>
-      <AccountMenu />
-      <RecentOrders userId={user.id} />
-    </>
-  );
-}
-
 export default async function AccountPage() {
+  const user = await getRequiredUser();
   const t = messages.account;
+
   return (
     <PageLayout title={t.myAccount}>
-      <AccountContent />
+      <AccountMenu />
+      <RecentOrders userId={user.id} />
     </PageLayout>
   );
 }
-

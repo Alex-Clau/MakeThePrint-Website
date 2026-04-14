@@ -69,11 +69,9 @@ export function WishlistContent({ items, userId }: WishlistContentProps) {
         {items.map((item) => (
           <WishlistItem
             key={item.id}
-            id={item.id}
             product={item.products}
-            onRemove={(productId) => {
-              const name = items.find((i) => i.products?.id === productId)?.products?.name ?? "";
-              handleRemoveClick(productId, name);
+            onRemove={(productId, productLabel) => {
+              handleRemoveClick(productId, productLabel);
             }}
           />
         ))}
@@ -88,7 +86,7 @@ export function WishlistContent({ items, userId }: WishlistContentProps) {
             <AlertDialogTitle>{w.confirmRemove}</AlertDialogTitle>
             <AlertDialogDescription>
               {removeTarget
-                ? `Sigur vrei să elimini „${removeTarget.name}" din lista de dorințe?`
+                ? w.confirmRemoveDescription.replace("{name}", removeTarget.name)
                 : ""}
             </AlertDialogDescription>
           </AlertDialogHeader>

@@ -1,6 +1,7 @@
 "use client";
 
 import { createClient } from "./client";
+import { handleSupabaseError } from "../utils/supabase-errors";
 
 /**
  * Add product to wishlist - Client-side
@@ -9,12 +10,16 @@ export async function addToWishlistClient(userId: string, productId: string) {
   const supabase = createClient();
 
   // Check if already in wishlist
-  const { data: existing } = await supabase
+  const { data: existing, error: existingError } = await supabase
     .from("wishlist")
     .select("id")
     .eq("user_id", userId)
     .eq("product_id", productId)
     .maybeSingle();
+
+  if (existingError) {
+    throw handleSupabaseError(existingError);
+  }
 
   if (existing) {
     return existing;
@@ -29,7 +34,7 @@ export async function addToWishlistClient(userId: string, productId: string) {
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) throw handleSupabaseError(error);
   return data;
 }
 
@@ -47,7 +52,7 @@ export async function removeFromWishlistClient(
     .eq("user_id", userId)
     .eq("product_id", productId);
 
-  if (error) throw error;
+  if (error) throw handleSupabaseError(error);
   return { success: true };
 }
 
