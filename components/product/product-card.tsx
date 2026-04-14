@@ -13,7 +13,6 @@ export function ProductCard({
   price,
   image,
   category,
-  featured,
   rating,
   review_count,
   isInWishlist = false,

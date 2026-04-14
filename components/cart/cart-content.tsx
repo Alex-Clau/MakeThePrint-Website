@@ -49,6 +49,7 @@ export function CartContent({ items: initialItems }: CartContentProps) {
     window.dispatchEvent(new CustomEvent(CART_UPDATED_EVENT));
     updateCartItemClient(cartItemId, newQuantity).catch((error: unknown) => {
       setItems(prevItems);
+      window.dispatchEvent(new CustomEvent(CART_UPDATED_EVENT));
       toast.error(getUserFriendlyError(error));
     });
   };

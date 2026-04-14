@@ -1,75 +1,82 @@
-/**
- * Convert technical database errors into user-friendly messages
- */
-export function getUserFriendlyError(error: any): string {
-  if (!error) return "An unexpected error occurred. Please try again.";
+import { messages } from "@/lib/messages";
 
-  const errorMessage = error?.message || error?.error_description || String(error);
+function rawErrorMessage(error: unknown): string {
+  if (error == null) return "";
+  if (typeof error === "string") return error;
+  if (error instanceof Error) return error.message;
+  if (typeof error === "object") {
+    const o = error as Record<string, unknown>;
+    if (typeof o.message === "string") return o.message;
+    if (typeof o.error_description === "string") return o.error_description;
+  }
+  return String(error);
+}
+
+/**
+ * Map technical/database errors to user-facing copy (Romanian via `messages`).
+ */
+export function getUserFriendlyError(error: unknown): string {
+  const e = messages.errors;
+  if (error == null || error === "") return e.unexpected;
+
+  const errorMessage = rawErrorMessage(error);
   const lowerMessage = errorMessage.toLowerCase();
 
-  // Row-Level Security (RLS) policy violations
   if (
     lowerMessage.includes("row-level security") ||
     lowerMessage.includes("row-level-security") ||
     lowerMessage.includes("violates row-level security policy") ||
     lowerMessage.includes("new row violates row-level security policy")
   ) {
-    return "You don't have permission to perform this action. Please ensure you're signed in and try again.";
+    return e.rls;
   }
 
-  // Foreign key violations
   if (
     lowerMessage.includes("foreign key") ||
     lowerMessage.includes("violates foreign key constraint")
   ) {
-    return "This item is no longer available or has been removed.";
+    return e.foreignKey;
   }
 
-  // Unique constraint violations
   if (
     lowerMessage.includes("unique constraint") ||
     lowerMessage.includes("duplicate key") ||
     lowerMessage.includes("already exists")
   ) {
-    return "This item already exists. Please refresh the page and try again.";
+    return e.unique;
   }
 
-  // Permission denied
   if (
     lowerMessage.includes("permission denied") ||
     lowerMessage.includes("access denied") ||
     lowerMessage.includes("insufficient privileges")
   ) {
-    return "You don't have permission to perform this action.";
+    return e.permission;
   }
 
-  // Network/connection errors
   if (
     lowerMessage.includes("network") ||
     lowerMessage.includes("connection") ||
     lowerMessage.includes("timeout") ||
     lowerMessage.includes("fetch failed")
   ) {
-    return "Network error. Please check your connection and try again.";
+    return e.network;
   }
 
-  // Authentication errors
   if (
     lowerMessage.includes("jwt") ||
     lowerMessage.includes("token") ||
     lowerMessage.includes("unauthorized") ||
     lowerMessage.includes("not authenticated")
   ) {
-    return "Please sign in to continue.";
+    return e.signIn;
   }
 
-  // Validation errors (keep some user-friendly ones)
   if (
     lowerMessage.includes("required") ||
     lowerMessage.includes("invalid") ||
     lowerMessage.includes("must be")
   ) {
-    // Check if it's already user-friendly
     if (
       !lowerMessage.includes("constraint") &&
       !lowerMessage.includes("violates") &&
@@ -79,7 +86,5 @@ export function getUserFriendlyError(error: any): string {
     }
   }
 
-  // Default: generic user-friendly message for technical errors
-  return "Something went wrong. Please try again or contact support if the problem persists.";
+  return e.generic;
 }
-

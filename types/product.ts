@@ -25,7 +25,7 @@ export interface CustomProductConfig {
   colorPrice?: number;
   /** Price per character (RON); total ramps up as customer types. 0 = no per-character pricing. */
   pricePerCharacter?: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**

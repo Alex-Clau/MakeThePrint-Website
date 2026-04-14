@@ -1,6 +1,7 @@
 "use client";
 
 import { createClient } from "./client";
+import { handleSupabaseError } from "../utils/supabase-errors";
 
 /**
  * Client-side cart operations (for use in Client Components)
@@ -54,7 +55,8 @@ export async function addToCartClient(item: {
     query = query.or("material.is.null,material.eq.");
   }
   
-  const { data: existingItem } = await query.maybeSingle();
+  const { data: existingItem, error: findError } = await query.maybeSingle();
+  if (findError) throw handleSupabaseError(findError);
 
   if (existingItem) {
     const { data, error } = await supabase
@@ -67,7 +69,7 @@ export async function addToCartClient(item: {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw handleSupabaseError(error);
     return data;
   } else {
     const { data, error } = await supabase
@@ -79,7 +81,7 @@ export async function addToCartClient(item: {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) throw handleSupabaseError(error);
     return data;
   }
 }
@@ -99,7 +101,7 @@ export async function updateCartItemClient(
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) throw handleSupabaseError(error);
   return data;
 }
 
@@ -107,7 +109,7 @@ export async function removeFromCartClient(cartItemId: string) {
   const supabase = createClient();
   const { error } = await supabase.from("cart").delete().eq("id", cartItemId);
 
-  if (error) throw error;
+  if (error) throw handleSupabaseError(error);
   return { success: true };
 }
 

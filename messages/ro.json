@@ -20,7 +20,7 @@
     "terms": "Termeni și condiții",
     "privacy": "Politica de confidențialitate",
     "anpc": "ANPC",
-    "copyright": "© 2025 MakeThePrint. Toate drepturile rezervate.",
+    "copyright": "© 2026 MakeThePrint. Toate drepturile rezervate.",
     "companyDetails": "Date firmă",
     "legalNameLabel": "Denumire legală",
     "legalName": "IGNAT D. SILVIU PERSOANA FIZICA AUTORIZATĂ",
@@ -45,10 +45,20 @@
     "loading": "Se încarcă…",
     "ron": "RON"
   },
+  "errors": {
+    "unexpected": "A apărut o eroare neașteptată. Încearcă din nou.",
+    "rls": "Nu ai permisiunea pentru această acțiune. Asigură-te că ești conectat și încearcă din nou.",
+    "foreignKey": "Acest articol nu mai este disponibil sau a fost eliminat.",
+    "unique": "Acest articol există deja. Reîmprospătează pagina și încearcă din nou.",
+    "permission": "Nu ai permisiunea pentru această acțiune.",
+    "network": "Eroare de rețea. Verifică conexiunea și încearcă din nou.",
+    "signIn": "Conectează-te pentru a continua.",
+    "generic": "Ceva nu a mers bine. Încearcă din nou sau contactează-ne dacă problema persistă."
+  },
   "home": {
     "badge": "Produse printate 3D de calitate",
     "headline": "Make it real",
-    "headlineHighlight": "MakeThePRint",
+    "headlineHighlight": "MakeThePrint",
     "subhead": "Where layers become products",
     "featuredTitle": "Produse recomandate",
     "featuredSubhead": "Modele alese care pun în valoare inovația printării 3D",

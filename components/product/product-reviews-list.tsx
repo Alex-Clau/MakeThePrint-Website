@@ -73,14 +73,27 @@ export function ProductReviewsList({
         const res = await fetch(
           `/api/reviews?${query.toString()}`
         );
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error ?? "Failed to fetch");
+        let data: {
+          reviews?: Review[];
+          hasMore?: boolean;
+          error?: string;
+        } = {};
+        try {
+          data = (await res.json()) as typeof data;
+        } catch {
+          // non-JSON body
+        }
+        if (!res.ok) {
+          toast.error(data.error ?? t.failedToLoadReviews);
+          setHasMore(false);
+          return;
+        }
         const newReviews = data.reviews ?? [];
         setReviews((prev) => (append ? [...prev, ...newReviews] : newReviews));
         setHasMore(data.hasMore ?? false);
-      } catch {
+      } catch (err) {
+        console.error("[ProductReviewsList] fetchMore", err);
         toast.error(t.failedToLoadReviews);
-        setHasMore(false);
       } finally {
         setIsLoading(false);
         isFetchingRef.current = false;
