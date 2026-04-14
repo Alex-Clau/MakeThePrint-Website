@@ -9,6 +9,8 @@ export interface CustomLettersFormProps {
   customConfig: CustomProductConfig;
   text: string; // Text input (controlled by parent; can be typed in form or in preview)
   onTextChange?: (text: string) => void; // Called when user types so parent can update preview and price recalculates
+  /** Large preview editor on the form; when set, omit onTextChange to avoid a second text field. */
+  onLetterTextChange?: (text: string) => void;
   onConfigChange: (config: {
     text: string;
     characterCount: number;
@@ -20,6 +22,22 @@ export interface CustomLettersFormProps {
     isLedStrip?: boolean;
     isColor?: boolean;
   }) => void;
+}
+
+/**
+ * Wall letter live preview (read-only or editable when onTextChange is set).
+ */
+export interface TextPreviewProps {
+  text: string;
+  font: string;
+  color: string;
+  size: string;
+  maxLength?: number;
+  onTextChange?: (text: string) => void;
+  /** Tighter padding when nested in the product form under instructions. */
+  padding?: "default" | "compact";
+  /** Associates an external `<Label htmlFor>`. */
+  inputId?: string;
 }
 
 /**
@@ -82,17 +100,5 @@ export interface ProductCardActionsProps {
   isInWishlist?: boolean;
   showWishlistOnly?: boolean;
   showCartOnly?: boolean;
-}
-
-/**
- * Text Preview component props
- */
-export interface TextPreviewProps {
-  text: string;
-  font: string;
-  color: string;
-  size: string; // Admin-defined size label (e.g. "10cm")
-  maxLength?: number; // Maximum characters allowed
-  onTextChange?: (text: string) => void;
 }
 

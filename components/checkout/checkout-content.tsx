@@ -130,7 +130,6 @@ export function CheckoutContent({
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            amount: total,
             currency: "ron",
             orderId,
           }),

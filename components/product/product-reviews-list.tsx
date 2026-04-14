@@ -16,6 +16,7 @@ import { createClient } from "@/lib/supabase/client";
 import { ProductReviewsListProps } from "@/types/product-components";
 import { messages } from "@/lib/messages";
 import type { Review } from "@/types/product-components";
+import { toast } from "sonner";
 
 type SortOption = "newest" | "oldest" | "highest" | "lowest";
 
@@ -35,10 +36,11 @@ export function ProductReviewsList({
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [userId, setUserId] = useState<string | undefined>(currentUserId);
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
-  const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [isLoading, setIsLoading] = useState(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const pageRef = useRef(1);
+  const isFetchingRef = useRef(false);
 
   useEffect(() => {
     async function getUser() {
@@ -58,6 +60,8 @@ export function ProductReviewsList({
 
   const fetchMore = useCallback(
     async (sort: SortOption, pageNum: number, append: boolean) => {
+      if (isFetchingRef.current) return;
+      isFetchingRef.current = true;
       setIsLoading(true);
       try {
         const res = await fetch(
@@ -69,25 +73,27 @@ export function ProductReviewsList({
         setReviews((prev) => (append ? [...prev, ...newReviews] : newReviews));
         setHasMore(data.hasMore ?? false);
       } catch {
+        toast.error(t.failedToLoadReviews);
         setHasMore(false);
       } finally {
         setIsLoading(false);
+        isFetchingRef.current = false;
       }
     },
-    [productId]
+    [productId, t.failedToLoadReviews]
   );
 
   useEffect(() => {
     if (sortBy !== "newest") {
-      setPage(1);
+      pageRef.current = 1;
       setReviews([]);
       fetchMore(sortBy, 1, false);
     } else {
       setReviews(initialReviews);
-      setPage(1);
+      pageRef.current = 1;
       setHasMore(initialHasMore);
     }
-  }, [sortBy]);
+  }, [sortBy, fetchMore, initialHasMore, initialReviews]);
 
   useEffect(() => {
     if (!sentinelRef.current || !hasMore || isLoading) return;
@@ -96,8 +102,8 @@ export function ProductReviewsList({
       (entries) => {
         const [entry] = entries;
         if (!entry.isIntersecting || isLoading) return;
-        const nextPage = page + 1;
-        setPage(nextPage);
+        const nextPage = pageRef.current + 1;
+        pageRef.current = nextPage;
         fetchMore(sortBy, nextPage, true);
       },
       { rootMargin: "100px" }
@@ -105,7 +111,7 @@ export function ProductReviewsList({
 
     observer.observe(sentinelRef.current);
     return () => observer.disconnect();
-  }, [hasMore, isLoading, page, sortBy, fetchMore]);
+  }, [hasMore, isLoading, sortBy, fetchMore]);
 
   const handleSortChange = (v: string) => {
     setSortBy(v as SortOption);
@@ -295,7 +301,7 @@ export function ProductReviewsList({
 
       {!hasMore && totalReviews > 0 && reviews.length > 5 && (
         <p className="text-center text-xs text-muted-foreground py-2">
-          Ai ajuns la finalul recenziilor.
+          {t.endOfReviews}
         </p>
       )}
     </div>

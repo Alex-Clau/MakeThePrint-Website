@@ -6,13 +6,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { CustomLettersFormProps } from "@/types/product-components";
 import { getPriceForSize, getSizeLabels } from "@/lib/utils/custom-letters-pricing";
+import { computePresetCustomizationPrice } from "@/lib/utils/preset-customization-pricing";
 import { messages } from "@/lib/messages";
+import { TextPreview } from "@/components/product/text-preview";
 
 export function CustomLettersForm({
   availableFonts,
   customConfig,
   text,
   onTextChange,
+  onLetterTextChange,
   onConfigChange,
 }: CustomLettersFormProps) {
   const t = messages.product;
@@ -41,18 +44,20 @@ export function CustomLettersForm({
         const newSize = sizeLabels[0] ?? "";
         setSize(newSize);
         // Push updated price to parent immediately when size is synced
-        const pricePerLetter = getPriceForSize(customConfig.sizePrices, newSize);
-        const lettersTotal = text.length * pricePerLetter;
-        const o = showOutdoorOption && isOutdoor ? (customConfig.outdoorPrice ?? 0) : 0;
-        const l = showLedStripOption && isLedStrip ? (customConfig.ledStripPrice ?? 0) : 0;
-        const col = showColorOption && isColor ? (customConfig.colorPrice ?? 0) : 0;
+        const pricing = computePresetCustomizationPrice(customConfig, {
+          text,
+          size: newSize,
+          isOutdoor,
+          isLedStrip,
+          isColor,
+        });
         onConfigChangeRef.current({
           text,
           characterCount: text.length,
           font,
           color,
           size: newSize,
-          totalPrice: lettersTotal + o + l + col,
+          totalPrice: pricing.totalPrice,
           isOutdoor: showOutdoorOption ? isOutdoor : undefined,
           isLedStrip: showLedStripOption ? isLedStrip : undefined,
           isColor: showColorOption ? isColor : undefined,
@@ -62,13 +67,16 @@ export function CustomLettersForm({
   }, [sizeLabels.join(","), size, customConfig.sizePrices, customConfig.outdoorPrice, customConfig.ledStripPrice, customConfig.colorPrice, showOutdoorOption, showLedStripOption, showColorOption, isOutdoor, isLedStrip, isColor, text, font, color]);
 
   const colors = customConfig.colors || ["black", "white"];
-  const characterCount = text.length;
-  const priceForSize = getPriceForSize(customConfig.sizePrices, size); // price per letter for selected size
-  const lettersTotal = characterCount * priceForSize;
-  const outdoorAddOn = showOutdoorOption && isOutdoor ? (customConfig.outdoorPrice ?? 0) : 0;
-  const ledStripAddOn = showLedStripOption && isLedStrip ? (customConfig.ledStripPrice ?? 0) : 0;
-  const colorAddOn = showColorOption && isColor ? (customConfig.colorPrice ?? 0) : 0;
-  const totalPrice = lettersTotal + outdoorAddOn + ledStripAddOn + colorAddOn;
+  const pricing = computePresetCustomizationPrice(customConfig, {
+    text,
+    size,
+    isOutdoor,
+    isLedStrip,
+    isColor,
+  });
+  const characterCount = pricing.characterCount;
+  const lettersTotal = pricing.lettersTotal;
+  const totalPrice = pricing.totalPrice;
 
   useEffect(() => {
     onConfigChangeRef.current({
@@ -92,8 +100,31 @@ export function CustomLettersForm({
     setColor(newColor);
   };
 
+  const letterPreviewInForm = !!onLetterTextChange && !onTextChange;
+
   return (
     <div className="space-y-4 sm:space-y-6">
+      {letterPreviewInForm && (
+        <div className="space-y-1">
+          <Label
+            className="text-sm sm:text-base font-semibold block leading-tight mb-0"
+            htmlFor="wall-letter-preview-input"
+          >
+            {t.yourText}
+          </Label>
+          <p className="text-xs text-muted-foreground leading-snug">{t.typeTextBelow}</p>
+          <TextPreview
+            text={text}
+            font={font}
+            color={color}
+            size={size}
+            maxLength={200}
+            padding="compact"
+            inputId="wall-letter-preview-input"
+            onTextChange={onLetterTextChange}
+          />
+        </div>
+      )}
       {/* Text input: when user types here, parent updates preview and price recalculates */}
       {onTextChange && (
         <div className="space-y-2">
@@ -113,15 +144,15 @@ export function CustomLettersForm({
       {text && (
         <div className="flex flex-wrap gap-x-2 gap-y-1 text-xs text-muted-foreground p-3 bg-accent-primary/5 rounded-lg">
           <span>{characterCount} {characterCount === 1 ? t.character : t.characters}</span>
-          {size && priceForSize > 0 && characterCount > 0 && (
+          {size && pricing.pricePerCharacter > 0 && characterCount > 0 && (
             <>
               <span>•</span>
-              <span>{characterCount} × {priceForSize.toFixed(2)} {c.ron} ({size}) = {lettersTotal.toFixed(2)} {c.ron}</span>
+              <span>{characterCount} × {pricing.pricePerCharacter.toFixed(2)} {c.ron} ({size}) = {lettersTotal.toFixed(2)} {c.ron}</span>
             </>
           )}
         </div>
       )}
-      {!text && !onTextChange && (
+      {!text && !onTextChange && !letterPreviewInForm && (
         <p className="text-xs text-muted-foreground p-3 bg-accent-primary/5 rounded-lg">
           {t.typeTextBelow}
         </p>
@@ -184,7 +215,7 @@ export function CustomLettersForm({
       {hasOptions && (
         <div className="space-y-2">
           <Label className="text-sm sm:text-base font-semibold mb-2 block">
-            Options (toggle what you want)
+            {t.optionsTitle}
           </Label>
           <div className="flex flex-col gap-2">
             {showOutdoorOption && (
@@ -196,7 +227,7 @@ export function CustomLettersForm({
                     onCheckedChange={(checked) => setIsOutdoor(checked === true)}
                   />
                   <Label htmlFor="customer-outdoor" className="cursor-pointer font-normal">
-                    Outdoor (weather resistant)
+                    {t.outdoorOption}
                   </Label>
                 </div>
                 <span className="text-sm text-muted-foreground whitespace-nowrap">
@@ -213,7 +244,7 @@ export function CustomLettersForm({
                     onCheckedChange={(checked) => setIsLedStrip(checked === true)}
                   />
                   <Label htmlFor="customer-ledstrip" className="cursor-pointer font-normal">
-                    LED strip
+                    {t.ledStripOption}
                   </Label>
                 </div>
                 <span className="text-sm text-muted-foreground whitespace-nowrap">
@@ -230,7 +261,7 @@ export function CustomLettersForm({
                     onCheckedChange={(checked) => setIsColor(checked === true)}
                   />
                   <Label htmlFor="customer-color-option" className="cursor-pointer font-normal">
-                    Color
+                    {t.colorOption}
                   </Label>
                 </div>
                 <span className="text-sm text-muted-foreground whitespace-nowrap">
@@ -247,9 +278,9 @@ export function CustomLettersForm({
         <p className="text-sm text-muted-foreground">
           {t.youChose}{" "}
           {[font, color, size].filter(Boolean).join(" · ")}
-          {showOutdoorOption && isOutdoor ? " · + Outdoor" : ""}
-          {showLedStripOption && isLedStrip ? " · + LED strip" : ""}
-          {showColorOption && isColor ? " · + Color" : ""}
+          {showOutdoorOption && isOutdoor ? ` · + ${t.outdoorOption}` : ""}
+          {showLedStripOption && isLedStrip ? ` · + ${t.ledStripOption}` : ""}
+          {showColorOption && isColor ? ` · + ${t.colorOption}` : ""}
         </p>
       )}
 
@@ -284,9 +315,9 @@ export function CustomLettersForm({
             {totalPrice.toFixed(2)} {c.ron}
           </span>
         </div>
-        {characterCount > 0 && size && priceForSize > 0 && (
+        {characterCount > 0 && size && pricing.pricePerCharacter > 0 && (
           <p className="text-xs text-muted-foreground mt-1">
-            {characterCount} {characterCount === 1 ? t.character : t.characters} × {priceForSize.toFixed(2)} {c.ron} ({size}) = {lettersTotal.toFixed(2)} {c.ron}
+            {characterCount} {characterCount === 1 ? t.character : t.characters} × {pricing.pricePerCharacter.toFixed(2)} {c.ron} ({size}) = {lettersTotal.toFixed(2)} {c.ron}
           </p>
         )}
       </div>

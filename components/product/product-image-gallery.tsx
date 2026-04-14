@@ -24,21 +24,21 @@ export function ProductImageGallery({
   const [selectedIndex, setSelectedIndex] = useState(0);
   const touchStartX = useRef<number | null>(null);
 
-  if (allImages.length === 0) {
-    return null;
-  }
-
   const nextImage = useCallback(() => {
-    setSelectedIndex((prev) => (prev + 1) % allImages.length);
+    setSelectedIndex((prev) => (prev + 1) % Math.max(allImages.length, 1));
   }, [allImages.length]);
 
   const prevImage = useCallback(() => {
-    setSelectedIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+    setSelectedIndex((prev) => (prev - 1 + Math.max(allImages.length, 1)) % Math.max(allImages.length, 1));
   }, [allImages.length]);
 
   const goToImage = (index: number) => {
     setSelectedIndex(index);
   };
+
+  if (allImages.length === 0) {
+    return null;
+  }
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
@@ -54,40 +54,10 @@ export function ProductImageGallery({
   };
 
   return (
-    <div className="relative w-full flex flex-col lg:flex-row lg:gap-4 lg:items-start">
-      {/* Desktop: vertical thumbnails on the left */}
-      {allImages.length > 1 && (
-        <div className="hidden lg:flex flex-col gap-2 flex-shrink-0 order-1">
-          {allImages.map((image, index) => (
-            <button
-              key={index}
-              type="button"
-              onClick={() => goToImage(index)}
-              className={`relative w-14 aspect-[3/4] rounded-lg overflow-hidden border-2 transition-all duration-200 hover:scale-105 ${
-                selectedIndex === index
-                  ? "border-accent-primary-dark shadow-lg"
-                  : "border-transparent hover:border-accent-primary/50 opacity-70 hover:opacity-100"
-              }`}
-            >
-              <Image
-                src={image}
-                alt={`${alt} thumbnail ${index + 1}`}
-                fill
-                className="object-cover"
-                sizes="56px"
-                draggable={false}
-              />
-              {selectedIndex === index && (
-                <div className="absolute inset-0 bg-accent-primary/20" />
-              )}
-            </button>
-          ))}
-        </div>
-      )}
-
+    <div className="relative w-full flex flex-col">
       {/* Main Image */}
       <div
-        className="relative w-full aspect-[3/4] max-w-2xl mx-auto lg:mx-0 lg:flex-1 lg:order-2 overflow-hidden rounded-lg"
+        className="relative w-full aspect-[3/4] max-w-2xl mx-auto overflow-hidden rounded-lg"
         onTouchStart={allImages.length > 1 ? handleTouchStart : undefined}
         onTouchEnd={allImages.length > 1 ? handleTouchEnd : undefined}
       >
@@ -103,7 +73,7 @@ export function ProductImageGallery({
               alt={`${alt} - Image ${index + 1}`}
               fill
               className="object-contain pointer-events-none select-none bg-transparent"
-              sizes="(max-width: 768px) 100vw, 50vw"
+              sizes="(max-width: 1024px) 100vw, min(672px, 50vw)"
               priority={index === 0}
               draggable={false}
             />
@@ -140,9 +110,9 @@ export function ProductImageGallery({
         )}
       </div>
 
-      {/* Dot Indicators - mobile only */}
+      {/* Dot Indicators */}
       {allImages.length > 1 && (
-        <div className="flex lg:hidden justify-center gap-2 mt-4">
+        <div className="flex justify-center gap-2 mt-1.5">
           {allImages.map((_, index) => (
             <button
               key={index}
@@ -158,9 +128,9 @@ export function ProductImageGallery({
         </div>
       )}
 
-      {/* Thumbnail Navigation - mobile only */}
+      {/* Thumbnail strip under main image */}
       {allImages.length > 1 && (
-        <div className="lg:hidden mt-4">
+        <div className="mt-1.5 w-full max-w-2xl mx-auto">
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide justify-center">
             {allImages.map((image, index) => (
               <button

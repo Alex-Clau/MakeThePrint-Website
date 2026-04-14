@@ -234,6 +234,10 @@
     "ronPerChar": "RON per caracter",
     "sizeNote": "Aceasta este înălțimea fiecărei litere pe perete. Prețul per caracter variază în funcție de mărime.",
     "outdoorNote": "Material premium pentru exterior - rezistent la intemperii",
+    "optionsTitle": "Opțiuni (alege ce vrei)",
+    "outdoorOption": "Exterior (rezistent la intemperii)",
+    "ledStripOption": "Bandă LED",
+    "colorOption": "Culoare",
     "characterCount": "{count} caractere",
     "whatsappNotConfigured": "Numărul WhatsApp nu este configurat pentru acest produs",
     "openingWhatsApp": "Se deschide WhatsApp...",
@@ -271,7 +275,9 @@
     "submitting": "Se trimite...",
     "updateReview": "Actualizează recenzia",
     "submitReview": "Trimite recenzia",
-    "deleteReview": "Șterge recenzia"
+    "deleteReview": "Șterge recenzia",
+    "failedToLoadReviews": "Nu am putut încărca recenziile.",
+    "endOfReviews": "Ai ajuns la finalul recenziilor."
   },
   "wishlist": {
     "confirmRemove": "Elimină din lista de dorințe?",

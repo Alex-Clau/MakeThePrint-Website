@@ -1,4 +1,8 @@
-import type { Product, ProductCardData } from "@/types/product";
+import type {
+  CustomProductConfig,
+  Product,
+  ProductCardData,
+} from "@/types/product";
 
 type ProductRowForCard = Pick<
   Product,
@@ -25,6 +29,13 @@ export function getProductDisplayName(product: {
 }): string {
 
   return (product.name ?? "").trim() || "";
+}
+
+export function isPresetLettersConfig(
+  config: Product["custom_config"]
+): config is CustomProductConfig {
+  if (!config || typeof config !== "object") return false;
+  return "fonts" in config || "defaultFont" in config || "sizePrices" in config;
 }
 
 /**

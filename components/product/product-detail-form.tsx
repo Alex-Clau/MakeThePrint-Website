@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Minus, Plus, MessageCircle, Share2 } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -14,7 +13,7 @@ import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { CustomLettersForm } from "./custom-letters-form";
 import { ProductCardActions } from "./product-card-actions";
 import { KeychainConfig } from "@/types/product";
-import { getProductDisplayName } from "@/lib/utils/products";
+import { getProductDisplayName, isPresetLettersConfig } from "@/lib/utils/products";
 import { messages } from "@/lib/messages";
 
 export function ProductDetailForm({
@@ -36,9 +35,10 @@ export function ProductDetailForm({
 
   const [quantity, setQuantity] = useState(1);
 
-  const customProductConfig = isPreset && product.custom_config && "defaultFont" in product.custom_config
-    ? product.custom_config
-    : null;
+  const customProductConfig =
+    isPreset && isPresetLettersConfig(product.custom_config)
+      ? product.custom_config
+      : null;
   const inquireConfig = isInquire && product.custom_config && "whatsappNumber" in product.custom_config
     ? (product.custom_config as KeychainConfig)
     : null;
@@ -265,7 +265,7 @@ export function ProductDetailForm({
             availableFonts={customProductConfig?.fonts ?? []}
             customConfig={product.custom_config || {}}
             text={previewText}
-            onTextChange={(text) =>
+            onLetterTextChange={(text) =>
               onPreviewChange?.({
                 text,
                 font: customConfig.font,
