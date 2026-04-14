@@ -80,7 +80,13 @@ export async function POST(request: NextRequest) {
     await setOrderPaidAdmin(orderId, userId, paymentIntent.id);
     const { error: cartError } = await clearCartAdmin(userId);
     if (cartError) throw cartError;
-    await sendOrderConfirmationEmails(orderId);
+    const emailResult = await sendOrderConfirmationEmails(orderId);
+    if (!emailResult.ok) {
+      console.error("[stripe/webhook] confirmation email failed", {
+        orderId,
+        error: emailResult.error,
+      });
+    }
     return NextResponse.json({ received: true });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Webhook handler error";

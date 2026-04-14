@@ -73,7 +73,13 @@ export async function POST(request: NextRequest) {
 
     await setOrderPaid(orderId, user.id, paymentIntentId);
     await clearCart(user.id);
-    await sendOrderConfirmationEmails(orderId);
+    const emailResult = await sendOrderConfirmationEmails(orderId);
+    if (!emailResult.ok) {
+      console.error("[confirm-paid] confirmation email failed", {
+        orderId,
+        error: emailResult.error,
+      });
+    }
 
     return NextResponse.json({ orderId });
   } catch (err) {
