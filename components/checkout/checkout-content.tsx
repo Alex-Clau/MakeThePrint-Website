@@ -115,7 +115,6 @@ export function CheckoutContent({
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            currency: "ron",
             orderId,
           }),
         });

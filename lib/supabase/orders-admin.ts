@@ -101,3 +101,22 @@ export async function setOrderPaidAdmin(
 
   if (error) throw error;
 }
+
+/**
+ * Admin-only: get payment state for one order/user pair.
+ */
+export async function getOrderPaymentStateAdmin(orderId: string, userId: string) {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("orders")
+    .select("id, total_amount, payment_status, payment_intent_id")
+    .eq("id", orderId)
+    .eq("user_id", userId)
+    .single();
+
+  if (error || !data) {
+    throw new Error("Order not found");
+  }
+
+  return data;
+}

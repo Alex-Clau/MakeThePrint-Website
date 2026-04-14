@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { currency = "ron", metadata = {}, orderId } = body;
+    const { orderId } = body;
 
     if (!orderId || typeof orderId !== "string") {
       return NextResponse.json(
@@ -49,11 +49,10 @@ export async function POST(request: NextRequest) {
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(amount * 100),
-      currency,
+      currency: "ron",
       metadata: {
         userId: user.id,
         orderId,
-        ...metadata,
       },
       automatic_payment_methods: {
         enabled: true,

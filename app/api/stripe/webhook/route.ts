@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import Stripe from "stripe";
 import { stripe } from "@/lib/stripe/server";
-import { setOrderPaidAdmin } from "@/lib/supabase/orders-admin";
+import {
+  getOrderPaymentStateAdmin,
+  setOrderPaidAdmin,
+} from "@/lib/supabase/orders-admin";
 import { clearCartAdmin } from "@/lib/supabase/cart";
 import { sendOrderConfirmationEmails } from "@/lib/email/send-order-confirmation";
 
@@ -46,6 +49,34 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const order = await getOrderPaymentStateAdmin(orderId, userId);
+    const expectedAmount = Math.round(Number(order.total_amount) * 100);
+
+    if (paymentIntent.currency !== "ron") {
+      return NextResponse.json(
+        { error: "Payment currency mismatch" },
+        { status: 400 }
+      );
+    }
+
+    if (paymentIntent.amount !== expectedAmount) {
+      return NextResponse.json(
+        { error: "Payment amount mismatch" },
+        { status: 400 }
+      );
+    }
+
+    if (order.payment_status === "paid") {
+      // Stripe retries webhooks; make this handler idempotent.
+      if (order.payment_intent_id !== paymentIntent.id) {
+        return NextResponse.json(
+          { error: "Order already paid by different payment intent" },
+          { status: 409 }
+        );
+      }
+      return NextResponse.json({ received: true, alreadyPaid: true });
+    }
+
     await setOrderPaidAdmin(orderId, userId, paymentIntent.id);
     const { error: cartError } = await clearCartAdmin(userId);
     if (cartError) throw cartError;

@@ -51,6 +51,22 @@ export async function POST(request: NextRequest) {
     }
 
     const order = await getOrderForPayment(orderId, user.id);
+    const expectedAmount = Math.round(Number(order.total_amount) * 100);
+
+    if (paymentIntent.currency !== "ron") {
+      return NextResponse.json(
+        { error: "Payment currency mismatch" },
+        { status: 400 }
+      );
+    }
+
+    if (paymentIntent.amount !== expectedAmount) {
+      return NextResponse.json(
+        { error: "Payment amount mismatch" },
+        { status: 400 }
+      );
+    }
+
     if (order.payment_status === "paid") {
       return NextResponse.json({ orderId, alreadyPaid: true });
     }

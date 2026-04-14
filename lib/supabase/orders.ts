@@ -55,8 +55,8 @@ export async function getOrderById(orderId: string, userId: string) {
 export async function createOrder(order: {
   user_id: string;
   total_amount: number;
-  shipping_address: Record<string, any>;
-  billing_address?: Record<string, any>;
+  shipping_address: Record<string, unknown>;
+  billing_address?: Record<string, unknown>;
   payment_status?: string;
   payment_method?: string;
   notes?: string;
@@ -65,7 +65,7 @@ export async function createOrder(order: {
     quantity: number;
     price: number;
     material?: string;
-    customizations?: Record<string, any>;
+    customizations?: Record<string, unknown>;
   }>;
 }) {
   const supabase = await createClient();
@@ -226,7 +226,7 @@ export async function getOrderForPayment(orderId: string, userId: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("orders")
-    .select("id, total_amount, payment_status")
+    .select("id, total_amount, payment_status, payment_intent_id")
     .eq("id", orderId)
     .eq("user_id", userId)
     .single();
