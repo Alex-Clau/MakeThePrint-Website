@@ -1,8 +1,4 @@
-import type {
-  SizePriceEntry,
-  CustomProductConfig,
-  KeychainConfig,
-} from "@/types/product";
+import type { CustomProductConfig, KeychainConfig } from "@/types/product";
 import { PRESET_COLORS, PRESET_FONTS } from "@/lib/constants/preset-options";
 
 export interface ProductFormData {

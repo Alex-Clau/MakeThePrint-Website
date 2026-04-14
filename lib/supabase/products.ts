@@ -1,5 +1,5 @@
 import { createClient } from "./server";
-import { Product } from "@/types/product";
+import type { CustomProductConfig, KeychainConfig, Product } from "@/types/product";
 import { handleSupabaseError } from "../utils/supabase-errors";
 
 /**
@@ -165,7 +165,7 @@ export async function createProduct(product: {
   featured?: boolean;
   product_type?: "custom" | "seasonal";
   category?: string;
-  custom_config?: Record<string, any>;
+  custom_config?: CustomProductConfig | KeychainConfig;
 }) {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -198,7 +198,7 @@ export async function updateProduct(
     featured: boolean;
     product_type?: "custom" | "seasonal";
     category?: string;
-    custom_config?: Record<string, any>;
+    custom_config?: CustomProductConfig | KeychainConfig;
   }>
 ) {
   const supabase = await createClient();

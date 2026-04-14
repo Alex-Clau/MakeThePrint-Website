@@ -8,11 +8,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { messages } from "@/lib/messages";
 import type { ProductFormData } from "./admin-product-form-types";
+import type { Product } from "@/types/product";
 
 interface AdminProductBasicCardProps {
   formData: ProductFormData;
   setFormData: React.Dispatch<React.SetStateAction<ProductFormData>>;
-  product?: any;
+  product?: Product;
   isPresetCategory: boolean;
   isInquireCategory: boolean;
 }

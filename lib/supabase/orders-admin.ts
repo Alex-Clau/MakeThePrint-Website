@@ -1,3 +1,4 @@
+import type { AdminOrderStatus } from "@/lib/constants/admin-order-status";
 import { createAdminClient } from "./admin";
 
 /**
@@ -57,7 +58,7 @@ export async function getOrderByIdAdmin(orderId: string) {
  */
 export async function updateOrderStatusAdmin(
   orderId: string,
-  status: string,
+  status: AdminOrderStatus,
   trackingNumber?: string | null
 ) {
   const supabase = createAdminClient();

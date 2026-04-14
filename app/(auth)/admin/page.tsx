@@ -41,7 +41,7 @@ async function DashboardContent() {
       value: ordersCount,
       icon: Users,
       description: a.customerOrders,
-      href: "/account/orders",
+      href: "/admin/orders",
     },
   ];
 

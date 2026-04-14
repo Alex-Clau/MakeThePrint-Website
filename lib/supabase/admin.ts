@@ -29,13 +29,17 @@ export interface DashboardStats {
 
 /**
  * Fetch counts for the admin dashboard (products, orders, custom/seasonal breakdown).
+ *
+ * Call only from routes already gated by admin auth (e.g. `/admin`). Order totals use the
+ * service-role client because RLS on `orders` only allows users to see their own rows.
  */
 export async function getDashboardStats(): Promise<DashboardStats> {
   const supabase = await createServerClient();
+  const admin = createAdminClient();
 
   const [productsRes, ordersRes, customRes, seasonalRes] = await Promise.all([
     supabase.from("products").select("id", { count: "exact", head: true }),
-    supabase.from("orders").select("id", { count: "exact", head: true }),
+    admin.from("orders").select("id", { count: "exact", head: true }),
     supabase
       .from("products")
       .select("id", { count: "exact", head: true })
@@ -45,6 +49,11 @@ export async function getDashboardStats(): Promise<DashboardStats> {
       .select("id", { count: "exact", head: true })
       .eq("product_type", "seasonal"),
   ]);
+
+  if (productsRes.error) throw productsRes.error;
+  if (ordersRes.error) throw ordersRes.error;
+  if (customRes.error) throw customRes.error;
+  if (seasonalRes.error) throw seasonalRes.error;
 
   return {
     productsCount: productsRes.count ?? 0,

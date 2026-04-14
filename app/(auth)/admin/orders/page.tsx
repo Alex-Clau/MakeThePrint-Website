@@ -8,15 +8,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { getAllOrdersAdmin } from "@/lib/supabase/orders-admin";
 
-export default function AdminOrdersPage() {
-  return <AdminOrdersContent />;
-}
-
-
-async function AdminOrdersContent() {
-  const { getAllOrdersAdmin } = await import("@/lib/supabase/orders-admin");
-
+export default async function AdminOrdersPage() {
   const orders = await getAllOrdersAdmin();
 
   return (
@@ -70,3 +64,4 @@ async function AdminOrdersContent() {
     </div>
   );
 }
+

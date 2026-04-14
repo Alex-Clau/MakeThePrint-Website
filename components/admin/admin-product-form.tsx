@@ -15,9 +15,10 @@ import Link from "next/link";
 import { messages } from "@/lib/messages";
 import { type ProductFormData, getDefaultConfig } from "./admin-product-form-types";
 import {getUserFriendlyError} from "@/lib/utils/error-messages";
+import type { Product } from "@/types/product";
 
 interface AdminProductFormProps {
-  product?: any;
+  product?: Product;
   initialType?: "custom" | "seasonal";
 }
 
