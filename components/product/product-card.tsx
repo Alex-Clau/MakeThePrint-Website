@@ -55,11 +55,8 @@ export function ProductCard({
             {isInquire ? (
               hasInquiryDisplayPrice(price) ? (
                 <div className="min-w-0 space-y-0.5">
-                  <p className="text-sm font-bold tabular-nums">
+                  <p className="text-lg font-bold tabular-nums">
                     {price.toFixed(2)} {c.ron}
-                  </p>
-                  <p className="text-xs text-muted-foreground leading-snug">
-                    {t.inquireIndicativePriceNote}
                   </p>
                 </div>
               ) : (
@@ -68,7 +65,7 @@ export function ProductCard({
                 </p>
               )
             ) : (
-              <p className="text-sm font-bold">{price.toFixed(2)} {c.ron}</p>
+              <p className="text-lg font-bold">{price.toFixed(2)} {c.ron}</p>
             )}
           </div>
           <div className="w-full sm:w-auto flex-shrink-0">
