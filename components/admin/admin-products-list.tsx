@@ -183,7 +183,13 @@ export function AdminProductsList({
 
   return (
     <div className="space-y-4">
-      {products.map((product) => (
+      {products.map((product) => {
+        const imageCount = product.images?.length ?? 0;
+        const imageCountLabel = (imageCount === 1 ? t.productImageCountOne : t.productImageCountOther).replace(
+          "{count}",
+          String(imageCount)
+        );
+        return (
         <Card
           key={product.id}
           className={`overflow-hidden transition-all ${
@@ -199,6 +205,7 @@ export function AdminProductsList({
                     alt={product.name}
                     fill
                     className="object-cover"
+                    sizes="(max-width: 767px) 100vw, 192px"
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-muted-foreground">
@@ -218,9 +225,7 @@ export function AdminProductsList({
                       <span className="text-lg font-bold">
                         {product.price.toFixed(2)} RON
                       </span>
-                      <span className="text-muted-foreground">
-                        {product.images?.length || 0} images
-                      </span>
+                      <span className="text-muted-foreground">{imageCountLabel}</span>
                     </div>
                   </div>
 
@@ -253,7 +258,8 @@ export function AdminProductsList({
             </div>
           </CardContent>
         </Card>
-      ))}
+        );
+      })}
 
       <div ref={sentinelRef} className="h-10" />
       {isLoading && (

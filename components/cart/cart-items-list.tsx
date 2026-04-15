@@ -32,7 +32,7 @@ export function CartItemsList({
                   alt={displayName}
                   fill
                   className="object-cover"
-                  sizes="96px"
+                  sizes="(max-width: 639px) 100vw, (max-width: 1023px) 80px, 96px"
                 />
               </div>
               <div className="flex-1 flex flex-col sm:flex-row sm:items-center gap-4">

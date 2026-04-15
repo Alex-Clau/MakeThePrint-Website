@@ -496,6 +496,8 @@
     "updateProductName": "Actualizează {name}",
     "noProductsFound": "Niciun produs găsit",
     "noImage": "Fără imagine",
+    "productImageCountOne": "{count} poză",
+    "productImageCountOther": "{count} poze",
     "featured": "Recomandat",
     "custom": "Personalizat",
     "seasonal": "Sezonier",

@@ -199,6 +199,7 @@ export function AdminImageUpload({
                   alt={`Product image ${index + 1}`}
                   fill
                   className="object-cover"
+                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
                 />
                 {index === 0 && (
                   <div className="absolute top-2 left-2 bg-accent-primary text-white text-xs px-2 py-1 rounded">

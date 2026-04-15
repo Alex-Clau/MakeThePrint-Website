@@ -58,9 +58,9 @@ export default async function CollectionsPage() {
       mainClassName="relative z-10 bg-background"
       title={
         <div className="mb-8 sm:mb-12">
-          <div className="flex items-center gap-2 mb-4">
-            <Sparkles className="h-6 w-6 text-accent-primary-dark" />
-            <h1 className="text-3xl sm:text-4xl font-bold text-accent-primary-dark">
+          <div className="mb-4 flex flex-col items-center gap-2 sm:flex-row sm:items-start sm:gap-3">
+            <Sparkles className="h-6 w-6 shrink-0 text-accent-primary-dark sm:mt-1.5" aria-hidden />
+            <h1 className="max-w-full text-balance text-center text-3xl font-bold text-accent-primary-dark sm:text-left sm:text-4xl">
               {t.title}
             </h1>
           </div>
