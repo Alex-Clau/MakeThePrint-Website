@@ -254,12 +254,12 @@
     "addToWishlist": "Adaugă la favorite",
     "reviews": "Recenzii",
     "writeReview": "Scrie o recenzie",
-    "keychainTitle": "Design breloc personalizat",
-    "keychainDesc": "Fiecare breloc este realizat la comandă. Parcurge portofoliul de mai sus pentru inspirație, apoi contactează-ne pentru ideile tale unice!",
-    "keychainBullet1": "Designuri personalizate pentru nevoile tale",
-    "keychainBullet2": "Materiale de calitate și măiestrie",
-    "keychainBullet3": "Consultare directă cu echipa noastră",
-    "inquireWhatsApp": "Întreabă pe WhatsApp",
+    "inquireTitle": "Design personalizat la comandă",
+    "inquireDesc": "Fiecare produs este realizat la comandă. Parcurge portofoliul de mai sus pentru inspirație, apoi contactează-ne pentru ideile tale unice!",
+    "inquireBullet1": "Designuri personalizate pentru nevoile tale",
+    "inquireBullet2": "Materiale de calitate și atenție la detalii",
+    "inquireBullet3": "Consultare directă cu echipa noastră",
+    "inquireWhatsApp": "Comandă pe WhatsApp",
     "priceVariesBySize": "Prețul depinde de mărimea aleasă și de numărul de caractere",
     "character": "caracter",
     "characters": "caractere",
@@ -397,8 +397,8 @@
     "digestLabel": "Cod eroare"
   },
   "products": {
-    "title": "Produse Customizabile",
-    "subhead": "Produse personalizate create cu atenție.",
+    "title": "Produse personalizate",
+    "subhead": "Descoperă produsele noastre create cu atenție.",
     "showingCount": "Se afișează {count} produse",
     "noProducts": "Nu există produse disponibile momentan.",
     "loadingMore": "Se încarcă mai multe produse…",
@@ -406,12 +406,12 @@
     "endOfList": "Ai ajuns la finalul listei de produse."
   },
   "seasons": {
-    "title": "Colecții sezoniere",
-    "subhead": "Descoperă colecțiile noastre exclusive de sărbători și sezon. Designuri în ediție limitată, perfecte pentru cadouri.",
-    "noSeasonal": "Nicio colecție sezonieră disponibilă momentan",
-    "loadingMore": "Se încarcă mai multe colecții…",
-    "loadMoreFailed": "Nu s-au putut încărca mai multe colecții.",
-    "endOfList": "Ai ajuns la finalul colecțiilor."
+    "title": "Produse sezoniere",
+    "subhead": "Descoperă produsele noastre ediție limitată pentru sărbători și sezon.",
+    "noSeasonal": "Nu există produse sezoniere disponibile momentan",
+    "loadingMore": "Se încarcă mai multe produse…",
+    "loadMoreFailed": "Nu s-au putut încărca mai multe produse.",
+    "endOfList": "Ai ajuns la finalul listei de produse sezoniere."
   },
   "faq": {
     "title": "Întrebări frecvente",

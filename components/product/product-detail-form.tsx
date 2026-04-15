@@ -208,23 +208,23 @@ export function ProductDetailForm({
         <div className="space-y-4">
           <div className="p-4 sm:p-6 bg-accent-primary/10 rounded-lg border-2 border-accent-primary/30">
             <h3 className="text-lg sm:text-xl font-semibold mb-2 text-accent-primary-dark">
-              {t.keychainTitle}
+              {t.inquireTitle}
             </h3>
             <p className="text-sm sm:text-base text-muted-foreground mb-4">
-              {t.keychainDesc}
+              {t.inquireDesc}
             </p>
             <ul className="space-y-2 text-sm sm:text-base">
               <li className="flex items-start gap-2">
                 <span className="text-accent-primary-dark">•</span>
-                <span>{t.keychainBullet1}</span>
+                <span>{t.inquireBullet1}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-accent-primary-dark">•</span>
-                <span>{t.keychainBullet2}</span>
+                <span>{t.inquireBullet2}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-accent-primary-dark">•</span>
-                <span>{t.keychainBullet3}</span>
+                <span>{t.inquireBullet3}</span>
               </li>
             </ul>
           </div>
