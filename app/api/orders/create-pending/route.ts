@@ -3,6 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import { createPendingOrder } from "@/lib/supabase/orders";
 import type { CreatePendingOrderInput } from "@/lib/supabase/orders";
 import { apiErrorResponse, normalizeToApiError } from "@/lib/utils/api-error";
+import { getShippingCost } from "@/lib/constants/shipping";
+import { getCartItems } from "@/lib/supabase/cart";
+import { getCartSubtotal, getCartUnitPrice } from "@/lib/cart/pricing";
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,32 +19,38 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const {
-      total_amount,
-      shipping_address,
-      order_items,
-    }: CreatePendingOrderInput = body;
+    const { shipping_address } = body as { shipping_address?: Record<string, unknown> };
 
-    if (
-      total_amount == null ||
-      total_amount <= 0 ||
-      !shipping_address ||
-      !Array.isArray(order_items) ||
-      order_items.length === 0
-    ) {
+    if (!shipping_address) {
       return NextResponse.json(
         {
-          error:
-            "Invalid request: total_amount, shipping_address, and order_items required",
+          error: "Invalid request: shipping_address is required",
         },
         { status: 400 }
       );
     }
 
+    const cartItems = await getCartItems(user.id);
+    if (cartItems.length === 0) {
+      return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
+    }
+
+    const expectedSubtotal = getCartSubtotal(cartItems);
+    const expectedTotal = expectedSubtotal + getShippingCost(expectedSubtotal);
+    const validatedOrderItems: CreatePendingOrderInput["order_items"] = cartItems.map(
+      (item) => ({
+        product_id: item.product_id,
+        quantity: item.quantity,
+        price: getCartUnitPrice(item),
+        material: item.material,
+        customizations: item.customizations ?? {},
+      })
+    );
+
     const { orderId } = await createPendingOrder(user.id, {
-      total_amount,
+      total_amount: expectedTotal,
       shipping_address,
-      order_items,
+      order_items: validatedOrderItems,
     });
 
     return NextResponse.json({ orderId });

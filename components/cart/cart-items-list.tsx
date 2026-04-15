@@ -7,6 +7,7 @@ import Image from "next/image";
 import { CartItemsListProps } from "@/types/cart-components";
 import { getProductDisplayName } from "@/lib/utils/products";
 import { messages } from "@/lib/messages";
+import { getCartLineTotal, getCartUnitPrice } from "@/lib/cart/pricing";
 
 export function CartItemsList({
   items,
@@ -19,6 +20,8 @@ export function CartItemsList({
     <div className="space-y-3 sm:space-y-4">
       {items.map((item) => {
         const displayName = getProductDisplayName(item.products);
+        const unitPrice = getCartUnitPrice(item);
+        const lineTotal = getCartLineTotal(item);
         return (
         <Card key={item.id}>
           <CardContent className="p-3 sm:p-4 lg:p-6">
@@ -29,7 +32,7 @@ export function CartItemsList({
                   alt={displayName}
                   fill
                   className="object-cover"
-                  sizes="96px"
+                  sizes="(max-width: 639px) 100vw, (max-width: 1023px) 80px, 96px"
                 />
               </div>
               <div className="flex-1 flex flex-col sm:flex-row sm:items-center gap-4">
@@ -60,14 +63,11 @@ export function CartItemsList({
                     </p>
                   )}
                   <p className="text-lg font-bold">
-                    {(item.customizations?.totalPrice != null
-                      ? item.customizations.totalPrice * item.quantity
-                      : (item.products?.price ?? 0) * item.quantity
-                    ).toFixed(2)}{" "}
+                    {lineTotal.toFixed(2)}{" "}
                     {c.ron}
                     {item.quantity > 1 && (
                       <span className="text-sm font-normal text-muted-foreground ml-1">
-                        ({(item.customizations?.totalPrice ?? item.products?.price ?? 0).toFixed(2)} {c.ron} × {item.quantity})
+                        ({unitPrice.toFixed(2)} {c.ron} × {item.quantity})
                       </span>
                     )}
                   </p>

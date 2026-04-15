@@ -14,10 +14,10 @@ import {ArrowLeft, Save} from "lucide-react";
 import Link from "next/link";
 import { messages } from "@/lib/messages";
 import { type ProductFormData, getDefaultConfig } from "./admin-product-form-types";
-import {getUserFriendlyError} from "@/lib/utils/error-messages";
+import type { Product } from "@/types/product";
 
 interface AdminProductFormProps {
-  product?: any;
+  product?: Product;
   initialType?: "custom" | "seasonal";
 }
 
@@ -48,12 +48,6 @@ export function AdminProductForm({product, initialType = "seasonal"}: AdminProdu
         ...prev,
         category: "finished",
         custom_config: undefined,
-      }));
-    } else if (formData.product_type === "custom" && formData.category === "finished") {
-      setFormData((prev) => ({
-        ...prev,
-        category: "preset",
-        custom_config: getDefaultConfig("preset"),
       }));
     }
   }, [formData.product_type]);
@@ -121,18 +115,30 @@ export function AdminProductForm({product, initialType = "seasonal"}: AdminProdu
         custom_config: cleanedConfig,
       };
 
-      if (product) {
-        await updateProductAction(product.id, productData);
-        toast.success(t.productUpdated);
-      } else {
-        await createProductAction(productData);
-        toast.success(t.productCreated);
-      }
+      const goToCatalog = () => {
+        router.push("/admin/products");
+        router.refresh();
+      };
 
-      router.push("/admin/products");
-      router.refresh();
-    } catch (error: unknown) {
-      toast.error(getUserFriendlyError(error) || t.saveFailed);
+      if (product) {
+        const result = await updateProductAction(product.id, productData);
+        if (result.success) {
+          toast.success(result.message);
+          queueMicrotask(goToCatalog);
+        } else {
+          toast.error(result.message);
+        }
+      } else {
+        const result = await createProductAction(productData);
+        if (result.success) {
+          toast.success(result.message);
+          queueMicrotask(goToCatalog);
+        } else {
+          toast.error(result.message);
+        }
+      }
+    } catch {
+      toast.error(t.adminActionFailed);
     } finally {
       setIsSubmitting(false);
     }

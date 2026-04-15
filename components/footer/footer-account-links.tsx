@@ -1,45 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { messages } from "@/lib/messages";
+import { useSupabaseUser } from "@/lib/supabase/use-supabase-user";
 
 export function FooterAccountLinks() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const c = messages.common;
-
-  useEffect(() => {
-    async function checkAuth() {
-      try {
-        const supabase = createClient();
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        setIsAuthenticated(!!user);
-      } catch (_error: unknown) {
-        // Silently fail - auth check failures are non-critical
-        setIsAuthenticated(false);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    checkAuth();
-
-    // Listen for auth changes
-    const supabase = createClient();
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthenticated(!!session?.user);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+  const { user, isLoading } = useSupabaseUser();
+  const isAuthenticated = !!user;
 
   return (
     <div>
@@ -66,4 +34,3 @@ export function FooterAccountLinks() {
     </div>
   );
 }
-

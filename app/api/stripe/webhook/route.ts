@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import Stripe from "stripe";
 import { stripe } from "@/lib/stripe/server";
-import { setOrderPaidAdmin } from "@/lib/supabase/orders-admin";
-import { clearCartAdmin } from "@/lib/supabase/cart";
-import { sendOrderConfirmationEmails } from "@/lib/email/send-order-confirmation";
+import { finalizePaidOrderFromPaymentIntent } from "@/lib/orders/finalize-paid-from-intent";
 
 export async function POST(request: NextRequest) {
   const body = await request.text();
@@ -35,27 +33,14 @@ export async function POST(request: NextRequest) {
   }
 
   const paymentIntent = event.data.object as Stripe.PaymentIntent;
-  const orderId = paymentIntent.metadata?.orderId;
-  const userId = paymentIntent.metadata?.userId;
+  const outcome = await finalizePaidOrderFromPaymentIntent(paymentIntent);
 
-  if (!orderId || !userId) {
-    return NextResponse.json(
-      { error: "Missing metadata" },
-      { status: 400 }
-    );
+  if (outcome.kind === "reject") {
+    return NextResponse.json({ error: outcome.error }, { status: outcome.httpStatus });
   }
 
-  try {
-    await setOrderPaidAdmin(orderId, userId, paymentIntent.id);
-    const { error: cartError } = await clearCartAdmin(userId);
-    if (cartError) throw cartError;
-    await sendOrderConfirmationEmails(orderId);
-    return NextResponse.json({ received: true });
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Webhook handler error";
-    return NextResponse.json(
-      { error: message },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json({
+    received: true,
+    ...(outcome.alreadyPaid ? { alreadyPaid: true } : {}),
+  });
 }

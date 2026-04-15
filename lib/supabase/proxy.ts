@@ -59,6 +59,10 @@ export async function updateSession(request: NextRequest) {
       (path) =>
         pathname === path || pathname.startsWith(path + "/"),
     ) ||
+    // static metadata in /public (middleware matcher may still run for .json)
+    pathname === "/manifest.json" ||
+    pathname === "/robots.txt" ||
+    pathname === "/sitemap.xml" ||
     // auth pages & flows
     pathname.startsWith("/auth") ||
     // all API routes are public; individual handlers enforce auth as needed

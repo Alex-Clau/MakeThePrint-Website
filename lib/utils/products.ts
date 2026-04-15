@@ -1,24 +1,52 @@
-import { ProductCardData } from "@/types/product";
+import type {
+  CustomProductConfig,
+  Product,
+  ProductCardData,
+} from "@/types/product";
+
+type ProductRowForCard = Pick<
+  Product,
+  "id" | "category" | "featured" | "images"
+> & {
+  name: string;
+  price: number | string;
+  rating?: number;
+  review_count?: number;
+};
+
+type ProductRowForFull = Pick<
+  Product,
+  "id" | "name" | "description" | "product_type" | "category" | "custom_config" | "featured" | "images"
+> & {
+  price: number | string;
+};
 
 /**
- * Get product display name
+ * Get product display name (empty string if missing or null product).
  */
-export function getProductDisplayName(product: {
-  name?: string;
-}): string {
-
+export function getProductDisplayName(
+  product: { name?: string } | null | undefined
+): string {
+  if (product == null) return "";
   return (product.name ?? "").trim() || "";
+}
+
+export function isPresetLettersConfig(
+  config: Product["custom_config"]
+): config is CustomProductConfig {
+  if (!config || typeof config !== "object") return false;
+  return "fonts" in config || "defaultFont" in config || "sizePrices" in config;
 }
 
 /**
  * Transform database product to ProductCardData format.
  */
-export function transformProductToCardData(product: any): ProductCardData {
-  const name = getProductDisplayName(product) || (product.name ?? "");
+export function transformProductToCardData(product: ProductRowForCard): ProductCardData {
+  const name = getProductDisplayName(product) || product.name;
   return {
     id: product.id,
     name,
-    price: parseFloat(product.price),
+    price: parseFloat(String(product.price)),
     image: product.images?.[0] || "",
     category: product.category,
     featured: product.featured,
@@ -30,17 +58,18 @@ export function transformProductToCardData(product: any): ProductCardData {
 /**
  * Transform database product to ProductWithImage format
  */
-export function transformProductToFull(product: any) {
+export function transformProductToFull(product: ProductRowForFull) {
+  const product_type = product.product_type || "custom";
   return {
     id: product.id,
     name: product.name,
     description: product.description || "",
-    price: parseFloat(product.price),
-    product_type: product.product_type || "custom",
-    category: product.category || "",
+    price: parseFloat(String(product.price)),
+    product_type,
+    category: (product.category ?? undefined) as Product["category"],
     custom_config: product.custom_config || {},
     featured: product.featured || false,
-    seasonal: product.product_type === "seasonal",
+    seasonal: product_type === "seasonal",
     image: product.images?.[0] || "",
     images: (product.images as string[]) || [],
   };

@@ -2,12 +2,15 @@ import { redirect } from "next/navigation";
 import { PageLayout } from "@/components/layout/page-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Package, Mail } from "lucide-react";
+import { CheckCircle, Clock, Package, Mail, CircleX } from "lucide-react";
 import Link from "next/link";
 import { getOrderById } from "@/lib/supabase/orders";
 import { getRequiredUser } from "@/lib/supabase/server";
 import { messages } from "@/lib/messages";
 import type { OrderConfirmationParams } from "@/types/pages";
+import type { OrderShippingAddress } from "@/types/order";
+import { orderStatusLabelRo } from "@/lib/utils/order-status-ui";
+import { getOrderConfirmationDerivedState } from "@/lib/orders/order-confirmation-view";
 
 async function OrderConfirmationContent({ orderId }: { orderId: string }) {
   const user = await getRequiredUser();
@@ -19,7 +22,13 @@ async function OrderConfirmationContent({ orderId }: { orderId: string }) {
   const t = messages.checkout;
   const c = messages.common;
 
-  const orderDate = new Date(order.created_at).toLocaleDateString("en-US", {
+  const { isAwaitingPayment, isInactiveOrder, isProcessingOrder, showPaidSuccessHero } =
+    getOrderConfirmationDerivedState(order);
+  const emailActuallySent =
+    typeof order.confirmation_email_sent_at === "string" &&
+    order.confirmation_email_sent_at.trim().length > 0;
+
+  const orderDate = new Date(order.created_at).toLocaleDateString("ro-RO", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -27,18 +36,54 @@ async function OrderConfirmationContent({ orderId }: { orderId: string }) {
     minute: "2-digit",
   });
 
+  const shipping = order.shipping_address as OrderShippingAddress;
+  const confirmationEmail =
+    typeof shipping?.email === "string" && shipping.email.trim().length > 0
+      ? shipping.email
+      : undefined;
+
   return (
     <Card className="max-w-2xl mx-auto">
       <CardContent className="p-6 sm:p-8">
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/20 mb-4">
-            <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
-          </div>
+          {isInactiveOrder ? (
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
+              <CircleX className="h-8 w-8 text-muted-foreground" />
+            </div>
+          ) : isProcessingOrder ? (
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
+              <Clock className="h-8 w-8 text-primary" />
+            </div>
+          ) : showPaidSuccessHero ? (
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/20 mb-4">
+              <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
+            </div>
+          ) : (
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-900/20 mb-4">
+              <Clock className="h-8 w-8 text-amber-600 dark:text-amber-400" />
+            </div>
+          )}
           <h1 className="text-2xl sm:text-3xl font-bold mb-2">
-            {t.orderConfirmed}
+            {isInactiveOrder
+              ? t.orderInactiveTitle
+              : isProcessingOrder
+                ? t.orderProcessingTitle
+              : showPaidSuccessHero
+                ? t.orderConfirmed
+                : isAwaitingPayment
+                  ? t.orderAwaitingPaymentTitle
+                  : t.orderPaymentUnconfirmedTitle}
           </h1>
           <p className="text-muted-foreground">
-            {t.orderConfirmedThankYou}
+            {isInactiveOrder
+              ? t.orderInactiveSubhead
+              : isProcessingOrder
+                ? t.orderProcessingSubhead
+              : showPaidSuccessHero
+                ? t.orderConfirmedThankYou
+                : isAwaitingPayment
+                  ? t.orderAwaitingPaymentSubhead
+                  : t.orderPaymentUnconfirmedSubhead}
           </p>
         </div>
 
@@ -60,24 +105,32 @@ async function OrderConfirmationContent({ orderId }: { orderId: string }) {
           <div className="flex items-center justify-between p-4 border rounded-lg">
             <div>
               <p className="text-sm text-muted-foreground">{t.totalAmount}</p>
-              <p className="text-2xl font-bold">{order.total_amount.toFixed(2)} {c.ron}</p>
+              <p className="text-2xl font-bold">
+                {order.total_amount.toFixed(2)} {c.ron}
+              </p>
             </div>
             <div className="text-right">
               <p className="text-sm text-muted-foreground">{t.status}</p>
-              <p className="font-semibold capitalize">{order.status}</p>
+              <p className="font-semibold">{orderStatusLabelRo(order.status ?? "pending")}</p>
             </div>
           </div>
 
-          {(order.shipping_address as any)?.email && (
+          {showPaidSuccessHero && confirmationEmail && emailActuallySent && (
             <div className="flex items-center gap-3 p-4 border rounded-lg">
               <Mail className="h-5 w-5 text-muted-foreground" />
               <div>
-                <p className="text-sm text-muted-foreground">
-                  {t.confirmationEmailSent}
-                </p>
-                <p className="font-semibold">
-                  {(order.shipping_address as any).email}
-                </p>
+                <p className="text-sm text-muted-foreground">{t.confirmationEmailSent}</p>
+                <p className="font-semibold">{confirmationEmail}</p>
+              </div>
+            </div>
+          )}
+
+          {showPaidSuccessHero && confirmationEmail && !emailActuallySent && (
+            <div className="flex items-start gap-3 p-4 border rounded-lg">
+              <Mail className="h-5 w-5 shrink-0 text-muted-foreground mt-0.5" aria-hidden />
+              <div className="min-w-0 space-y-1">
+                <p className="text-sm text-muted-foreground">{t.confirmationEmailPending}</p>
+                <p className="text-sm font-medium break-all">{confirmationEmail}</p>
               </div>
             </div>
           )}
@@ -110,4 +163,3 @@ export default function OrderConfirmationPage({
     </PageLayout>
   );
 }
-

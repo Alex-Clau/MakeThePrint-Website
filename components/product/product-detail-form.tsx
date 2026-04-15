@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Minus, Plus, MessageCircle, Share2 } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -13,9 +12,10 @@ import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { CustomLettersForm } from "./custom-letters-form";
 import { ProductCardActions } from "./product-card-actions";
-import { KeychainConfig } from "@/types/product";
-import { getProductDisplayName } from "@/lib/utils/products";
+import type { CustomProductConfig, KeychainConfig } from "@/types/product";
+import { getProductDisplayName, isPresetLettersConfig } from "@/lib/utils/products";
 import { messages } from "@/lib/messages";
+import { CART_UPDATED_EVENT } from "@/lib/cart/events";
 
 export function ProductDetailForm({
   product,
@@ -36,12 +36,16 @@ export function ProductDetailForm({
 
   const [quantity, setQuantity] = useState(1);
 
-  const customProductConfig = isPreset && product.custom_config && "defaultFont" in product.custom_config
-    ? product.custom_config
-    : null;
+  const customProductConfig =
+    isPreset && isPresetLettersConfig(product.custom_config)
+      ? product.custom_config
+      : null;
   const inquireConfig = isInquire && product.custom_config && "whatsappNumber" in product.custom_config
     ? (product.custom_config as KeychainConfig)
     : null;
+
+  const lettersCustomConfig: CustomProductConfig =
+    customProductConfig ?? { sizePrices: [] };
 
   const [customConfig, setCustomConfig] = useState<{
     text: string;
@@ -130,7 +134,7 @@ export function ProductDetailForm({
 
       toast.success(t.addedToCart);
       // Dispatch custom event to refresh cart count
-      window.dispatchEvent(new CustomEvent("cart-updated"));
+      window.dispatchEvent(new CustomEvent(CART_UPDATED_EVENT));
       router.push("/cart");
     } catch (error: unknown) {
       toast.error(getUserFriendlyError(error));
@@ -161,9 +165,8 @@ export function ProductDetailForm({
     }
   };
 
-  return (
-    <div className="space-y-4 sm:space-y-6 lg:space-y-8 mb-8">
-      {/* Product Name & Description */}
+  const heroBlock = (
+    <div>
       <div>
         <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 sm:mb-2 lg:mb-3 text-accent-primary-dark">
           {displayName}
@@ -172,8 +175,6 @@ export function ProductDetailForm({
           {product.description}
         </p>
       </div>
-
-      {/* Compact rating summary */}
       <div className="flex flex-wrap items-center gap-2 text-sm">
         <div className="flex items-center gap-1.5">
           {[...Array(5)].map((_, i) => (
@@ -197,29 +198,33 @@ export function ProductDetailForm({
           {r.basedOn} {totalReviews} {totalReviews === 1 ? r.review : r.reviews}
         </a>
       </div>
+    </div>
+  );
 
+  const purchaseBlock = (
+    <>
       {/* Inquire - Show inquiry/contact CTA only */}
       {isInquire ? (
         <div className="space-y-4">
           <div className="p-4 sm:p-6 bg-accent-primary/10 rounded-lg border-2 border-accent-primary/30">
             <h3 className="text-lg sm:text-xl font-semibold mb-2 text-accent-primary-dark">
-              {t.keychainTitle}
+              {t.inquireTitle}
             </h3>
             <p className="text-sm sm:text-base text-muted-foreground mb-4">
-              {t.keychainDesc}
+              {t.inquireDesc}
             </p>
             <ul className="space-y-2 text-sm sm:text-base">
               <li className="flex items-start gap-2">
                 <span className="text-accent-primary-dark">•</span>
-                <span>{t.keychainBullet1}</span>
+                <span>{t.inquireBullet1}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-accent-primary-dark">•</span>
-                <span>{t.keychainBullet2}</span>
+                <span>{t.inquireBullet2}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-accent-primary-dark">•</span>
-                <span>{t.keychainBullet3}</span>
+                <span>{t.inquireBullet3}</span>
               </li>
             </ul>
           </div>
@@ -263,9 +268,9 @@ export function ProductDetailForm({
           </div>
           <CustomLettersForm
             availableFonts={customProductConfig?.fonts ?? []}
-            customConfig={product.custom_config || {}}
+            customConfig={lettersCustomConfig}
             text={previewText}
-            onTextChange={(text) =>
+            onLetterTextChange={(text) =>
               onPreviewChange?.({
                 text,
                 font: customConfig.font,
@@ -370,6 +375,13 @@ export function ProductDetailForm({
           </div>
         </>
       )}
+    </>
+  );
+
+  return (
+    <div className="mb-8 space-y-4 sm:space-y-6 lg:space-y-8">
+      {heroBlock}
+      {purchaseBlock}
     </div>
   );
 }

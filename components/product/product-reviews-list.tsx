@@ -10,12 +10,13 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CheckCircle2, ChevronDown, Loader2 } from "lucide-react";
+import { ChevronDown, Loader2 } from "lucide-react";
 import { CreateReviewForm } from "./create-review-form";
 import { createClient } from "@/lib/supabase/client";
 import { ProductReviewsListProps } from "@/types/product-components";
 import { messages } from "@/lib/messages";
 import type { Review } from "@/types/product-components";
+import { toast } from "sonner";
 
 type SortOption = "newest" | "oldest" | "highest" | "lowest";
 
@@ -35,10 +36,11 @@ export function ProductReviewsList({
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [userId, setUserId] = useState<string | undefined>(currentUserId);
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
-  const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [isLoading, setIsLoading] = useState(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const pageRef = useRef(1);
+  const isFetchingRef = useRef(false);
 
   useEffect(() => {
     async function getUser() {
@@ -58,36 +60,59 @@ export function ProductReviewsList({
 
   const fetchMore = useCallback(
     async (sort: SortOption, pageNum: number, append: boolean) => {
+      if (isFetchingRef.current) return;
+      isFetchingRef.current = true;
       setIsLoading(true);
       try {
+        const query = new URLSearchParams({
+          product_id: productId,
+          page: String(pageNum),
+          limit: "5",
+          sort,
+        });
         const res = await fetch(
-          `/api/reviews?product_id=${productId}&page=${pageNum}&limit=5&sort=${sort}`
+          `/api/reviews?${query.toString()}`
         );
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error ?? "Failed to fetch");
+        let data: {
+          reviews?: Review[];
+          hasMore?: boolean;
+          error?: string;
+        } = {};
+        try {
+          data = (await res.json()) as typeof data;
+        } catch {
+          // non-JSON body
+        }
+        if (!res.ok) {
+          toast.error(data.error ?? t.failedToLoadReviews);
+          setHasMore(false);
+          return;
+        }
         const newReviews = data.reviews ?? [];
         setReviews((prev) => (append ? [...prev, ...newReviews] : newReviews));
         setHasMore(data.hasMore ?? false);
-      } catch {
-        setHasMore(false);
+      } catch (err) {
+        console.error("[ProductReviewsList] fetchMore", err);
+        toast.error(t.failedToLoadReviews);
       } finally {
         setIsLoading(false);
+        isFetchingRef.current = false;
       }
     },
-    [productId]
+    [productId, t.failedToLoadReviews]
   );
 
   useEffect(() => {
     if (sortBy !== "newest") {
-      setPage(1);
+      pageRef.current = 1;
       setReviews([]);
       fetchMore(sortBy, 1, false);
     } else {
       setReviews(initialReviews);
-      setPage(1);
+      pageRef.current = 1;
       setHasMore(initialHasMore);
     }
-  }, [sortBy]);
+  }, [sortBy, fetchMore, initialHasMore, initialReviews]);
 
   useEffect(() => {
     if (!sentinelRef.current || !hasMore || isLoading) return;
@@ -96,8 +121,8 @@ export function ProductReviewsList({
       (entries) => {
         const [entry] = entries;
         if (!entry.isIntersecting || isLoading) return;
-        const nextPage = page + 1;
-        setPage(nextPage);
+        const nextPage = pageRef.current + 1;
+        pageRef.current = nextPage;
         fetchMore(sortBy, nextPage, true);
       },
       { rootMargin: "100px" }
@@ -105,7 +130,7 @@ export function ProductReviewsList({
 
     observer.observe(sentinelRef.current);
     return () => observer.disconnect();
-  }, [hasMore, isLoading, page, sortBy, fetchMore]);
+  }, [hasMore, isLoading, sortBy, fetchMore]);
 
   const handleSortChange = (v: string) => {
     setSortBy(v as SortOption);
@@ -133,21 +158,6 @@ export function ProductReviewsList({
     );
   };
 
-  const sortedReviews = [...reviews].sort((a, b) => {
-    switch (sortBy) {
-      case "newest":
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-      case "oldest":
-        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-      case "highest":
-        return b.rating - a.rating;
-      case "lowest":
-        return a.rating - b.rating;
-      default:
-        return 0;
-    }
-  });
-
   return (
     <div className="space-y-6">
       {/* Rating Summary */}
@@ -159,11 +169,8 @@ export function ProductReviewsList({
               {averageRating.toFixed(2)} {t.outOf5}
             </span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span>
-              {t.basedOn} {totalReviews} {totalReviews === 1 ? t.review : t.reviews}
-            </span>
-            {totalReviews > 0 && <CheckCircle2 className="h-4 w-4 text-green-500" />}
+          <div className="text-sm text-muted-foreground">
+            {t.basedOn} {totalReviews} {totalReviews === 1 ? t.review : t.reviews}
           </div>
           {totalReviews === 0 && (
             <div className="mt-1 text-xs text-muted-foreground/80">
@@ -245,12 +252,9 @@ export function ProductReviewsList({
       {/* Reviews List */}
       {reviews.length > 0 && (
         <div className="space-y-4">
-          {sortedReviews.map((review) => {
+          {reviews.map((review) => {
             const reviewDate = new Date(review.created_at);
-            const userName =
-              review.user_profiles?.full_name ||
-              review.user_profiles?.email?.split("@")[0] ||
-              "Anonymous";
+            const userName = review.user_profiles?.full_name || "Anonymous";
 
             return (
               <Card key={review.id} className="border-accent-primary/20">
@@ -295,7 +299,7 @@ export function ProductReviewsList({
 
       {!hasMore && totalReviews > 0 && reviews.length > 5 && (
         <p className="text-center text-xs text-muted-foreground py-2">
-          Ai ajuns la finalul recenziilor.
+          {t.endOfReviews}
         </p>
       )}
     </div>

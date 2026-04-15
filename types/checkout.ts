@@ -47,6 +47,8 @@ export interface OrderItemProps {
  */
 export interface StripePaymentFormProps {
   clientSecret: string;
+  /** Used for Stripe `return_url` after redirect-based payment methods (e.g. 3DS). */
+  orderId: string;
   onPaymentSuccess: (paymentIntentId: string) => void;
   onPaymentError: (error: string) => void;
   isSubmitting?: boolean;
@@ -57,6 +59,7 @@ export interface StripePaymentFormProps {
  */
 export interface StripePaymentWrapperProps {
   clientSecret: string;
+  orderId: string;
   onPaymentSuccess: (paymentIntentId: string) => void;
   onPaymentError: (error: string) => void;
   isSubmitting?: boolean;

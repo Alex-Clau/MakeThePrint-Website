@@ -14,6 +14,7 @@ import { messages } from "@/lib/messages";
 
 export function StripePaymentForm({
   clientSecret,
+  orderId,
   onPaymentSuccess,
   onPaymentError,
   isSubmitting = false,
@@ -62,7 +63,7 @@ export function StripePaymentForm({
     const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${window.location.origin}/checkout/confirmation`,
+        return_url: `${window.location.origin}/checkout/confirmation/${orderId}`,
       },
       redirect: "if_required",
     });

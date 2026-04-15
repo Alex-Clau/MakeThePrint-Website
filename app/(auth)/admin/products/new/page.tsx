@@ -3,7 +3,7 @@ import { messages } from "@/lib/messages";
 import type { NewProductPageProps } from "@/types/admin";
 
 async function NewProductContent({ type }: { type?: string }) {
-  const productType = type;
+  const productType = type === "custom" || type === "seasonal" ? type : undefined;
   const t = messages.admin;
   const subtitle =
     productType === "custom"
@@ -17,7 +17,7 @@ async function NewProductContent({ type }: { type?: string }) {
         <p className="text-muted-foreground mt-1">{subtitle}</p>
       </div>
 
-      <AdminProductForm initialType={productType as "custom" | "seasonal"} />
+      <AdminProductForm initialType={productType ?? "seasonal"} />
     </div>
   );
 }

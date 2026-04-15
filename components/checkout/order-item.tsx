@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { OrderItemProps } from "@/types/checkout";
 import { getProductDisplayName } from "@/lib/utils/products";
+import { getCartLineTotal } from "@/lib/cart/pricing";
 
 export function OrderItem({ item }: OrderItemProps) {
   const product = item.products;
@@ -13,10 +14,7 @@ export function OrderItem({ item }: OrderItemProps) {
     product?.images && product.images.length > 0
       ? product.images[0]
       : "https://via.placeholder.com/64";
-  const lineTotal =
-    item.customizations?.totalPrice != null
-      ? item.customizations.totalPrice * item.quantity
-      : (product?.price || 0) * item.quantity;
+  const lineTotal = getCartLineTotal(item);
 
   return (
     <div className="flex gap-3">

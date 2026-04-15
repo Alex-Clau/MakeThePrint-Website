@@ -1,18 +1,19 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import { Sparkles, Mail, MessageCircle } from "lucide-react";
 import { messages } from "@/lib/messages";
 
 export function CustomPrintingSection() {
   const t = messages.home;
+  const phoneDigits = process.env.NEXT_PUBLIC_WHATSAPP_PHONE?.replace(/\D/g, "") ?? "";
+  const waHref = `https://wa.me/${phoneDigits}`;
+
   return (
     <section className="mx-3 py-12 sm:py-16 lg:py-24 bg-gradient-to-br from-accent-primary-light/10 via-background to-accent-primary-light/5 border-t border-accent-primary/30">
       <div className="max-w-4xl mx-auto px-5 sm:px-4 lg:px-8">
         <div className="text-center mb-8 sm:mb-12">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Sparkles className="h-6 w-6 text-accent-primary-dark" />
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-accent-primary-dark">
+          <div className="mb-4 flex flex-col items-center gap-2 sm:flex-row sm:justify-center sm:gap-3 sm:items-start">
+            <Sparkles className="h-6 w-6 shrink-0 text-accent-primary-dark sm:mt-1.5" aria-hidden />
+            <h2 className="max-w-full text-balance text-center text-2xl font-bold text-accent-primary-dark sm:text-left sm:text-3xl lg:text-4xl">
               {t.customTitle}
             </h2>
           </div>
@@ -55,16 +56,16 @@ export function CustomPrintingSection() {
                   {t.whatsapp}
                 </h3>
                 <p className="text-sm text-muted-foreground mb-4">{t.whatsappDesc}</p>
-                <Button
-                  asChild
-                  variant="outline"
-                  className="border-accent-primary-dark/30 hover:bg-accent-primary/10 w-full sm:w-auto"
-                >
-                  <a href="https://wa.me/1234567890" target="_blank" rel="noopener noreferrer">
-                    {t.messageOnWhatsApp}
-                    <MessageCircle className="ml-2 h-4 w-4" />
-                  </a>
-                </Button>
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="border-accent-primary-dark/30 hover:bg-accent-primary/10 w-full sm:w-auto"
+                  >
+                    <a href={waHref} target="_blank" rel="noopener noreferrer">
+                      {t.messageOnWhatsApp}
+                      <MessageCircle className="ml-2 h-4 w-4" />
+                    </a>
+                  </Button>
               </div>
             </div>
           </div>
@@ -77,4 +78,3 @@ export function CustomPrintingSection() {
     </section>
   );
 }
-

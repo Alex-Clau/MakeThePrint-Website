@@ -6,6 +6,7 @@ import { OrderItemsList } from "@/components/order/order-items-list";
 import { OrderShippingInfo } from "@/components/order/order-shipping-info";
 import { OrderStatusForm } from "./order-status-form";
 import type { AdminOrderDetailPageProps } from "@/types/admin";
+import type { OrderShippingAddress } from "@/types/order";
 
 export default async function AdminOrderDetailPage({
   params,
@@ -19,7 +20,7 @@ export default async function AdminOrderDetailPage({
     notFound();
   }
 
-  const addr = (order.shipping_address as Record<string, unknown>) || {};
+  const addr = (order.shipping_address ?? {}) as OrderShippingAddress;
 
   return (
     <div className="space-y-6">
@@ -47,17 +48,7 @@ export default async function AdminOrderDetailPage({
             </div>
             <div>
               <OrderShippingInfo
-                shippingAddress={{
-                  firstName: addr.firstName,
-                  lastName: addr.lastName,
-                  email: addr.email,
-                  address: addr.address,
-                  city: addr.city,
-                  state: addr.state,
-                  zip: addr.zip,
-                  country: addr.country,
-                  phone: addr.phone,
-                }}
+                shippingAddress={addr}
                 trackingNumber={order.tracking_number ?? undefined}
               />
             </div>

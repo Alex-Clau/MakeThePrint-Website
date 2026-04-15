@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { TextPreviewProps } from "@/types/product-components";
 import { messages } from "@/lib/messages";
 
-// Map font names to CSS font families
 const getFontFamily = (fontName: string) => {
   const fontMap: Record<string, string> = {
     Tinos: '"Tinos", serif',
@@ -16,19 +15,16 @@ const getFontFamily = (fontName: string) => {
   return fontMap[fontName] || `"${fontName}", serif`;
 };
 
-// Parse admin-defined size label (e.g. "10cm", "20") to number for display
 const parseSizeToCm = (sizeLabel: string): number => {
   const match = sizeLabel.match(/\d+(\.\d+)?/);
   return match ? parseFloat(match[0]) : 20;
 };
 
-// Convert CM to CSS font size
 const getFontSize = (sizeCm: number) => {
   const pixels = sizeCm * 3.78;
   return `${pixels}px`;
 };
 
-// Map color name to hex value
 const getColorValue = (color: string) => {
   const colorMap: Record<string, string> = {
     white: "#ffffff",
@@ -41,12 +37,21 @@ const getColorValue = (color: string) => {
   return colorMap[color] || color;
 };
 
-const MAX_TEXT_LENGTH = 50; // Default maximum characters
+/** Aligns with practical wall-letter orders; adjust if product rules change. */
+const MAX_TEXT_LENGTH = 200;
 
-export function TextPreview({ text, font, color, size, maxLength = MAX_TEXT_LENGTH, onTextChange }: TextPreviewProps) {
+export function TextPreview({
+  text,
+  font,
+  color,
+  size,
+  maxLength = MAX_TEXT_LENGTH,
+  onTextChange,
+  padding = "default",
+  inputId,
+}: TextPreviewProps) {
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-resize textarea to fit content
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.style.height = "auto";
@@ -62,18 +67,30 @@ export function TextPreview({ text, font, color, size, maxLength = MAX_TEXT_LENG
   const remainingChars = maxLength - text.length;
   const isNearLimit = remainingChars <= 10;
 
+  const contentPad =
+    padding === "compact"
+      ? "px-2 py-4 sm:px-3 sm:py-5"
+      : "p-6 sm:p-8 lg:p-12";
+  const blockGap = padding === "compact" ? "space-y-2" : "space-y-3";
+  const metaRowPt = "pt-2";
+  const metaGap =
+    padding === "compact" ? "gap-2 sm:gap-2.5" : "gap-3 sm:gap-4";
+
   return (
-    <Card className={`border-accent-primary/30 bg-card/50 ${isEditable ? 'cursor-text' : ''}`}>
-      <CardContent className="p-6 sm:p-8 lg:p-12">
-        <div className="text-center space-y-3">
+    <Card
+      className={`border-accent-primary/30 bg-card/50 ${padding === "compact" ? "shadow-none" : ""} ${isEditable ? "cursor-text" : ""}`}
+    >
+      <CardContent className={contentPad}>
+        <div className={`text-center ${blockGap}`}>
           {isEditable ? (
             <textarea
               ref={inputRef}
+              id={inputId}
               value={text}
               onChange={(e) => onTextChange(e.target.value)}
               placeholder={messages.product.enterYourText}
               maxLength={maxLength}
-              className="w-full bg-transparent border-none outline-none resize-none text-center font-bold placeholder:text-muted-foreground/50"
+              className={`w-full bg-transparent border-none outline-none resize-none text-center font-bold placeholder:text-muted-foreground/50 leading-tight ${padding === "compact" ? "py-1" : ""}`}
               style={{
                 fontFamily,
                 color: text ? colorValue : undefined,
@@ -85,7 +102,7 @@ export function TextPreview({ text, font, color, size, maxLength = MAX_TEXT_LENG
             />
           ) : (
             <p
-              className="font-bold break-words mx-auto"
+              className="font-bold break-words mx-auto min-h-[1.2em]"
               style={{
                 fontFamily,
                 color: colorValue,
@@ -96,7 +113,9 @@ export function TextPreview({ text, font, color, size, maxLength = MAX_TEXT_LENG
               {text || messages.product.enterYourText}
             </p>
           )}
-          <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground pt-2 border-t border-accent-primary/10">
+          <div
+            className={`flex items-center justify-center ${metaGap} text-xs text-muted-foreground ${metaRowPt} border-t border-accent-primary/10 flex-wrap ${padding === "compact" ? "leading-tight" : ""}`}
+          >
             {isEditable && (
               <>
                 <span className={isNearLimit ? "text-yellow-500 font-medium" : ""}>
@@ -105,11 +124,11 @@ export function TextPreview({ text, font, color, size, maxLength = MAX_TEXT_LENG
                 <span>•</span>
               </>
             )}
-            <span>{messages.product.fontLabel} {font}</span>
+            <span>{messages.product.fontLabel} {font || "—"}</span>
             <span>•</span>
-            <span>{messages.product.colorLabel} {color}</span>
+            <span>{messages.product.colorLabel} {color || "—"}</span>
             <span>•</span>
-            <span>{messages.product.heightLabel} {size}</span>
+            <span>{messages.product.heightLabel} {size || "—"}</span>
           </div>
         </div>
       </CardContent>

@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe/server";
 import { createClient } from "@/lib/supabase/server";
-import { setOrderPaid, getOrderForPayment } from "@/lib/supabase/orders";
-import { clearCart } from "@/lib/supabase/cart";
-import { sendOrderConfirmationEmails } from "@/lib/email/send-order-confirmation";
+import { finalizePaidOrderFromPaymentIntent } from "@/lib/orders/finalize-paid-from-intent";
 import { apiErrorResponse, normalizeToApiError } from "@/lib/utils/api-error";
 
 export async function POST(request: NextRequest) {
@@ -21,45 +19,35 @@ export async function POST(request: NextRequest) {
     const { orderId, paymentIntentId } = body;
 
     if (!orderId || !paymentIntentId) {
-      return NextResponse.json(
-        { error: "orderId and paymentIntentId required" },
-        { status: 400 }
-      );
+      return apiErrorResponse("orderId and paymentIntentId required", 400, "BAD_REQUEST");
     }
 
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
 
     if (paymentIntent.status !== "succeeded") {
-      return NextResponse.json(
-        { error: "Payment has not succeeded" },
-        { status: 400 }
-      );
+      return apiErrorResponse("Payment has not succeeded", 400, "BAD_REQUEST");
     }
 
-    if (paymentIntent.metadata.userId !== user.id) {
-      return NextResponse.json(
-        { error: "Payment intent does not belong to user" },
-        { status: 403 }
-      );
+    const outcome = await finalizePaidOrderFromPaymentIntent(paymentIntent, {
+      sessionUserId: user.id,
+      sessionOrderId: orderId,
+    });
+
+    if (outcome.kind === "reject") {
+      const code =
+        outcome.httpStatus === 403
+          ? "FORBIDDEN"
+          : outcome.httpStatus === 409
+            ? "CONFLICT"
+            : outcome.httpStatus === 404
+              ? "NOT_FOUND"
+              : outcome.httpStatus === 400
+                ? "BAD_REQUEST"
+                : undefined;
+      return apiErrorResponse(outcome.error, outcome.httpStatus, code);
     }
 
-    if (paymentIntent.metadata.orderId !== orderId) {
-      return NextResponse.json(
-        { error: "Payment intent does not match order" },
-        { status: 403 }
-      );
-    }
-
-    const order = await getOrderForPayment(orderId, user.id);
-    if (order.payment_status === "paid") {
-      return NextResponse.json({ orderId, alreadyPaid: true });
-    }
-
-    await setOrderPaid(orderId, user.id, paymentIntentId);
-    await clearCart(user.id);
-    await sendOrderConfirmationEmails(orderId);
-
-    return NextResponse.json({ orderId });
+    return NextResponse.json({ orderId, alreadyPaid: outcome.alreadyPaid });
   } catch (err) {
     const { message } = normalizeToApiError(err);
     const isNotFound = message === "Order not found";

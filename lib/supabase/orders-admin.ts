@@ -1,11 +1,24 @@
+import type { AdminOrderStatus } from "@/lib/constants/admin-order-status";
 import { createAdminClient } from "./admin";
 
-/**
- * Admin-only: get all orders (for admin dashboard).
- */
-export async function getAllOrdersAdmin() {
+type AdminOrderListItem = {
+  id: string;
+  created_at: string;
+  status: string;
+  payment_status: string;
+  total_amount: number;
+  tracking_number: string | null;
+  shipping_address: Record<string, unknown> | null;
+};
+
+export async function getAdminOrdersPage(params: {
+  page: number;
+  pageSize: number;
+}): Promise<{ orders: AdminOrderListItem[]; hasMore: boolean }> {
   const supabase = createAdminClient();
-  const { data, error } = await supabase
+  const from = (params.page - 1) * params.pageSize;
+  const to = from + params.pageSize - 1;
+  const { data, error, count } = await supabase
     .from("orders")
     .select(
       `
@@ -16,12 +29,17 @@ export async function getAllOrdersAdmin() {
       total_amount,
       tracking_number,
       shipping_address
-    `
+    `,
+      { count: "exact" }
     )
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(from, to);
 
   if (error) throw error;
-  return data ?? [];
+
+  const total = count ?? data?.length ?? 0;
+  const hasMore = total ? to + 1 < total : (data?.length ?? 0) === params.pageSize;
+  return { orders: (data ?? []) as AdminOrderListItem[], hasMore };
 }
 
 /**
@@ -57,7 +75,7 @@ export async function getOrderByIdAdmin(orderId: string) {
  */
 export async function updateOrderStatusAdmin(
   orderId: string,
-  status: string,
+  status: AdminOrderStatus,
   trackingNumber?: string | null
 ) {
   const supabase = createAdminClient();
@@ -100,4 +118,23 @@ export async function setOrderPaidAdmin(
     .eq("user_id", userId);
 
   if (error) throw error;
+}
+
+/**
+ * Admin-only: get payment state for one order/user pair.
+ */
+export async function getOrderPaymentStateAdmin(orderId: string, userId: string) {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("orders")
+    .select("id, total_amount, payment_status, payment_intent_id")
+    .eq("id", orderId)
+    .eq("user_id", userId)
+    .single();
+
+  if (error || !data) {
+    throw new Error("Order not found");
+  }
+
+  return data;
 }

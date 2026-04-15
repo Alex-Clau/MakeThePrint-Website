@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ProductDetailForm } from "@/components/product/product-detail-form";
 import { ProductImageGallery } from "@/components/product/product-image-gallery";
 import { AnimatedProductPageContentProps } from "@/types/components";
-import { getProductDisplayName } from "@/lib/utils/products";
+import { getProductDisplayName, isPresetLettersConfig } from "@/lib/utils/products";
 
 export function AnimatedProductPageContent({
   product,
@@ -14,7 +14,10 @@ export function AnimatedProductPageContent({
 }: AnimatedProductPageContentProps) {
   const displayName = getProductDisplayName(product);
   const isPreset = product.category === "preset";
-  const customConfig = isPreset && product.custom_config && "fonts" in product.custom_config ? product.custom_config : null;
+  const customConfig =
+    isPreset && isPresetLettersConfig(product.custom_config)
+      ? product.custom_config
+      : null;
   const [preview, setPreview] = useState<{
     text: string;
     font: string;
@@ -34,30 +37,23 @@ export function AnimatedProductPageContent({
     : [];
 
   return (
-    <div className="space-y-10 sm:space-y-12 relative z-10">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-10 items-start relative">
-        {/* Left Side - Product Image Gallery */}
-        <div className="relative flex items-center justify-start group">
-          <div className="w-full">
-            <ProductImageGallery
-              images={allImages.length > 1 ? allImages.slice(1) : []}
-              alt={displayName}
-              defaultImage={allImages[0] || undefined}
-            />
-          </div>
-        </div>
-
-        {/* Right Side - Product Info */}
-        <div>
-          <ProductDetailForm
-            product={product}
-            previewText={preview.text}
-            onPreviewChange={setPreview}
-            averageRating={averageRating}
-            totalReviews={totalReviews}
-            isInWishlist={isInWishlist}
+    <div className="relative z-10 space-y-10 sm:space-y-12">
+      <div className="relative grid grid-cols-1 items-start gap-6 sm:gap-8 lg:grid-cols-2 lg:gap-10">
+        <div className="group relative flex w-full flex-col items-stretch justify-start">
+          <ProductImageGallery
+            images={allImages.length > 1 ? allImages.slice(1) : []}
+            alt={displayName}
+            defaultImage={allImages[0] || undefined}
           />
         </div>
+        <ProductDetailForm
+          product={product}
+          previewText={preview.text}
+          onPreviewChange={setPreview}
+          averageRating={averageRating}
+          totalReviews={totalReviews}
+          isInWishlist={isInWishlist}
+        />
       </div>
     </div>
   );

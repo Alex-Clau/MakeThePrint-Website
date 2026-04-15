@@ -7,11 +7,11 @@ export interface IdRouteParams {
   params: Promise<{ id: string }>;
 }
 
-export interface ProductPageParams extends IdRouteParams {}
+export type ProductPageParams = IdRouteParams;
 
 /** Account order detail page. */
-export interface OrderDetailPageParams extends IdRouteParams {}
+export type OrderDetailPageParams = IdRouteParams;
 
 /** Checkout confirmation page. */
-export interface OrderConfirmationParams extends IdRouteParams {}
+export type OrderConfirmationParams = IdRouteParams;
 

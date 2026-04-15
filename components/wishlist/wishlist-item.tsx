@@ -13,9 +13,7 @@ export function WishlistItem({ product, onRemove }: WishlistItemProps) {
   const displayName = getProductDisplayName(product);
   const w = messages.wishlist;
   const imageUrl =
-    product.images && product.images.length > 0
-      ? product.images[0]
-      : "https://via.placeholder.com/400";
+    product.images && product.images.length > 0 ? product.images[0] : "/package.png";
   return (
     <Card className="group overflow-hidden hover:shadow-lg transition-all">
       <Link href={`/products/${product.id}`}>
@@ -41,7 +39,7 @@ export function WishlistItem({ product, onRemove }: WishlistItemProps) {
         <Button
           variant="outline"
           className="flex-1 h-10 sm:h-10 text-xs sm:text-sm"
-          onClick={() => onRemove(product.id)}
+          onClick={() => onRemove(product.id, displayName)}
         >
           <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
           {w.remove}

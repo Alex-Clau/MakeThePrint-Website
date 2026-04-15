@@ -5,10 +5,9 @@ import type { Review } from "@/types/product-components";
 /** Resolve user_profiles from Supabase join (PostgREST many-to-one returns object, not array) */
 function resolveUserProfiles(raw: unknown): Review["user_profiles"] {
   if (!raw || typeof raw !== "object") return undefined;
-  const p = raw as { full_name?: string; email?: string };
+  const p = raw as { full_name?: string };
   return {
     full_name: p.full_name ?? undefined,
-    email: p.email ?? undefined,
   };
 }
 
@@ -103,8 +102,7 @@ export async function getProductReviewsPaginated(
       updated_at,
       user_profiles (
         id,
-        full_name,
-        email
+        full_name
       )
     `,
       { count: "exact" }
@@ -177,8 +175,7 @@ export async function getUserReview(
       updated_at,
       user_profiles (
         id,
-        full_name,
-        email
+        full_name
       )
     `
     )
@@ -191,105 +188,4 @@ export async function getUserReview(
   return mapReviewRow(data as Record<string, unknown>);
 }
 
-/**
- * Create a product review
- */
-export async function createReview(review: {
-  user_id: string;
-  product_id: string;
-  rating: number;
-  comment?: string;
-}) {
-  const supabase = await createClient();
-
-  // Check if user already reviewed this product
-  const { data: existingReview } = await supabase
-    .from("product_reviews")
-    .select("id")
-    .eq("user_id", review.user_id)
-    .eq("product_id", review.product_id)
-    .maybeSingle();
-
-  if (existingReview) {
-    throw new Error("You have already reviewed this product");
-  }
-
-  // Create review
-  const { data, error } = await supabase
-    .from("product_reviews")
-    .insert(review)
-    .select()
-    .single();
-
-  if (error) {
-    throw handleSupabaseError(error);
-  }
-
-  // Note: Product ratings are now calculated dynamically from reviews
-  // No need to update product columns
-
-  return data;
-}
-
-/**
- * Update a review
- */
-export async function updateReview(
-  reviewId: string,
-  userId: string,
-  updates: {
-    rating?: number;
-    comment?: string;
-  }
-) {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("product_reviews")
-    .update({
-      ...updates,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", reviewId)
-    .eq("user_id", userId)
-    .select()
-    .single();
-
-  if (error) {
-    throw handleSupabaseError(error);
-  }
-
-  // Note: Product ratings are now calculated dynamically from reviews
-  // No need to update product columns
-
-  return data;
-}
-
-/**
- * Delete a review
- */
-export async function deleteReview(reviewId: string, userId: string) {
-  const supabase = await createClient();
-
-  // Get product_id before deleting
-  const { data: review } = await supabase
-    .from("product_reviews")
-    .select("product_id")
-    .eq("id", reviewId)
-    .single();
-
-  const { error } = await supabase
-    .from("product_reviews")
-    .delete()
-    .eq("id", reviewId)
-    .eq("user_id", userId);
-
-  if (error) {
-    throw handleSupabaseError(error);
-  }
-
-  // Note: Product ratings are now calculated dynamically from reviews
-  // No need to update product columns
-
-  return { success: true };
-}
 

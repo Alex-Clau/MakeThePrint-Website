@@ -1,9 +1,23 @@
 import { NextResponse } from "next/server";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { PRODUCT_IMAGE_UPLOAD_MAX_BYTES } from "@/lib/constants/product-image-upload";
 
-const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
 const BUCKET_NAME = "product-images";
+
+function extensionForImageMime(mime: string): string {
+  const map: Record<string, string> = {
+    "image/jpeg": "jpg",
+    "image/jpg": "jpg",
+    "image/pjpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+    "image/gif": "gif",
+    "image/svg+xml": "svg",
+    "image/bmp": "bmp",
+  };
+  return map[mime.toLowerCase()] ?? "img";
+}
 
 export async function POST(request: Request) {
   try {
@@ -51,9 +65,10 @@ export async function POST(request: Request) {
       );
     }
 
-    if (file.size > MAX_FILE_SIZE_BYTES) {
+    if (file.size > PRODUCT_IMAGE_UPLOAD_MAX_BYTES) {
+      const mb = PRODUCT_IMAGE_UPLOAD_MAX_BYTES / (1024 * 1024);
       return NextResponse.json(
-        { error: "Fișierul este prea mare. Dimensiunea maximă acceptată este 10MB." },
+        { error: `Fișierul este prea mare. Dimensiunea maximă acceptată este ${mb}MB.` },
         { status: 400 },
       );
     }
@@ -68,15 +83,16 @@ export async function POST(request: Request) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    const ext = "webp";
+    const ext = extensionForImageMime(file.type);
     const safeName = filename
       .toLowerCase()
       .replace(/[^a-z0-9\-_.]/g, "-")
-      .replace(/-+/g, "-");
+      .replace(/-+/g, "-")
+      .replace(/\.(jpe?g|png|gif|webp|svg|bmp|ico)$/i, "");
 
     const path = `products/${Date.now()}-${Math.random()
       .toString(36)
-      .slice(2, 10)}-${safeName}.${ext}`;
+      .slice(2, 10)}-${safeName || "image"}.${ext}`;
 
     const adminClient = createAdminClient();
     const { error: uploadError } = await adminClient.storage

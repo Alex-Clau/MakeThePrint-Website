@@ -9,26 +9,34 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { Mail, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { messages } from "@/lib/messages";
+import { SIGNUP_EMAIL_SESSION_KEY } from "@/lib/auth/client-helpers";
 
 export default function Page() {
   const t = messages.auth;
   const [resent, setResent] = useState(false);
   const [isResending, setIsResending] = useState(false);
-  
-  // Get email from URL params
-  const [email] = useState(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      return params.get("email") || "";
+  const [email, setEmail] = useState("");
+
+  useLayoutEffect(() => {
+    try {
+      const fromSession = sessionStorage.getItem(SIGNUP_EMAIL_SESSION_KEY);
+      if (fromSession) {
+        setEmail(fromSession);
+        sessionStorage.removeItem(SIGNUP_EMAIL_SESSION_KEY);
+        return;
+      }
+    } catch {
+      // ignore
     }
-    return "";
-  });
+    const fromUrl = new URLSearchParams(window.location.search).get("email");
+    if (fromUrl) setEmail(fromUrl);
+  }, []);
 
   const handleResendEmail = async () => {
     if (!email) return;

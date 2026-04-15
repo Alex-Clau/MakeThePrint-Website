@@ -25,7 +25,7 @@ export function NavigationMobileMenu() {
           variant="ghost"
           size="icon"
           className="md:hidden h-10 w-10 touch-manipulation"
-          aria-label="Toggle menu"
+          aria-label={n.openMenu}
         >
           <Menu className="h-5 w-5" />
         </Button>

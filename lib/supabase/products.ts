@@ -1,5 +1,6 @@
 import { createClient } from "./server";
-import { Product } from "@/types/product";
+import type { CustomProductConfig, KeychainConfig, Product } from "@/types/product";
+import { normalizeCatalogSearchInput } from "@/lib/utils/catalog-search";
 import { handleSupabaseError } from "../utils/supabase-errors";
 
 /**
@@ -31,10 +32,9 @@ export async function getProducts(options?: {
     }
   }
 
-  if (options?.search) {
-    query = query.or(
-      `name.ilike.%${options.search}%,description.ilike.%${options.search}%`
-    );
+  const searchTerm = normalizeCatalogSearchInput(options?.search);
+  if (searchTerm) {
+    query = query.ilike("name", `%${searchTerm}%`);
   }
 
   if (options?.limit) {
@@ -65,23 +65,31 @@ export async function getPublicCustomProducts() {
 export async function getPublicCustomProductsPage({
   page,
   pageSize,
+  search,
 }: {
   page: number;
   pageSize: number;
+  search?: string;
 }): Promise<{ products: Product[]; hasMore: boolean; total: number }> {
   const supabase = await createClient();
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
-  const { data, error, count } = await supabase
+  let query = supabase
     .from("products")
     .select(
       "id, name, description, price, product_type, category, custom_config, featured, images, created_at, updated_at",
       { count: "exact" },
     )
     .eq("product_type", "custom")
-    .order("created_at", { ascending: false })
-    .range(from, to);
+    .order("created_at", { ascending: false });
+
+  const term = normalizeCatalogSearchInput(search);
+  if (term) {
+    query = query.ilike("name", `%${term}%`);
+  }
+
+  const { data, error, count } = await query.range(from, to);
 
   if (error) {
     throw handleSupabaseError(error);
@@ -97,65 +105,98 @@ export async function getPublicCustomProductsPage({
   };
 }
 
-export async function getPublicSeasonalProducts(limit = 12) {
-  return getProducts({ product_type: "seasonal", limit });
+export async function getPublicSeasonalProductsPage({
+  page,
+  pageSize,
+  search,
+}: {
+  page: number;
+  pageSize: number;
+  search?: string;
+}): Promise<{ products: Product[]; hasMore: boolean; total: number }> {
+  const supabase = await createClient();
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  let query = supabase
+    .from("products")
+    .select(
+      "id, name, description, price, product_type, category, custom_config, featured, images, created_at, updated_at",
+      { count: "exact" }
+    )
+    .eq("product_type", "seasonal")
+    .order("created_at", { ascending: false });
+
+  const term = normalizeCatalogSearchInput(search);
+  if (term) {
+    query = query.ilike("name", `%${term}%`);
+  }
+
+  const { data, error, count } = await query.range(from, to);
+  if (error) {
+    throw handleSupabaseError(error);
+  }
+
+  const total = count ?? data?.length ?? 0;
+  const hasMore = total ? to + 1 < total : (data?.length ?? 0) === pageSize;
+
+  return {
+    products: (data ?? []) as Product[],
+    hasMore,
+    total,
+  };
 }
 
 export async function getPublicFeaturedProducts(limit = 8) {
   return getProducts({ featured: true, limit });
 }
 
-type HomepageFeaturedProduct = Pick<
-  Product,
-  "id" | "name" | "price" | "category" | "featured" | "images"
->;
-
-export async function getHomepageFeaturedProducts(
-  limit = 8,
-): Promise<HomepageFeaturedProduct[]> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("products")
-    .select("id, name, price, category, featured, images")
-    .eq("featured", true)
-    .order("created_at", { ascending: false })
-    .limit(limit);
-
-  if (error) {
-    throw handleSupabaseError(error);
-  }
-
-  return (data ?? []) as HomepageFeaturedProduct[];
-}
-
 /**
- * Get products for admin list with optional type/category filters.
- * Throws on error (same as getProducts, getProductById, etc.).
+ * Paginated admin catalog (same columns/filters as legacy list, for infinite scroll).
  */
-export async function getAdminProducts(filters?: {
+export async function getAdminProductsPage(params: {
+  page: number;
+  pageSize: number;
   type?: string;
   category?: string;
-}): Promise<Product[]> {
+  search?: string;
+}): Promise<{ products: Product[]; hasMore: boolean }> {
   const supabase = await createClient();
+  const { page, pageSize, type, category, search } = params;
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
   let query = supabase
     .from("products")
     .select(
-      "id, name, description, price, images, featured, created_at, product_type, category"
+      "id, name, description, price, images, featured, created_at, product_type, category",
+      { count: "exact" }
     )
     .order("created_at", { ascending: false });
 
-  if (filters?.type) {
-    query = query.eq("product_type", filters.type);
+  if (type) {
+    query = query.eq("product_type", type);
   }
-  if (filters?.category) {
-    query = query.eq("category", filters.category);
+  if (category) {
+    query = query.eq("category", category);
+  }
+  const term = normalizeCatalogSearchInput(search);
+  if (term) {
+    query = query.ilike("name", `%${term}%`);
   }
 
-  const { data, error } = await query;
+  const { data, error, count } = await query.range(from, to);
   if (error) {
     throw handleSupabaseError(error);
   }
-  return (data ?? []) as Product[];
+
+  const total = count ?? 0;
+  const hasMore = total ? to + 1 < total : (data?.length ?? 0) === pageSize;
+
+  return {
+    products: (data ?? []) as Product[],
+    hasMore,
+  };
 }
 
 /**
@@ -188,7 +229,7 @@ export async function createProduct(product: {
   featured?: boolean;
   product_type?: "custom" | "seasonal";
   category?: string;
-  custom_config?: Record<string, any>;
+  custom_config?: CustomProductConfig | KeychainConfig;
 }) {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -221,7 +262,7 @@ export async function updateProduct(
     featured: boolean;
     product_type?: "custom" | "seasonal";
     category?: string;
-    custom_config?: Record<string, any>;
+    custom_config?: CustomProductConfig | KeychainConfig;
   }>
 ) {
   const supabase = await createClient();

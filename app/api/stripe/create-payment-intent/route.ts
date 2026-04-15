@@ -16,44 +16,39 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { currency = "ron", metadata = {}, orderId } = body;
+    const { orderId } = body;
 
     if (!orderId || typeof orderId !== "string") {
-      return NextResponse.json(
-        { error: "orderId is required for payment" },
-        { status: 400 }
-      );
+      return apiErrorResponse("orderId is required for payment", 400, "BAD_REQUEST");
     }
 
     let order: { id: string; total_amount: number; payment_status: string };
     try {
       order = await getOrderForPayment(orderId, user.id);
-    } catch {
-      return apiErrorResponse("Order not found", 404, "NOT_FOUND");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "";
+      if (msg === "Order not found") {
+        return apiErrorResponse("Order not found", 404, "NOT_FOUND");
+      }
+      const { message } = normalizeToApiError(err);
+      return apiErrorResponse(message, 500);
     }
 
     if (order.payment_status === "paid") {
-      return NextResponse.json(
-        { error: "Order already paid" },
-        { status: 400 }
-      );
+      return apiErrorResponse("Order already paid", 400, "ORDER_ALREADY_PAID");
     }
 
     const amount = Number(order.total_amount);
     if (!amount || amount <= 0) {
-      return NextResponse.json(
-        { error: "Invalid order amount" },
-        { status: 400 }
-      );
+      return apiErrorResponse("Invalid order amount", 400, "BAD_REQUEST");
     }
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(amount * 100),
-      currency,
+      currency: "ron",
       metadata: {
         userId: user.id,
         orderId,
-        ...metadata,
       },
       automatic_payment_methods: {
         enabled: true,

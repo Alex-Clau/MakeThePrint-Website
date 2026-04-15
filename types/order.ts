@@ -9,7 +9,14 @@ export interface Order {
   shipping_address: OrderShippingAddress;
   created_at: string;
   order_items: OrderItem[];
-};
+  tracking_number?: string | null;
+  /** Order lifecycle (e.g. pending, confirmed). */
+  status?: string;
+  /** Set when Stripe payment succeeded and order marked paid (Supabase). */
+  payment_status?: string;
+  /** Set after buyer confirmation email is accepted by Resend (Supabase). */
+  confirmation_email_sent_at?: string | null;
+}
 
 export interface OrderItem {
   id: string;
@@ -17,11 +24,12 @@ export interface OrderItem {
   price: number;
   material?: string;
   customizations?: Record<string, unknown>;
+  /** Null when the product row was removed but the line item is kept. */
   products: {
     id: string;
     name: string;
     images?: string[];
-  };
+  } | null;
 }
 
 /**
@@ -39,13 +47,15 @@ export interface OrderDetailHeaderProps {
   status: string;
   createdAt: string;
   totalAmount: number;
+  /** Sum of line totals (price × quantity); shipping = total − subtotal. */
+  subtotal: number;
 }
 
 /**
  * Order Shipping Info component props
  */
 export interface OrderShippingInfoProps {
-  shippingAddress: Record<string, any>;
+  shippingAddress: OrderShippingAddress;
   trackingNumber?: string;
 }
 

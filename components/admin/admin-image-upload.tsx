@@ -8,6 +8,7 @@ import Image from "next/image";
 import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { messages } from "@/lib/messages";
+import { PRODUCT_IMAGE_UPLOAD_MAX_BYTES } from "@/lib/constants/product-image-upload";
 
 interface AdminImageUploadProps {
   images: string[];
@@ -24,9 +25,8 @@ export function AdminImageUpload({
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Upload original image file to Supabase Storage via API.
-  // Resolves with the public URL string returned by the API.
-  const compressImage = async (file: File): Promise<string> => {
+  /** Upload image bytes via authenticated admin API; returns public URL. */
+  const uploadProductImage = useCallback(async (file: File): Promise<string> => {
     const formData = new FormData();
     const filename = file.name || "image";
 
@@ -57,9 +57,9 @@ export function AdminImageUpload({
     }
 
     return data.url;
-  };
+  }, []);
 
-  const handleFiles = async (files: FileList | null) => {
+  const handleFiles = useCallback(async (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
     if (images.length + files.length > maxImages) {
@@ -81,15 +81,14 @@ export function AdminImageUpload({
           continue;
         }
 
-        // Validate file size (max 1MB per imagine)
-        if (file.size > 1 * 1024 * 1024) {
+        if (file.size > PRODUCT_IMAGE_UPLOAD_MAX_BYTES) {
           toast.error(messages.admin.tooLarge.replace("{name}", file.name));
           continue;
         }
 
         try {
-          const compressedImage = await compressImage(file);
-          newImages.push(compressedImage);
+          const url = await uploadProductImage(file);
+          newImages.push(url);
         } catch (error: unknown) {
           toast.error(getUserFriendlyError(error) || messages.admin.failedToProcess.replace("{name}", file.name));
         }
@@ -107,7 +106,7 @@ export function AdminImageUpload({
         fileInputRef.current.value = "";
       }
     }
-  };
+  }, [images, maxImages, onChange, uploadProductImage]);
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -126,10 +125,10 @@ export function AdminImageUpload({
       setDragActive(false);
 
       if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        handleFiles(e.dataTransfer.files);
+        void handleFiles(e.dataTransfer.files);
       }
     },
-    [images, maxImages]
+    [handleFiles]
   );
 
   const handleRemove = (index: number) => {
@@ -200,6 +199,7 @@ export function AdminImageUpload({
                   alt={`Product image ${index + 1}`}
                   fill
                   className="object-cover"
+                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
                 />
                 {index === 0 && (
                   <div className="absolute top-2 left-2 bg-accent-primary text-white text-xs px-2 py-1 rounded">

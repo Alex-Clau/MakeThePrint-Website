@@ -1,12 +1,12 @@
-import { redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { PageLayout } from "@/components/layout/page-layout";
 import { getOrderById } from "@/lib/supabase/orders";
 import { getRequiredUser } from "@/lib/supabase/server";
 import { OrderDetailHeader } from "@/components/order/order-detail-header";
 import { OrderItemsList } from "@/components/order/order-items-list";
 import { OrderShippingInfo } from "@/components/order/order-shipping-info";
-import { notFound } from "next/navigation";
 import type { OrderDetailPageParams } from "@/types/pages";
+import type { OrderItem } from "@/types/order";
 
 async function OrderDetailContent({ orderId }: { orderId: string }) {
   const user = await getRequiredUser();
@@ -15,13 +15,17 @@ async function OrderDetailContent({ orderId }: { orderId: string }) {
     notFound();
   }
 
+  const items = (order.order_items ?? []) as OrderItem[];
+  const subtotal = items.reduce((sum, row) => sum + row.price * row.quantity, 0);
+
   return (
     <div className="space-y-6">
       <OrderDetailHeader
         orderId={order.id}
-        status={order.status}
+        status={order.status ?? "pending"}
         createdAt={order.created_at}
         totalAmount={order.total_amount}
+        subtotal={subtotal}
       />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
@@ -50,4 +54,3 @@ export default function OrderDetailPage({ params }: OrderDetailPageParams) {
     </PageLayout>
   );
 }
-

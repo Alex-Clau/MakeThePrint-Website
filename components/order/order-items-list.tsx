@@ -6,20 +6,34 @@ import { OrderItemsListProps } from "@/types/order";
 import { getProductDisplayName } from "@/lib/utils/products";
 import { messages } from "@/lib/messages";
 
+function lineImageSrc(images: string[] | undefined): string {
+  const first = images?.find((u) => typeof u === "string" && u.trim() !== "");
+  return first ?? "/package.png";
+}
+
 export function OrderItemsList({ items }: OrderItemsListProps) {
   const t = messages.account;
+  const c = messages.common;
   return (
     <Card>
       <CardContent className="p-6">
         <h2 className="text-xl font-bold mb-4">{t.orderItems}</h2>
         <div className="space-y-4">
           {items.map((item) => {
-            const displayName = getProductDisplayName(item.products);
+            const rawName = getProductDisplayName(item.products);
+            const displayName = rawName || t.productUnavailable;
+            const showUnavailableStyle = item.products == null || !rawName;
+            const src = lineImageSrc(item.products?.images ?? undefined);
+            const opts = [
+              item.customizations?.isOutdoor === true ? t.optionOutdoor : null,
+              item.customizations?.isLedStrip === true ? t.optionLedStrip : null,
+              item.customizations?.isColor === true ? t.optionColor : null,
+            ].filter(Boolean);
             return (
               <div key={item.id} className="flex flex-col sm:flex-row gap-3 sm:gap-4 pb-4 border-b last:border-0">
                 <div className="relative w-full sm:w-20 h-32 sm:h-20 flex-shrink-0 overflow-hidden rounded-lg border bg-muted">
                   <Image
-                    src="/package.png"
+                    src={src}
                     alt={displayName}
                     fill
                     className="object-cover"
@@ -28,42 +42,47 @@ export function OrderItemsList({ items }: OrderItemsListProps) {
                 </div>
                 <div className="flex-1 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4 min-w-0">
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-base sm:text-lg mb-1 line-clamp-2">
+                    <h3
+                      className={`font-semibold text-base sm:text-lg mb-1 line-clamp-2${
+                        showUnavailableStyle ? " text-muted-foreground" : ""
+                      }`}
+                    >
                       {displayName}
                     </h3>
                     {item.customizations?.text != null && String(item.customizations.text).trim() !== "" && (
                       <p className="text-xs sm:text-sm text-muted-foreground mb-1">
-                        Text: &ldquo;{String(item.customizations.text)}&rdquo;
+                        {t.orderLineText}: &ldquo;{String(item.customizations.text)}&rdquo;
                       </p>
                     )}
                     {item.customizations?.size != null && (
                       <p className="text-xs sm:text-sm text-muted-foreground mb-1">
-                        Size: {String(item.customizations.size)}
-                        {item.customizations.font != null && ` • Font: ${String(item.customizations.font)}`}
-                        {item.customizations.color != null && ` • Color: ${String(item.customizations.color)}`}
+                        {t.orderLineSize}: {String(item.customizations.size)}
+                        {item.customizations.font != null && ` • ${t.orderLineFont}: ${String(item.customizations.font)}`}
+                        {item.customizations.color != null && ` • ${t.orderLineColor}: ${String(item.customizations.color)}`}
                       </p>
                     )}
-                    {((item.customizations?.isOutdoor === true) || (item.customizations?.isLedStrip === true) || (item.customizations?.isColor === true)) && (
+                    {opts.length > 0 && (
                       <p className="text-xs sm:text-sm text-muted-foreground mb-1">
-                        Options: {[item.customizations.isOutdoor && "Outdoor", item.customizations.isLedStrip && "LED strip", item.customizations.isColor && "Color"].filter(Boolean).join(", ")}
+                        {t.orderLineOptions}: {opts.join(", ")}
                       </p>
                     )}
                     {item.material && item.customizations?.text == null && (
                       <p className="text-xs sm:text-sm text-muted-foreground mb-1">
-                        Feature: {item.material}
+                        {t.orderLineFeature}: {item.material}
                       </p>
                     )}
                     <p className="text-xs sm:text-sm text-muted-foreground">
-                      Quantity: {item.quantity}
+                      {t.orderLineQuantity}: {item.quantity}
                     </p>
                   </div>
                   <div className="text-left sm:text-right flex-shrink-0">
                     <p className="font-semibold text-base sm:text-lg">
-                      {(item.price * item.quantity).toFixed(2)} RON
+                      {(item.price * item.quantity).toFixed(2)} {c.ron}
                     </p>
                     {item.quantity > 1 && (
                       <p className="text-xs sm:text-sm text-muted-foreground">
-                        {item.price.toFixed(2)} RON each
+                        {item.price.toFixed(2)} {c.ron}
+                        {t.orderLinePerUnit}
                       </p>
                     )}
                   </div>

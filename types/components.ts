@@ -1,19 +1,7 @@
 import { Product, ProductCardData } from "./product";
 
-/**
- * ProductCard component props
- */
-export interface ProductCardProps {
-  id: string;
-  name: string;
-  price: number;
-  image: string;
-  category?: string;
-  featured?: boolean;
-  rating?: number;
-  review_count?: number;
-  isInWishlist?: boolean;
-}
+/** Same shape as list/grid product data — single source of truth in `types/product`. */
+export type ProductCardProps = ProductCardData;
 
 /**
  * ProductDetailForm component props
@@ -40,14 +28,6 @@ export interface AnimatedProductPageContentProps {
   averageRating?: number;
   totalReviews?: number;
   isInWishlist?: boolean;
-}
-
-/**
- * AnimatedProductImage component props
- */
-export interface AnimatedProductImageProps {
-  src: string;
-  alt: string;
 }
 
 /**

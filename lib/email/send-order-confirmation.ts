@@ -1,33 +1,16 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getResendClient, getFromEmail } from "./resend";
-import { OrderShippingAddress, Order} from "@/types";
-/**
- * Atomically claim "we send the confirmation email" for this order.
- * Returns true if we claimed it (should send), false if already sent.
- * If the confirmation_email_sent_at column is missing, we still return true so email is sent.
- */
-async function claimConfirmationEmailSent(orderId: string): Promise<boolean> {
-  try {
-    const supabase = createAdminClient();
-    const { data, error } = await supabase
-      .from("orders")
-      .update({ confirmation_email_sent_at: new Date().toISOString() })
-      .eq("id", orderId)
-      .is("confirmation_email_sent_at", null)
-      .select("id")
-      .maybeSingle();
+import { OrderShippingAddress, type Order } from "@/types";
 
-    if (error) {
-      return true; // Still try to send (e.g. column not added yet)
-    }
-    if (!data) return false; // Already sent
-    return true;
-  } catch {
-    return true; // Still try to send
-  }
-}
+type FetchOrderForEmailResult =
+  | { status: "not_found" }
+  | { status: "already_sent" }
+  | { status: "ready"; order: Order }
+  | { status: "error"; message: string };
 
-async function fetchOrderForEmail(orderId: string): Promise<Order | null> {
+async function fetchOrderForConfirmationEmail(
+  orderId: string
+): Promise<FetchOrderForEmailResult> {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("orders")
@@ -37,6 +20,7 @@ async function fetchOrderForEmail(orderId: string): Promise<Order | null> {
       total_amount,
       shipping_address,
       created_at,
+      confirmation_email_sent_at,
       order_items (
         id,
         quantity,
@@ -51,14 +35,57 @@ async function fetchOrderForEmail(orderId: string): Promise<Order | null> {
     `
     )
     .eq("id", orderId)
-    .single();
+    .maybeSingle();
 
-  if (error || !data) return null;
-  return data as unknown as Order;
+  if (error) {
+    return { status: "error", message: error.message };
+  }
+  if (!data) {
+    return { status: "not_found" };
+  }
+
+  const row = data as unknown as {
+    id: string;
+    total_amount: number;
+    shipping_address: Order["shipping_address"];
+    created_at: string;
+    confirmation_email_sent_at?: string | null;
+    order_items?: Order["order_items"];
+  };
+  if (row.confirmation_email_sent_at) {
+    return { status: "already_sent" };
+  }
+
+  const order: Order = {
+    id: row.id,
+    total_amount: row.total_amount,
+    shipping_address: row.shipping_address,
+    created_at: row.created_at,
+    order_items: row.order_items ?? [],
+  };
+
+  return { status: "ready", order };
+}
+
+async function markConfirmationEmailSent(orderId: string): Promise<void> {
+  const supabase = createAdminClient();
+  const { error } = await supabase
+    .from("orders")
+    .update({ confirmation_email_sent_at: new Date().toISOString() })
+    .eq("id", orderId)
+    .is("confirmation_email_sent_at", null);
+
+  if (error) {
+    console.error("[sendOrderConfirmationEmails] mark sent failed", {
+      orderId,
+      message: error.message,
+      code: error.code,
+    });
+  }
 }
 
 function formatInvoiceHtml(order: Order, orderShortId: string): string {
-  const date = new Date(order.created_at).toLocaleDateString("en-US", {
+  const date = new Date(order.created_at).toLocaleDateString("ro-RO", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -67,7 +94,7 @@ function formatInvoiceHtml(order: Order, orderShortId: string): string {
     .map(
       (item) =>
         `<tr>
-          <td style="padding:8px;border-bottom:1px solid #eee">${item.products?.name ?? "Product"}</td>
+          <td style="padding:8px;border-bottom:1px solid #eee">${item.products?.name?.trim() || "Produs indisponibil"}</td>
           <td style="padding:8px;border-bottom:1px solid #eee">${item.quantity}</td>
           <td style="padding:8px;border-bottom:1px solid #eee">${item.price.toFixed(2)} RON</td>
           <td style="padding:8px;border-bottom:1px solid #eee">${(item.quantity * item.price).toFixed(2)} RON</td>
@@ -75,27 +102,27 @@ function formatInvoiceHtml(order: Order, orderShortId: string): string {
     )
     .join("");
   return `
-    <h2>Order Confirmation #${orderShortId}</h2>
-    <p>Thank you for your order. Here is your invoice.</p>
-    <p><strong>Order date:</strong> ${date}</p>
+    <h2>Confirmare comandă #${orderShortId}</h2>
+    <p>Îți mulțumim pentru comandă. Mai jos găsești detaliile comenzii tale.</p>
+    <p><strong>Data comenzii:</strong> ${date}</p>
     <table style="width:100%;border-collapse:collapse;margin:16px 0">
       <thead>
         <tr style="background:#f5f5f5">
-          <th style="padding:8px;text-align:left">Item</th>
-          <th style="padding:8px;text-align:left">Qty</th>
-          <th style="padding:8px;text-align:left">Unit price</th>
+          <th style="padding:8px;text-align:left">Produs</th>
+          <th style="padding:8px;text-align:left">Cant.</th>
+          <th style="padding:8px;text-align:left">Preț unitar</th>
           <th style="padding:8px;text-align:left">Total</th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>
     </table>
-    <p style="font-size:18px;font-weight:bold">Total: ${order.total_amount.toFixed(2)} RON</p>
-    <p>If you have any questions, please contact us.</p>
+    <p style="font-size:18px;font-weight:bold">Total de plată: ${order.total_amount.toFixed(2)} RON</p>
+    <p>Dacă ai întrebări, răspunde la acest email sau folosește datele de contact de pe site.</p>
   `;
 }
 
 function formatSellerNotificationHtml(order: Order, orderShortId: string): string {
-  const date = new Date(order.created_at).toLocaleDateString("en-US", {
+  const date = new Date(order.created_at).toLocaleDateString("ro-RO", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -107,7 +134,7 @@ function formatSellerNotificationHtml(order: Order, orderShortId: string): strin
     addr?.address,
     addr?.city && addr?.state && addr?.zip && `${addr.city}, ${addr.state} ${addr.zip}`,
     addr?.country,
-    addr?.phone && `Phone: ${addr.phone}`,
+    addr?.phone && `Telefon: ${addr.phone}`,
   ]
     .filter(Boolean)
     .join("<br/>");
@@ -115,24 +142,24 @@ function formatSellerNotificationHtml(order: Order, orderShortId: string): strin
     .map(
       (item) =>
         `<tr>
-          <td style="padding:8px;border-bottom:1px solid #eee">${item.products?.name ?? "Product"}</td>
+          <td style="padding:8px;border-bottom:1px solid #eee">${item.products?.name?.trim() || "Produs indisponibil"}</td>
           <td style="padding:8px;border-bottom:1px solid #eee">${item.quantity}</td>
           <td style="padding:8px;border-bottom:1px solid #eee">${(item.quantity * item.price).toFixed(2)} RON</td>
         </tr>`
     )
     .join("");
   return `
-    <h2>New order #${orderShortId}</h2>
-    <p><strong>Order date:</strong> ${date}</p>
+    <h2>Comandă nouă #${orderShortId}</h2>
+    <p><strong>Data comenzii:</strong> ${date}</p>
     <p><strong>Total:</strong> ${order.total_amount.toFixed(2)} RON</p>
-    <h3>Shipping address</h3>
+    <h3>Adresă de livrare</h3>
     <p>${shipping}</p>
-    <h3>Items</h3>
+    <h3>Produse</h3>
     <table style="width:100%;border-collapse:collapse">
       <thead>
         <tr style="background:#f5f5f5">
-          <th style="padding:8px;text-align:left">Item</th>
-          <th style="padding:8px;text-align:left">Qty</th>
+          <th style="padding:8px;text-align:left">Produs</th>
+          <th style="padding:8px;text-align:left">Cant.</th>
           <th style="padding:8px;text-align:left">Total</th>
         </tr>
       </thead>
@@ -143,7 +170,7 @@ function formatSellerNotificationHtml(order: Order, orderShortId: string): strin
 
 /**
  * Send order confirmation to buyer (invoice) and to store owner (order details + shipping).
- * Only sends once per order (uses confirmation_email_sent_at).
+ * Idempotent: `confirmation_email_sent_at` is set only after the buyer email is accepted by Resend.
  */
 export async function sendOrderConfirmationEmails(orderId: string): Promise<{ ok: boolean; error?: string }> {
   const resend = getResendClient();
@@ -151,16 +178,18 @@ export async function sendOrderConfirmationEmails(orderId: string): Promise<{ ok
     return { ok: false, error: "RESEND_API_KEY not set" };
   }
 
-  const claimed = await claimConfirmationEmailSent(orderId);
-  if (!claimed) {
+  const loaded = await fetchOrderForConfirmationEmail(orderId);
+  if (loaded.status === "error") {
+    return { ok: false, error: loaded.message };
+  }
+  if (loaded.status === "not_found") {
+    return { ok: false, error: "Order not found" };
+  }
+  if (loaded.status === "already_sent") {
     return { ok: true };
   }
 
-  const order = await fetchOrderForEmail(orderId);
-  if (!order) {
-    return { ok: false, error: "Order not found" };
-  }
-
+  const order = loaded.order;
   const buyerEmail = (order.shipping_address as OrderShippingAddress)?.email;
   if (!buyerEmail) {
     return { ok: false, error: "No buyer email in shipping address" };
@@ -174,23 +203,28 @@ export async function sendOrderConfirmationEmails(orderId: string): Promise<{ ok
     await resend.emails.send({
       from: `Make The Print <${fromEmail}>`,
       to: buyerEmail,
-      subject: `Order confirmation #${orderShortId}`,
+      subject: `Confirmare comandă #${orderShortId}`,
       html: formatInvoiceHtml(order, orderShortId),
     });
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Failed to send buyer email" };
   }
 
+  await markConfirmationEmailSent(orderId);
+
   if (storeEmail) {
     try {
       await resend.emails.send({
         from: `Make The Print <${fromEmail}>`,
         to: storeEmail,
-        subject: `New order #${orderShortId}`,
+        subject: `Comandă nouă #${orderShortId}`,
         html: formatSellerNotificationHtml(order, orderShortId),
       });
-    } catch {
-      // Buyer email already sent; don't fail the whole operation
+    } catch (e) {
+      console.error("[sendOrderConfirmationEmails] seller notify failed", {
+        orderId,
+        message: e instanceof Error ? e.message : "unknown",
+      });
     }
   }
 

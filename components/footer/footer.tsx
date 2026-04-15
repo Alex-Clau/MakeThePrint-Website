@@ -11,7 +11,7 @@ export function Footer({ messages }: { messages: Messages }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-5 gap-6 sm:gap-8 mb-6 sm:mb-8">
           <div>
-            <Link href="/" className="inline-block focus:outline-none focus-visible-ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded mb-4">
+            <Link href="/" className="inline-block focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded mb-4">
               <Image
                 src="/logoColor.png"
                 alt={f.brand}
@@ -72,9 +72,14 @@ export function Footer({ messages }: { messages: Messages }) {
                 </Link>
               </li>
               <li>
-                <Link href="https://anpc.ro" className="hover:text-accent-primary-dark transition-colors">
+                <a
+                  href="https://anpc.ro/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-accent-primary-dark transition-colors"
+                >
                   {f.anpc}
-                </Link>
+                </a>
               </li>
             </ul>
           </div>

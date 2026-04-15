@@ -9,6 +9,17 @@ import {
   deleteProduct,
   getProductById,
 } from "@/lib/supabase/products";
+import { isAdminOrderStatus } from "@/lib/constants/admin-order-status";
+import { messages } from "@/lib/messages";
+import type { CustomProductConfig, KeychainConfig } from "@/types/product";
+
+const ORDER_ID_UUID =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Same shape as order status form — for admin product mutations and toasts. */
+export type AdminToastResult =
+  | { success: true; message: string }
+  | { success: false; message: string };
 
 /**
  * Check if current user is admin
@@ -48,15 +59,19 @@ export async function createProductAction(product: {
   featured?: boolean;
   product_type?: "custom" | "seasonal";
   category?: string;
-  custom_config?: Record<string, any>;
-}) {
-  await requireAdmin();
-  const data = await createProduct({
-    ...product,
-    images: product.images || [],
-  });
-  revalidatePath("/admin/products");
-  return data ?? null;
+  custom_config?: CustomProductConfig | KeychainConfig;
+}): Promise<AdminToastResult> {
+  try {
+    await requireAdmin();
+    await createProduct({
+      ...product,
+      images: product.images || [],
+    });
+    revalidatePath("/admin/products");
+    return { success: true, message: messages.admin.productCreated };
+  } catch {
+    return { success: false, message: messages.admin.adminActionFailed };
+  }
 }
 
 /**
@@ -72,25 +87,34 @@ export async function updateProductAction(
     featured: boolean;
     product_type?: "custom" | "seasonal";
     category?: string;
-    custom_config?: Record<string, any>;
+    custom_config?: CustomProductConfig | KeychainConfig;
   }>
-) {
-  await requireAdmin();
-  await getProductById(id);
-  const data = await updateProduct(id, updates);
-  revalidatePath("/admin/products");
-  revalidatePath(`/products/${id}`);
-  return data ?? null;
+): Promise<AdminToastResult> {
+  try {
+    await requireAdmin();
+    await getProductById(id);
+    await updateProduct(id, updates);
+    revalidatePath("/admin/products");
+    revalidatePath(`/admin/products/${id}/edit`);
+    revalidatePath(`/products/${id}`);
+    return { success: true, message: messages.admin.productUpdated };
+  } catch {
+    return { success: false, message: messages.admin.adminActionFailed };
+  }
 }
 
 /**
  * Server action to delete a product
  */
-export async function deleteProductAction(productId: string) {
-  await requireAdmin();
-  await deleteProduct(productId);
-  revalidatePath("/admin/products");
-  return { success: true };
+export async function deleteProductAction(productId: string): Promise<AdminToastResult> {
+  try {
+    await requireAdmin();
+    await deleteProduct(productId);
+    revalidatePath("/admin/products");
+    return { success: true, message: messages.admin.productDeleted };
+  } catch {
+    return { success: false, message: messages.admin.adminActionFailed };
+  }
 }
 
 /**
@@ -102,30 +126,41 @@ export async function updateOrderStatusAction(
   trackingNumber?: string | null
 ) {
   await requireAdmin();
+  const trimmedId = orderId?.trim() ?? "";
+  if (!trimmedId || !ORDER_ID_UUID.test(trimmedId)) {
+    throw new Error("Invalid order id");
+  }
+  if (!isAdminOrderStatus(status)) {
+    throw new Error("Invalid order status");
+  }
   const { updateOrderStatusAdmin } = await import("@/lib/supabase/orders-admin");
-  await updateOrderStatusAdmin(orderId, status, trackingNumber);
+  await updateOrderStatusAdmin(trimmedId, status, trackingNumber);
   revalidatePath("/admin/orders");
-  revalidatePath(`/admin/orders/${orderId}`);
+  revalidatePath(`/admin/orders/${trimmedId}`);
 }
 
-/**
- * Revalidate pages that display product cards (and wishlist state).
- * Call after client-side wishlist add/remove so navigation to those routes shows fresh data.
- */
-export async function revalidateWishlistPaths() {
-  revalidatePath("/");
-  revalidatePath("/products");
-  revalidatePath("/collections");
-}
+export type UpdateOrderStatusFormResult =
+  | { success: true; message: string }
+  | { success: false; message: string };
 
 /**
- * Form action for admin order status update
+ * Form handler for admin order status update — returns a message for client toasts.
  */
-export async function updateOrderStatusFormAction(formData: FormData) {
-  const orderId = formData.get("orderId") as string;
-  const status = formData.get("status") as string;
-  const raw = formData.get("trackingNumber");
-  const trackingNumber =
-    raw === null || raw === undefined || raw === "" ? null : String(raw).trim() || null;
-  await updateOrderStatusAction(orderId, status, trackingNumber);
+export async function updateOrderStatusFormAction(
+  formData: FormData
+): Promise<UpdateOrderStatusFormResult> {
+  try {
+    const orderId = formData.get("orderId");
+    const status = formData.get("status");
+    const raw = formData.get("trackingNumber");
+    const trackingNumber =
+      raw === null || raw === undefined || raw === "" ? null : String(raw).trim() || null;
+    if (typeof orderId !== "string" || typeof status !== "string") {
+      return { success: false, message: messages.admin.adminActionFailed };
+    }
+    await updateOrderStatusAction(orderId, status, trackingNumber);
+    return { success: true, message: messages.admin.orderUpdateSuccess };
+  } catch {
+    return { success: false, message: messages.admin.adminActionFailed };
+  }
 }
