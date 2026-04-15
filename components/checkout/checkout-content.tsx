@@ -253,9 +253,10 @@ export function CheckoutContent({
               </div>
             </CardContent>
           </Card>
-        ) : clientSecret ? (
+        ) : clientSecret && pendingOrderId ? (
           <StripePaymentWrapper
             clientSecret={clientSecret}
+            orderId={pendingOrderId}
             onPaymentSuccess={handlePaymentSuccess}
             onPaymentError={handlePaymentError}
             isSubmitting={isSubmitting}

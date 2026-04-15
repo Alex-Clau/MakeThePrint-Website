@@ -8,6 +8,7 @@ import { StripePaymentWrapperProps } from "@/types/checkout";
 
 export function StripePaymentWrapper({
   clientSecret,
+  orderId,
   onPaymentSuccess,
   onPaymentError,
   isSubmitting = false,
@@ -39,7 +40,7 @@ export function StripePaymentWrapper({
 
   return (
     <Elements
-      key={clientSecret}
+      key={`${clientSecret}:${orderId}`}
       stripe={stripePromise}
       options={{
         clientSecret,
@@ -48,6 +49,7 @@ export function StripePaymentWrapper({
     >
       <StripePaymentForm
         clientSecret={clientSecret}
+        orderId={orderId}
         onPaymentSuccess={onPaymentSuccess}
         onPaymentError={onPaymentError}
         isSubmitting={isSubmitting}

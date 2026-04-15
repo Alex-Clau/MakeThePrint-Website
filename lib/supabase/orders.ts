@@ -1,6 +1,6 @@
-import { createAdminClient } from "./admin";
 import { createClient } from "./server";
 import { handleSupabaseError } from "../utils/supabase-errors";
+import type { Order } from "@/types/order";
 
 /**
  * Get user's orders
@@ -52,9 +52,20 @@ export async function getOrderById(orderId: string, userId: string) {
     .from("orders")
     .select(
       `
-      *,
+      id,
+      total_amount,
+      shipping_address,
+      tracking_number,
+      created_at,
+      status,
+      payment_status,
+      confirmation_email_sent_at,
       order_items (
-        *,
+        id,
+        quantity,
+        price,
+        material,
+        customizations,
         products (
           id,
           name,
@@ -71,7 +82,17 @@ export async function getOrderById(orderId: string, userId: string) {
   if (error) {
     throw handleSupabaseError(error);
   }
-  return data;
+
+  const normalizedItems = (data.order_items ?? []).map((item) => ({
+    ...item,
+    // Supabase nested relation typing can return an array shape even for single product relation.
+    products: Array.isArray(item.products) ? (item.products[0] ?? null) : item.products,
+  }));
+
+  return {
+    ...data,
+    order_items: normalizedItems,
+  } as unknown as Order;
 }
 
 /** Input for creating a pending order (checkout flow). */
@@ -149,32 +170,5 @@ export async function getOrderForPayment(orderId: string, userId: string) {
     throw new Error("Order not found");
   }
   return data;
-}
-
-/**
- * Mark order as paid and confirmed (after Stripe payment). Does not clear cart.
- * Uses the service-role client so DB triggers can restrict payment fields to
- * `service_role` only; callers must still pass the real `userId` (e.g. from session).
- */
-export async function setOrderPaid(
-  orderId: string,
-  userId: string,
-  paymentIntentId: string
-) {
-  const supabase = createAdminClient();
-  const { error } = await supabase
-    .from("orders")
-    .update({
-      payment_status: "paid",
-      status: "confirmed",
-      payment_intent_id: paymentIntentId,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", orderId)
-    .eq("user_id", userId);
-
-  if (error) {
-    throw handleSupabaseError(error);
-  }
 }
 

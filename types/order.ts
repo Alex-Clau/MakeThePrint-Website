@@ -9,7 +9,14 @@ export interface Order {
   shipping_address: OrderShippingAddress;
   created_at: string;
   order_items: OrderItem[];
-};
+  tracking_number?: string | null;
+  /** Order lifecycle (e.g. pending, confirmed). */
+  status?: string;
+  /** Set when Stripe payment succeeded and order marked paid (Supabase). */
+  payment_status?: string;
+  /** Set after buyer confirmation email is accepted by Resend (Supabase). */
+  confirmation_email_sent_at?: string | null;
+}
 
 export interface OrderItem {
   id: string;

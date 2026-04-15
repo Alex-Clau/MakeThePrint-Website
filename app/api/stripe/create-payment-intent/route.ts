@@ -35,18 +35,12 @@ export async function POST(request: NextRequest) {
     }
 
     if (order.payment_status === "paid") {
-      return NextResponse.json(
-        { error: "Order already paid" },
-        { status: 400 }
-      );
+      return apiErrorResponse("Order already paid", 400, "ORDER_ALREADY_PAID");
     }
 
     const amount = Number(order.total_amount);
     if (!amount || amount <= 0) {
-      return NextResponse.json(
-        { error: "Invalid order amount" },
-        { status: 400 }
-      );
+      return apiErrorResponse("Invalid order amount", 400, "BAD_REQUEST");
     }
 
     const paymentIntent = await stripe.paymentIntents.create({

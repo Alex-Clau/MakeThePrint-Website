@@ -22,7 +22,7 @@ async function OrderDetailContent({ orderId }: { orderId: string }) {
     <div className="space-y-6">
       <OrderDetailHeader
         orderId={order.id}
-        status={order.status}
+        status={order.status ?? "pending"}
         createdAt={order.created_at}
         totalAmount={order.total_amount}
         subtotal={subtotal}

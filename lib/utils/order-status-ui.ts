@@ -14,8 +14,16 @@ export function orderStatusBadgeClassName(status: string): string {
       "rounded-s border border-primary/50 bg-primary/25 text-primary shadow-sm dark:border-primary/60 dark:bg-primary/38 dark:text-primary",
     delivered:
       "rounded-s border border-primary/70 bg-primary text-primary-foreground shadow-sm dark:border-primary dark:bg-primary dark:text-primary-foreground",
+    failed:
+      "rounded-s border border-muted-foreground/30 bg-muted text-muted-foreground shadow-sm",
+    cancelled:
+      "rounded-s border border-muted-foreground/30 bg-muted text-muted-foreground shadow-sm",
+    canceled:
+      "rounded-s border border-muted-foreground/30 bg-muted text-muted-foreground shadow-sm",
   };
-  return map[key] ?? map.pending;
+  const neutral =
+    "rounded-s border border-border bg-muted/40 text-muted-foreground shadow-sm";
+  return map[key] ?? neutral;
 }
 
 export function orderStatusLabelRo(status: string): string {
