@@ -1,6 +1,8 @@
 import type {Metadata} from "next";
+import { Suspense } from "react";
 import {ThemeProvider} from "next-themes";
 import {ToastProvider} from "@/components/providers/toast-provider";
+import {ScrollToTop} from "@/components/scroll-to-top";
 import {Footer} from "@/components/footer/footer";
 import {messages} from "@/lib/messages";
 import {getSiteOrigin} from "@/lib/site-url";
@@ -50,6 +52,9 @@ export default function RootLayout({
       disableTransitionOnChange
     >
       <ToastProvider/>
+      <Suspense fallback={null}>
+        <ScrollToTop/>
+      </Suspense>
       <div className="min-h-screen flex flex-col">
         {children}
         <Footer messages={messages}/>

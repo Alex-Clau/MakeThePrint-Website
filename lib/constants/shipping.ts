@@ -2,7 +2,7 @@
  * Shipping rules: single source for cart and checkout.
  */
 
-/** Subtotal (RON) above which shipping is free. */
+/** Subtotal (RON) at or above which shipping is free (cart, checkout, /shipping copy). */
 export const FREE_SHIPPING_THRESHOLD_RON = 500;
 
 /** Shipping fee (RON) when below free-shipping threshold. */

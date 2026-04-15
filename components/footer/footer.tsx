@@ -72,9 +72,14 @@ export function Footer({ messages }: { messages: Messages }) {
                 </Link>
               </li>
               <li>
-                <Link href="https://anpc.ro" className="hover:text-accent-primary-dark transition-colors">
+                <a
+                  href="https://anpc.ro/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-accent-primary-dark transition-colors"
+                >
                   {f.anpc}
-                </Link>
+                </a>
               </li>
             </ul>
           </div>

@@ -10,6 +10,22 @@ import { computePresetCustomizationPrice } from "@/lib/utils/preset-customizatio
 import { messages } from "@/lib/messages";
 import { TextPreview } from "@/components/product/text-preview";
 
+/** Map preset color keys to Romanian labels for UI (avoids raw "white" on dark theme). */
+function presetColorLabelRo(raw: string): string {
+  const k = raw.trim().toLowerCase();
+  const map: Record<string, string> = {
+    white: "Alb",
+    black: "Negru",
+    beige: "Bej",
+    tan: "Bej",
+    brown: "Maro",
+    "dark brown": "Maro închis",
+  };
+  if (map[k]) return map[k];
+  if (!k) return raw;
+  return k.charAt(0).toUpperCase() + k.slice(1);
+}
+
 export function CustomLettersForm({
   availableFonts,
   customConfig,
@@ -225,7 +241,9 @@ export function CustomLettersForm({
             />
           ))}
         </div>
-        <p className="text-xs text-muted-foreground mt-2">{t.selected}: {color}</p>
+        <p className="text-xs text-muted-foreground mt-2">
+          {t.selected}: {presetColorLabelRo(color)}
+        </p>
       </div>
 
       {hasOptions && (
