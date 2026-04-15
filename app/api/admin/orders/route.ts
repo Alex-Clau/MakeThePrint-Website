@@ -1,6 +1,6 @@
 import { connection, NextRequest, NextResponse } from "next/server";
 import { assertAdminUser } from "@/lib/auth/assert-admin-user";
-import { getAdminProductsPage } from "@/lib/supabase/products";
+import { getAdminOrdersPage } from "@/lib/supabase/orders-admin";
 import { apiErrorResponse, normalizeToApiError } from "@/lib/utils/api-error";
 
 const DEFAULT_PAGE_SIZE = 12;
@@ -20,27 +20,14 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
-    const rawSize = parseInt(
-      searchParams.get("page_size") ?? String(DEFAULT_PAGE_SIZE),
-      10
-    );
+    const rawSize = parseInt(searchParams.get("page_size") ?? String(DEFAULT_PAGE_SIZE), 10);
     const pageSize = Math.min(
       MAX_PAGE_SIZE,
       Math.max(1, Number.isFinite(rawSize) ? rawSize : DEFAULT_PAGE_SIZE)
     );
-    const type = searchParams.get("type") ?? undefined;
-    const category = searchParams.get("category") ?? undefined;
-    const search = searchParams.get("search") ?? undefined;
 
-    const { products, hasMore } = await getAdminProductsPage({
-      page,
-      pageSize,
-      ...(type ? { type } : {}),
-      ...(category ? { category } : {}),
-      ...(search ? { search } : {}),
-    });
-
-    return NextResponse.json({ products, hasMore, page, pageSize });
+    const { orders, hasMore } = await getAdminOrdersPage({ page, pageSize });
+    return NextResponse.json({ orders, hasMore, page, pageSize });
   } catch (error: unknown) {
     const { message } = normalizeToApiError(error);
     return apiErrorResponse(message, 500);

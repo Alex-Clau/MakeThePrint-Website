@@ -31,7 +31,7 @@ async function ProductsContent({
       });
     return (
       <AdminProductsList
-        key={`${type || "all"}-${category || "all"}`}
+        key={`${type || "all"}-${category || "all"}-${search || ""}`}
         initialProducts={products}
         initialPage={1}
         pageSize={ADMIN_PRODUCTS_PAGE_SIZE}

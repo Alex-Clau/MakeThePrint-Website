@@ -19,6 +19,30 @@ export async function getOrders(userId: string) {
   return data;
 }
 
+export async function getOrdersPage(params: {
+  userId: string;
+  page: number;
+  pageSize: number;
+}): Promise<{ orders: Awaited<ReturnType<typeof getOrders>>; hasMore: boolean }> {
+  const supabase = await createClient();
+  const from = (params.page - 1) * params.pageSize;
+  const to = from + params.pageSize - 1;
+  const { data, error, count } = await supabase
+    .from("orders")
+    .select("id, user_id, total_amount, status, created_at", { count: "exact" })
+    .eq("user_id", params.userId)
+    .order("created_at", { ascending: false })
+    .range(from, to);
+
+  if (error) {
+    throw handleSupabaseError(error);
+  }
+
+  const total = count ?? data?.length ?? 0;
+  const hasMore = total ? to + 1 < total : (data?.length ?? 0) === params.pageSize;
+  return { orders: data ?? [], hasMore };
+}
+
 /**
  * Get a single order by ID
  */

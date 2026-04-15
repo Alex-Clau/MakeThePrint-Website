@@ -1,12 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ProductCard } from "@/components/product/product-card";
 import type { ProductCardData } from "@/types/product";
 import { messages } from "@/lib/messages";
 import { fetchWishlistProductIdsFromApi } from "@/lib/supabase/wishlist-client";
 import { getApiErrorBody } from "@/lib/utils/api-error";
 import { WISHLIST_UPDATED_EVENT } from "@/lib/wishlist/events";
+import { useInfiniteScrollList } from "@/lib/hooks/use-infinite-scroll-list";
 
 type ProductsInfiniteListProps = {
   initialProducts: ProductCardData[];
@@ -14,6 +15,11 @@ type ProductsInfiniteListProps = {
   pageSize: number;
   initialHasMore: boolean;
   search?: string;
+  apiPath?: string;
+  emptyLabel?: string;
+  loadingLabel?: string;
+  endOfListLabel?: string;
+  loadMoreFailedLabel?: string;
 };
 
 type CatalogApiResponse = {
@@ -29,17 +35,14 @@ export function ProductsInfiniteList({
   pageSize,
   initialHasMore,
   search,
+  apiPath = "/api/products/catalog",
+  emptyLabel,
+  loadingLabel,
+  endOfListLabel,
+  loadMoreFailedLabel,
 }: ProductsInfiniteListProps) {
   const t = messages.products;
-  const [products, setProducts] = useState<ProductCardData[]>(initialProducts);
   const [wishlistIds, setWishlistIds] = useState<Set<string>>(new Set());
-  const [hasMore, setHasMore] = useState(initialHasMore);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
-  const pageRef = useRef(initialPage);
-  const loadingRef = useRef(false);
-  const hasMoreRef = useRef(initialHasMore);
 
   const refreshWishlistIds = useCallback(() => {
     void fetchWishlistProductIdsFromApi().then((result) => {
@@ -64,93 +67,55 @@ export function ProductsInfiniteList({
     return () => window.removeEventListener(WISHLIST_UPDATED_EVENT, refreshWishlistIds);
   }, [refreshWishlistIds]);
 
-  useEffect(() => {
-    setProducts(initialProducts);
-    pageRef.current = initialPage;
-    hasMoreRef.current = initialHasMore;
-    setHasMore(initialHasMore);
-    setError(null);
-  }, [initialProducts, initialPage, initialHasMore, search]);
+  const loadPage = useCallback(
+    async (page: number) => {
+      const params = new URLSearchParams({
+        page: String(page),
+        page_size: String(pageSize),
+      });
+      if (search) {
+        params.set("search", search);
+      }
+      const res = await fetch(`${apiPath}?${params.toString()}`);
+      if (!res.ok) {
+        const { message } = await getApiErrorBody(res);
+        throw new Error(message);
+      }
+      const body = (await res.json()) as CatalogApiResponse;
+      return { items: body.products, hasMore: body.hasMore };
+    },
+    [apiPath, pageSize, search]
+  );
 
-  useEffect(() => {
-    const node = sentinelRef.current;
-    if (!node) return;
-
-    let cancelled = false;
-
-    const observer = new IntersectionObserver((entries) => {
-      const [entry] = entries;
-      if (!entry.isIntersecting || loadingRef.current || !hasMoreRef.current) return;
-
-      void (async () => {
-        loadingRef.current = true;
-        if (!cancelled) {
-          setIsLoading(true);
-          setError(null);
-        }
-
-        try {
-          const nextPage = pageRef.current + 1;
-          const params = new URLSearchParams({
-            page: String(nextPage),
-            page_size: String(pageSize),
-          });
-          if (search) {
-            params.set("search", search);
-          }
-          const res = await fetch(`/api/products/catalog?${params.toString()}`);
-
-          if (!res.ok) {
-            const { message } = await getApiErrorBody(res);
-            throw new Error(message);
-          }
-
-          const body = (await res.json()) as CatalogApiResponse;
-          const cardData = body.products;
-
-          if (cancelled) return;
-
-          setProducts((prev) => [...prev, ...cardData]);
-          pageRef.current = nextPage;
-          const nextHasMore = body.hasMore;
-          hasMoreRef.current = nextHasMore;
-          setHasMore(nextHasMore);
-        } catch (e) {
-          if (!cancelled) {
-            setError(e instanceof Error ? e.message : t.loadMoreFailed);
-          }
-        } finally {
-          loadingRef.current = false;
-          if (!cancelled) {
-            setIsLoading(false);
-          }
-        }
-      })();
+  const { items: products, hasMore, isLoading, error, sentinelRef } =
+    useInfiniteScrollList<ProductCardData>({
+      initialItems: initialProducts,
+      initialPage,
+      initialHasMore,
+      resetKey: `${search ?? ""}|${apiPath}`,
+      loadPage,
+      defaultError: loadMoreFailedLabel ?? t.loadMoreFailed,
     });
-
-    observer.observe(node);
-
-    return () => {
-      cancelled = true;
-      observer.disconnect();
-    };
-  }, [pageSize, search, t.loadMoreFailed]);
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-6">
-        {products.map((product) => (
-          <ProductCard
-            key={product.id}
-            {...product}
-            isInWishlist={product.isInWishlist ?? wishlistIds.has(product.id)}
-          />
-        ))}
-      </div>
+      {products.length > 0 ? (
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
+          {products.map((product) => (
+            <ProductCard
+              key={product.id}
+              {...product}
+              isInWishlist={product.isInWishlist ?? wishlistIds.has(product.id)}
+            />
+          ))}
+        </div>
+      ) : (
+        <p className="py-12 text-center text-muted-foreground">{emptyLabel ?? t.noProducts}</p>
+      )}
       <div ref={sentinelRef} className="h-10" />
       {isLoading && (
         <p className="mt-4 text-center text-sm text-muted-foreground">
-          {t.loadingMore}
+          {loadingLabel ?? t.loadingMore}
         </p>
       )}
       {error && (
@@ -158,9 +123,9 @@ export function ProductsInfiniteList({
           {error}
         </p>
       )}
-      {!hasMore && (
+      {!hasMore && products.length > 0 && (
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          {t.endOfList}
+          {endOfListLabel ?? t.endOfList}
         </p>
       )}
     </>

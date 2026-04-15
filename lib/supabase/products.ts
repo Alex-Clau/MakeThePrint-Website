@@ -105,15 +105,46 @@ export async function getPublicCustomProductsPage({
   };
 }
 
-export async function getPublicSeasonalProducts(params?: {
-  limit?: number;
+export async function getPublicSeasonalProductsPage({
+  page,
+  pageSize,
+  search,
+}: {
+  page: number;
+  pageSize: number;
   search?: string;
-}) {
-  return getProducts({
-    product_type: "seasonal",
-    limit: params?.limit ?? 12,
-    search: params?.search,
-  });
+}): Promise<{ products: Product[]; hasMore: boolean; total: number }> {
+  const supabase = await createClient();
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  let query = supabase
+    .from("products")
+    .select(
+      "id, name, description, price, product_type, category, custom_config, featured, images, created_at, updated_at",
+      { count: "exact" }
+    )
+    .eq("product_type", "seasonal")
+    .order("created_at", { ascending: false });
+
+  const term = normalizeCatalogSearchInput(search);
+  if (term) {
+    query = query.ilike("name", `%${term}%`);
+  }
+
+  const { data, error, count } = await query.range(from, to);
+  if (error) {
+    throw handleSupabaseError(error);
+  }
+
+  const total = count ?? data?.length ?? 0;
+  const hasMore = total ? to + 1 < total : (data?.length ?? 0) === pageSize;
+
+  return {
+    products: (data ?? []) as Product[],
+    hasMore,
+    total,
+  };
 }
 
 export async function getPublicFeaturedProducts(limit = 8) {

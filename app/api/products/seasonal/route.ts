@@ -1,42 +1,25 @@
 import { connection, NextRequest, NextResponse } from "next/server";
-import { assertAdminUser } from "@/lib/auth/assert-admin-user";
-import { getAdminProductsPage } from "@/lib/supabase/products";
+import { fetchSeasonalProductCardsPage } from "@/lib/catalog/fetch-seasonal-product-cards-page";
 import { apiErrorResponse, normalizeToApiError } from "@/lib/utils/api-error";
 
-const DEFAULT_PAGE_SIZE = 12;
-const MAX_PAGE_SIZE = 48;
+const DEFAULT_PAGE_SIZE = 8;
+const MAX_PAGE_SIZE = 24;
 
 export async function GET(request: NextRequest) {
   await connection();
-  const guard = await assertAdminUser();
-  if (!guard.ok) {
-    return apiErrorResponse(
-      guard.status === 401 ? "Neautorizat" : "Acces refuzat",
-      guard.status,
-      guard.status === 401 ? "UNAUTHORIZED" : "FORBIDDEN"
-    );
-  }
-
   try {
     const { searchParams } = new URL(request.url);
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
-    const rawSize = parseInt(
-      searchParams.get("page_size") ?? String(DEFAULT_PAGE_SIZE),
-      10
-    );
+    const rawSize = parseInt(searchParams.get("page_size") ?? String(DEFAULT_PAGE_SIZE), 10);
     const pageSize = Math.min(
       MAX_PAGE_SIZE,
       Math.max(1, Number.isFinite(rawSize) ? rawSize : DEFAULT_PAGE_SIZE)
     );
-    const type = searchParams.get("type") ?? undefined;
-    const category = searchParams.get("category") ?? undefined;
     const search = searchParams.get("search") ?? undefined;
 
-    const { products, hasMore } = await getAdminProductsPage({
+    const { products, hasMore } = await fetchSeasonalProductCardsPage({
       page,
       pageSize,
-      ...(type ? { type } : {}),
-      ...(category ? { category } : {}),
       ...(search ? { search } : {}),
     });
 

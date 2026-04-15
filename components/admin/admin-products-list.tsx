@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { messages } from "@/lib/messages";
 import type { Product } from "@/types/product";
 import { getApiErrorBody } from "@/lib/utils/api-error";
+import { useInfiniteScrollList } from "@/lib/hooks/use-infinite-scroll-list";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -51,94 +52,39 @@ export function AdminProductsList({
 }: AdminProductsListProps) {
   const router = useRouter();
   const t = messages.admin;
-  const [products, setProducts] = useState<Product[]>(initialProducts);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
-  const [hasMore, setHasMore] = useState(initialHasMore);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
-  const pageRef = useRef(initialPage);
-  const loadingRef = useRef(false);
-  const hasMoreRef = useRef(initialHasMore);
-
-  useEffect(() => {
-    setProducts(initialProducts);
-    pageRef.current = initialPage;
-    hasMoreRef.current = initialHasMore;
-    setHasMore(initialHasMore);
-    setError(null);
-  }, [initialProducts, initialPage, initialHasMore, type, category, search]);
-
-  const buildQuery = useCallback(
-    (page: number) => {
-      const p = new URLSearchParams({
+  const loadPage = useCallback(
+    async (page: number) => {
+      const params = new URLSearchParams({
         page: String(page),
         page_size: String(pageSize),
       });
-      if (type) p.set("type", type);
-      if (category) p.set("category", category);
-      if (search) p.set("search", search);
-      return p.toString();
+      if (type) params.set("type", type);
+      if (category) params.set("category", category);
+      if (search) params.set("search", search);
+
+      const res = await fetch(`/api/admin/products?${params.toString()}`);
+      if (!res.ok) {
+        const { message } = await getApiErrorBody(res);
+        throw new Error(message);
+      }
+      const body = (await res.json()) as AdminProductsApiResponse;
+      return { items: body.products, hasMore: body.hasMore };
     },
-    [pageSize, type, category, search]
+    [category, pageSize, search, type]
   );
 
-  useEffect(() => {
-    const node = sentinelRef.current;
-    if (!node) return;
-
-    let cancelled = false;
-
-    const observer = new IntersectionObserver((entries) => {
-      const [entry] = entries;
-      if (!entry.isIntersecting || loadingRef.current || !hasMoreRef.current) return;
-
-      void (async () => {
-        loadingRef.current = true;
-        if (!cancelled) {
-          setIsLoading(true);
-          setError(null);
-        }
-
-        try {
-          const nextPage = pageRef.current + 1;
-          const res = await fetch(`/api/admin/products?${buildQuery(nextPage)}`);
-
-          if (!res.ok) {
-            const { message } = await getApiErrorBody(res);
-            throw new Error(message);
-          }
-
-          const body = (await res.json()) as AdminProductsApiResponse;
-          if (cancelled) return;
-
-          setProducts((prev) => [...prev, ...body.products]);
-          pageRef.current = nextPage;
-          const nextHasMore = body.hasMore;
-          hasMoreRef.current = nextHasMore;
-          setHasMore(nextHasMore);
-        } catch (e) {
-          if (!cancelled) {
-            setError(e instanceof Error ? e.message : t.catalogLoadMoreFailed);
-          }
-        } finally {
-          loadingRef.current = false;
-          if (!cancelled) {
-            setIsLoading(false);
-          }
-        }
-      })();
+  const { items: products, setItems: setProducts, hasMore, isLoading, error, sentinelRef } =
+    useInfiniteScrollList<Product>({
+      initialItems: initialProducts,
+      initialPage,
+      initialHasMore,
+      resetKey: `${type ?? "all"}|${category ?? "all"}|${search ?? ""}`,
+      loadPage,
+      defaultError: t.catalogLoadMoreFailed,
     });
-
-    observer.observe(node);
-
-    return () => {
-      cancelled = true;
-      observer.disconnect();
-    };
-  }, [buildQuery]);
 
   const handleDeleteClick = (id: string, name: string) => {
     setDeleteTarget({ id, name });
@@ -280,7 +226,7 @@ export function AdminProductsList({
               {deleteTarget
                 ? t.confirmDelete.replace("{name}", deleteTarget.name)
                 : ""}{" "}
-              Această acțiune nu poate fi anulată.
+              {t.confirmDeleteIrreversible}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
