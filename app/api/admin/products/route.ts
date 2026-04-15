@@ -49,12 +49,14 @@ export async function GET(request: NextRequest) {
     );
     const type = searchParams.get("type") ?? undefined;
     const category = searchParams.get("category") ?? undefined;
+    const search = searchParams.get("search") ?? undefined;
 
     const { products, hasMore } = await getAdminProductsPage({
       page,
       pageSize,
       ...(type ? { type } : {}),
       ...(category ? { category } : {}),
+      ...(search ? { search } : {}),
     });
 
     return NextResponse.json({ products, hasMore, page, pageSize });

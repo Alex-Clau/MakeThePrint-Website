@@ -10,6 +10,7 @@ import type { ProductCardData } from "@/types/product";
 export async function fetchCustomProductCardsPage(params: {
   page: number;
   pageSize: number;
+  search?: string;
 }): Promise<{ products: ProductCardData[]; hasMore: boolean }> {
   const { products, hasMore } = await getPublicCustomProductsPage(params);
   const reviewStats = await getProductReviewStats(products.map((p) => p.id));

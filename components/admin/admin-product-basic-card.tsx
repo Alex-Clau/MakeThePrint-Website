@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { messages } from "@/lib/messages";
-import type { ProductFormData } from "./admin-product-form-types";
+import { getDefaultConfig, type ProductFormData } from "./admin-product-form-types";
 import type { Product } from "@/types/product";
 
 interface AdminProductBasicCardProps {
@@ -63,7 +63,14 @@ export function AdminProductBasicCard({
           <Label htmlFor="category">{t.categoryLabel}</Label>
           <Select
             value={formData.category}
-            onValueChange={(value) => setFormData({ ...formData, category: value })}
+            onValueChange={(value) =>
+              setFormData({
+                ...formData,
+                category: value,
+                custom_config:
+                  value === "finished" ? undefined : getDefaultConfig(value),
+              })
+            }
           >
             <SelectTrigger>
               <SelectValue />

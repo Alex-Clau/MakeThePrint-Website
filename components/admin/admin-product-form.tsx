@@ -49,14 +49,8 @@ export function AdminProductForm({product, initialType = "seasonal"}: AdminProdu
         category: "finished",
         custom_config: undefined,
       }));
-    } else if (formData.product_type === "custom" && formData.category === "finished") {
-      setFormData((prev) => ({
-        ...prev,
-        category: "preset",
-        custom_config: getDefaultConfig("preset"),
-      }));
     }
-  }, [formData.product_type, formData.category]);
+  }, [formData.product_type]);
 
   useEffect(() => {
     if (formData.product_type === "custom" && !product) {

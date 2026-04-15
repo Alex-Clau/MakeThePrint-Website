@@ -30,6 +30,7 @@ export type AdminProductsListProps = {
   initialHasMore: boolean;
   type?: string;
   category?: string;
+  search?: string;
 };
 
 type AdminProductsApiResponse = {
@@ -46,10 +47,10 @@ export function AdminProductsList({
   initialHasMore,
   type,
   category,
+  search,
 }: AdminProductsListProps) {
   const router = useRouter();
   const t = messages.admin;
-  const catalog = messages.products;
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
@@ -68,7 +69,7 @@ export function AdminProductsList({
     hasMoreRef.current = initialHasMore;
     setHasMore(initialHasMore);
     setError(null);
-  }, [initialProducts, initialPage, initialHasMore, type, category]);
+  }, [initialProducts, initialPage, initialHasMore, type, category, search]);
 
   const buildQuery = useCallback(
     (page: number) => {
@@ -78,9 +79,10 @@ export function AdminProductsList({
       });
       if (type) p.set("type", type);
       if (category) p.set("category", category);
+      if (search) p.set("search", search);
       return p.toString();
     },
-    [pageSize, type, category]
+    [pageSize, type, category, search]
   );
 
   useEffect(() => {
@@ -119,7 +121,7 @@ export function AdminProductsList({
           setHasMore(nextHasMore);
         } catch (e) {
           if (!cancelled) {
-            setError(e instanceof Error ? e.message : catalog.loadMoreFailed);
+            setError(e instanceof Error ? e.message : t.catalogLoadMoreFailed);
           }
         } finally {
           loadingRef.current = false;
@@ -136,7 +138,7 @@ export function AdminProductsList({
       cancelled = true;
       observer.disconnect();
     };
-  }, [buildQuery, catalog.loadMoreFailed]);
+  }, [buildQuery]);
 
   const handleDeleteClick = (id: string, name: string) => {
     setDeleteTarget({ id, name });
@@ -263,11 +265,11 @@ export function AdminProductsList({
 
       <div ref={sentinelRef} className="h-10" />
       {isLoading && (
-        <p className="mt-2 text-center text-sm text-muted-foreground">{catalog.loadingMore}</p>
+        <p className="mt-2 text-center text-sm text-muted-foreground">{t.catalogLoadingMore}</p>
       )}
       {error && <p className="mt-2 text-center text-sm text-red-500">{error}</p>}
       {!hasMore && products.length > 0 && (
-        <p className="mt-4 text-center text-xs text-muted-foreground">{catalog.endOfList}</p>
+        <p className="mt-4 text-center text-xs text-muted-foreground">{t.catalogEndOfList}</p>
       )}
 
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>

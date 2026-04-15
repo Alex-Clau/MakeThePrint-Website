@@ -18,10 +18,12 @@ export async function GET(request: NextRequest) {
       MAX_PAGE_SIZE,
       Math.max(1, Number.isFinite(rawSize) ? rawSize : DEFAULT_PAGE_SIZE),
     );
+    const search = searchParams.get("search") ?? undefined;
 
     const { products, hasMore } = await fetchCustomProductCardsPage({
       page,
       pageSize,
+      ...(search ? { search } : {}),
     });
 
     return NextResponse.json({ products, hasMore, page, pageSize });

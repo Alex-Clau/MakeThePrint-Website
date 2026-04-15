@@ -14,9 +14,11 @@ const ADMIN_PRODUCTS_PAGE_SIZE = 12;
 async function ProductsContent({
   type,
   category,
+  search,
 }: {
   type?: string;
   category?: string;
+  search?: string;
 }) {
   try {
     const { products, hasMore }: { products: Product[]; hasMore: boolean } =
@@ -25,6 +27,7 @@ async function ProductsContent({
         pageSize: ADMIN_PRODUCTS_PAGE_SIZE,
         ...(type ? { type } : {}),
         ...(category ? { category } : {}),
+        ...(search ? { search } : {}),
       });
     return (
       <AdminProductsList
@@ -35,6 +38,7 @@ async function ProductsContent({
         initialHasMore={hasMore}
         type={type}
         category={category}
+        search={search}
       />
     );
   } catch (err) {
@@ -48,7 +52,7 @@ async function ProductsContent({
 }
 
 export default async function AdminProductsPage({ searchParams }: AdminProductsPageProps) {
-  const { type, category } = await searchParams;
+  const { type, category, search } = await searchParams;
   const a = messages.admin;
 
   return (
@@ -70,7 +74,7 @@ export default async function AdminProductsPage({ searchParams }: AdminProductsP
         <AdminProductsFilters />
       </Suspense>
 
-      <ProductsContent type={type} category={category} />
+      <ProductsContent type={type} category={category} search={search} />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { createClient } from "./server";
 import type { CustomProductConfig, KeychainConfig, Product } from "@/types/product";
+import { normalizeCatalogSearchInput } from "@/lib/utils/catalog-search";
 import { handleSupabaseError } from "../utils/supabase-errors";
 
 /**
@@ -31,10 +32,9 @@ export async function getProducts(options?: {
     }
   }
 
-  if (options?.search) {
-    query = query.or(
-      `name.ilike.%${options.search}%,description.ilike.%${options.search}%`
-    );
+  const searchTerm = normalizeCatalogSearchInput(options?.search);
+  if (searchTerm) {
+    query = query.ilike("name", `%${searchTerm}%`);
   }
 
   if (options?.limit) {
@@ -65,23 +65,31 @@ export async function getPublicCustomProducts() {
 export async function getPublicCustomProductsPage({
   page,
   pageSize,
+  search,
 }: {
   page: number;
   pageSize: number;
+  search?: string;
 }): Promise<{ products: Product[]; hasMore: boolean; total: number }> {
   const supabase = await createClient();
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
-  const { data, error, count } = await supabase
+  let query = supabase
     .from("products")
     .select(
       "id, name, description, price, product_type, category, custom_config, featured, images, created_at, updated_at",
       { count: "exact" },
     )
     .eq("product_type", "custom")
-    .order("created_at", { ascending: false })
-    .range(from, to);
+    .order("created_at", { ascending: false });
+
+  const term = normalizeCatalogSearchInput(search);
+  if (term) {
+    query = query.ilike("name", `%${term}%`);
+  }
+
+  const { data, error, count } = await query.range(from, to);
 
   if (error) {
     throw handleSupabaseError(error);
@@ -97,8 +105,15 @@ export async function getPublicCustomProductsPage({
   };
 }
 
-export async function getPublicSeasonalProducts(limit = 12) {
-  return getProducts({ product_type: "seasonal", limit });
+export async function getPublicSeasonalProducts(params?: {
+  limit?: number;
+  search?: string;
+}) {
+  return getProducts({
+    product_type: "seasonal",
+    limit: params?.limit ?? 12,
+    search: params?.search,
+  });
 }
 
 export async function getPublicFeaturedProducts(limit = 8) {
@@ -113,9 +128,10 @@ export async function getAdminProductsPage(params: {
   pageSize: number;
   type?: string;
   category?: string;
+  search?: string;
 }): Promise<{ products: Product[]; hasMore: boolean }> {
   const supabase = await createClient();
-  const { page, pageSize, type, category } = params;
+  const { page, pageSize, type, category, search } = params;
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
@@ -132,6 +148,10 @@ export async function getAdminProductsPage(params: {
   }
   if (category) {
     query = query.eq("category", category);
+  }
+  const term = normalizeCatalogSearchInput(search);
+  if (term) {
+    query = query.ilike("name", `%${term}%`);
   }
 
   const { data, error, count } = await query.range(from, to);

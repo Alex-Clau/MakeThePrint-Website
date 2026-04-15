@@ -13,6 +13,7 @@ type ProductsInfiniteListProps = {
   initialPage: number;
   pageSize: number;
   initialHasMore: boolean;
+  search?: string;
 };
 
 type CatalogApiResponse = {
@@ -27,6 +28,7 @@ export function ProductsInfiniteList({
   initialPage,
   pageSize,
   initialHasMore,
+  search,
 }: ProductsInfiniteListProps) {
   const t = messages.products;
   const [products, setProducts] = useState<ProductCardData[]>(initialProducts);
@@ -63,6 +65,14 @@ export function ProductsInfiniteList({
   }, [refreshWishlistIds]);
 
   useEffect(() => {
+    setProducts(initialProducts);
+    pageRef.current = initialPage;
+    hasMoreRef.current = initialHasMore;
+    setHasMore(initialHasMore);
+    setError(null);
+  }, [initialProducts, initialPage, initialHasMore, search]);
+
+  useEffect(() => {
     const node = sentinelRef.current;
     if (!node) return;
 
@@ -85,6 +95,9 @@ export function ProductsInfiniteList({
             page: String(nextPage),
             page_size: String(pageSize),
           });
+          if (search) {
+            params.set("search", search);
+          }
           const res = await fetch(`/api/products/catalog?${params.toString()}`);
 
           if (!res.ok) {
@@ -121,7 +134,7 @@ export function ProductsInfiniteList({
       cancelled = true;
       observer.disconnect();
     };
-  }, [pageSize, t.loadMoreFailed]);
+  }, [pageSize, search, t.loadMoreFailed]);
 
   return (
     <>

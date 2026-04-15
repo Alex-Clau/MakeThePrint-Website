@@ -4,7 +4,7 @@
 
 /** Admin products list page (searchParams). */
 export interface AdminProductsPageProps {
-  searchParams: Promise<{ type?: string; category?: string }>;
+  searchParams: Promise<{ type?: string; category?: string; search?: string }>;
 }
 
 /** Admin new product page (searchParams). */
