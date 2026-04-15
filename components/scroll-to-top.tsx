@@ -1,17 +1,25 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 
 /**
- * Client navigations (Next Link) do not reset scroll by default. Scroll to top
- * on pathname change so long pages (e.g. account) do not keep prior offset.
+ * Scroll to top only on in-app pathname changes (Next Link), not on the first
+ * paint after a full load or refresh (avoids fighting scroll restoration).
  */
 export function ScrollToTop() {
   const pathname = usePathname();
+  const prevPathnameRef = useRef<string | null>(null);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    if (prevPathnameRef.current === null) {
+      prevPathnameRef.current = pathname;
+      return;
+    }
+    if (prevPathnameRef.current !== pathname) {
+      window.scrollTo(0, 0);
+      prevPathnameRef.current = pathname;
+    }
   }, [pathname]);
 
   return null;
