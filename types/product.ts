@@ -29,11 +29,11 @@ export interface CustomProductConfig {
 }
 
 /**
- * Keychain product configuration
+ * Contact options for inquire-category products (e.g. WhatsApp).
  */
-export interface KeychainConfig {
-  whatsappNumber: string; // Phone number for WhatsApp inquiry (format: 1234567890)
-  whatsappMessage?: string; // Pre-filled message template
+export interface InquireContactConfig {
+  whatsappNumber: string;
+  whatsappMessage?: string;
 }
 
 /**
@@ -46,7 +46,7 @@ export interface Product {
   price: number;
   product_type?: "custom" | "seasonal";
   category?: "preset" | "inquire" | "finished";
-  custom_config?: CustomProductConfig | KeychainConfig;
+  custom_config?: CustomProductConfig | InquireContactConfig;
   featured?: boolean;
   images?: string[];
   created_at?: string;

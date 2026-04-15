@@ -5,8 +5,16 @@ import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { ProductListItemProps } from "@/types/components";
 import { ProductCardActions } from "./product-card-actions";
+import { messages } from "@/lib/messages";
+import {
+  hasInquiryDisplayPrice,
+  isInquiryCategory,
+} from "@/lib/utils/products";
 
 export function ProductListItem({ product, isInWishlist = false }: ProductListItemProps) {
+  const isInquire = isInquiryCategory(product.category);
+  const t = messages.product;
+  const c = messages.common;
   return (
     <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-2 border-accent-primary-light/20 hover:border-accent-primary/60 relative z-10">
       <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 p-3 sm:p-4">
@@ -31,9 +39,32 @@ export function ProductListItem({ product, isInWishlist = false }: ProductListIt
           </div>
           <div className="flex flex-col gap-3 pt-2 border-t border-accent-primary/20">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-              <p className="text-xl sm:text-2xl font-bold">{product.price.toFixed(2)} RON</p>
+              {isInquire ? (
+                hasInquiryDisplayPrice(product.price) ? (
+                  <div className="space-y-0.5 min-w-0">
+                    <p className="text-xl sm:text-2xl font-bold tabular-nums">
+                      {product.price.toFixed(2)} {c.ron}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {t.inquireIndicativePriceNote}
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-sm font-medium text-muted-foreground">
+                    {t.contactForPricing}
+                  </p>
+                )
+              ) : (
+                <p className="text-xl sm:text-2xl font-bold tabular-nums">
+                  {product.price.toFixed(2)} {c.ron}
+                </p>
+              )}
               <div className="flex items-center gap-2 w-full sm:w-auto">
-                <ProductCardActions productId={product.id} isInWishlist={isInWishlist} />
+                <ProductCardActions
+                  productId={product.id}
+                  isInWishlist={isInWishlist}
+                  showWishlistOnly={isInquire}
+                />
               </div>
             </div>
             {product.rating !== undefined && product.rating > 0 && (

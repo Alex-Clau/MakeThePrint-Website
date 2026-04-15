@@ -4,7 +4,11 @@ import { useState } from "react";
 import { ProductDetailForm } from "@/components/product/product-detail-form";
 import { ProductImageGallery } from "@/components/product/product-image-gallery";
 import { AnimatedProductPageContentProps } from "@/types/components";
-import { getProductDisplayName, isPresetLettersConfig } from "@/lib/utils/products";
+import {
+  getProductDisplayName,
+  isPresetLettersConfig,
+  normalizeProductCategory,
+} from "@/lib/utils/products";
 
 export function AnimatedProductPageContent({
   product,
@@ -13,7 +17,7 @@ export function AnimatedProductPageContent({
   isInWishlist = false,
 }: AnimatedProductPageContentProps) {
   const displayName = getProductDisplayName(product);
-  const isPreset = product.category === "preset";
+  const isPreset = normalizeProductCategory(product.category) === "preset";
   const customConfig =
     isPreset && isPresetLettersConfig(product.custom_config)
       ? product.custom_config

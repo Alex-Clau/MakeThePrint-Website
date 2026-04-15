@@ -5,18 +5,18 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { ProductFormData } from "./admin-product-form-types";
-import type { KeychainConfig } from "@/types/product";
+import type { InquireContactConfig } from "@/types/product";
 import { messages } from "@/lib/messages";
 
 function inquireFormValues(
   custom_config: ProductFormData["custom_config"]
-): KeychainConfig {
+): InquireContactConfig {
   if (
     custom_config &&
     typeof custom_config === "object" &&
     "whatsappNumber" in custom_config
   ) {
-    const c = custom_config as KeychainConfig;
+    const c = custom_config as InquireContactConfig;
     return {
       whatsappNumber: c.whatsappNumber,
       whatsappMessage: typeof c.whatsappMessage === "string" ? c.whatsappMessage : "",

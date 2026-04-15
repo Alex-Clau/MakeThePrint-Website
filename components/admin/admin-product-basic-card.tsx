@@ -38,9 +38,27 @@ export function AdminProductBasicCard({
           <Label htmlFor="product_type">{t.productTypeLabel}</Label>
           <Select
             value={formData.product_type}
-            onValueChange={(value: "custom" | "seasonal") =>
-              setFormData({ ...formData, product_type: value })
-            }
+            onValueChange={(value: "custom" | "seasonal") => {
+              if (value === "seasonal") {
+                setFormData((prev) => ({
+                  ...prev,
+                  product_type: value,
+                  category: "finished",
+                  custom_config: undefined,
+                }));
+                return;
+              }
+              setFormData((prev) => {
+                const nextCategory =
+                  prev.category === "finished" ? "preset" : prev.category;
+                return {
+                  ...prev,
+                  product_type: value,
+                  category: nextCategory,
+                  custom_config: getDefaultConfig(nextCategory),
+                };
+              });
+            }}
             disabled={!!product}
           >
             <SelectTrigger>

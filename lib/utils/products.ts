@@ -39,6 +39,32 @@ export function isPresetLettersConfig(
 }
 
 /**
+ * Normalize DB / CMS category strings so storefront logic stays consistent
+ * (e.g. accidental whitespace or different casing).
+ */
+export function normalizeProductCategory(
+  category: string | null | undefined
+): Product["category"] | undefined {
+  if (category == null) return undefined;
+  const c = String(category).trim().toLowerCase();
+
+  if (c === "preset" || c === "inquire" || c === "finished") {
+    return c;
+  }
+  return undefined;
+}
+
+/** Categories that sell via contact / WhatsApp (matches product detail purchase flow). */
+export function isInquiryCategory(category: string | undefined): boolean {
+  return normalizeProductCategory(category) === "inquire";
+}
+
+/** Admin “base / reference” price for inquiry items: show on storefront only when set. */
+export function hasInquiryDisplayPrice(price: number): boolean {
+  return Number.isFinite(price) && price > 0;
+}
+
+/**
  * Transform database product to ProductCardData format.
  */
 export function transformProductToCardData(product: ProductRowForCard): ProductCardData {
@@ -48,7 +74,7 @@ export function transformProductToCardData(product: ProductRowForCard): ProductC
     name,
     price: parseFloat(String(product.price)),
     image: product.images?.[0] || "",
-    category: product.category,
+    category: normalizeProductCategory(product.category as string | undefined),
     featured: product.featured,
     ...(product.rating != null && { rating: product.rating }),
     ...(product.review_count !== undefined && { review_count: product.review_count }),
@@ -66,7 +92,7 @@ export function transformProductToFull(product: ProductRowForFull) {
     description: product.description || "",
     price: parseFloat(String(product.price)),
     product_type,
-    category: (product.category ?? undefined) as Product["category"],
+    category: normalizeProductCategory(product.category as string | undefined),
     custom_config: product.custom_config || {},
     featured: product.featured || false,
     seasonal: product_type === "seasonal",

@@ -21,7 +21,7 @@ interface AdminProductFormProps {
   initialType?: "custom" | "seasonal";
 }
 
-export function AdminProductForm({product, initialType = "seasonal"}: AdminProductFormProps) {
+export function AdminProductForm({product, initialType = "custom"}: AdminProductFormProps) {
   const router = useRouter();
   const t = messages.admin;
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,16 +41,6 @@ export function AdminProductForm({product, initialType = "seasonal"}: AdminProdu
 
   const isPresetCategory = formData.category === "preset";
   const isInquireCategory = formData.category === "inquire";
-
-  useEffect(() => {
-    if (formData.product_type === "seasonal") {
-      setFormData((prev) => ({
-        ...prev,
-        category: "finished",
-        custom_config: undefined,
-      }));
-    }
-  }, [formData.product_type]);
 
   useEffect(() => {
     if (formData.product_type === "custom" && !product) {

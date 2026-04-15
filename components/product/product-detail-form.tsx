@@ -12,8 +12,14 @@ import { toast } from "sonner";
 import { getUserFriendlyError } from "@/lib/utils/error-messages";
 import { CustomLettersForm } from "./custom-letters-form";
 import { ProductCardActions } from "./product-card-actions";
-import type { CustomProductConfig, KeychainConfig } from "@/types/product";
-import { getProductDisplayName, isPresetLettersConfig } from "@/lib/utils/products";
+import type { CustomProductConfig, InquireContactConfig } from "@/types/product";
+import {
+  getProductDisplayName,
+  hasInquiryDisplayPrice,
+  isInquiryCategory,
+  isPresetLettersConfig,
+  normalizeProductCategory,
+} from "@/lib/utils/products";
 import { messages } from "@/lib/messages";
 import { CART_UPDATED_EVENT } from "@/lib/cart/events";
 
@@ -30,9 +36,9 @@ export function ProductDetailForm({
   const c = messages.common;
   const r = messages.reviews;
   const router = useRouter();
-  const category = product.category as string | undefined;
+  const category = normalizeProductCategory(product.category);
   const isPreset = category === "preset";
-  const isInquire = category === "inquire" || category === "keychains";
+  const isInquire = isInquiryCategory(category);
 
   const [quantity, setQuantity] = useState(1);
 
@@ -41,7 +47,7 @@ export function ProductDetailForm({
       ? product.custom_config
       : null;
   const inquireConfig = isInquire && product.custom_config && "whatsappNumber" in product.custom_config
-    ? (product.custom_config as KeychainConfig)
+    ? (product.custom_config as InquireContactConfig)
     : null;
 
   const lettersCustomConfig: CustomProductConfig =
@@ -210,6 +216,16 @@ export function ProductDetailForm({
             <h3 className="text-lg sm:text-xl font-semibold mb-2 text-accent-primary-dark">
               {t.inquireTitle}
             </h3>
+            {hasInquiryDisplayPrice(product.price) ? (
+              <div className="mb-4 space-y-1">
+                <p className="text-2xl sm:text-3xl font-bold tabular-nums text-white">
+                  {product.price.toFixed(2)} {c.ron}
+                </p>
+                <p className="text-xs sm:text-sm text-muted-foreground">
+                  {t.inquireIndicativePriceNote}
+                </p>
+              </div>
+            ) : null}
             <p className="text-sm sm:text-base text-muted-foreground mb-4">
               {t.inquireDesc}
             </p>

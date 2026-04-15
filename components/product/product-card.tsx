@@ -6,6 +6,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ProductCardProps } from "@/types/components";
 import { ProductCardActions } from "./product-card-actions";
 import { messages } from "@/lib/messages";
+import {
+  hasInquiryDisplayPrice,
+  isInquiryCategory,
+} from "@/lib/utils/products";
 
 export function ProductCard({
   id,
@@ -17,7 +21,7 @@ export function ProductCard({
   review_count,
   isInWishlist = false,
 }: ProductCardProps) {
-  const isInquire = category === "inquire";
+  const isInquire = isInquiryCategory(category);
   const t = messages.product;
   const c = messages.common;
   const r = messages.reviews;
@@ -49,7 +53,20 @@ export function ProductCard({
         <div className="w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-2 min-h-9">
           <div className="flex items-center min-w-0">
             {isInquire ? (
-              <p className="text-sm font-medium text-muted-foreground">{t.contactForPricing}</p>
+              hasInquiryDisplayPrice(price) ? (
+                <div className="min-w-0 space-y-0.5">
+                  <p className="text-sm font-bold tabular-nums">
+                    {price.toFixed(2)} {c.ron}
+                  </p>
+                  <p className="text-xs text-muted-foreground leading-snug">
+                    {t.inquireIndicativePriceNote}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-sm font-medium text-muted-foreground">
+                  {t.contactForPricing}
+                </p>
+              )
             ) : (
               <p className="text-sm font-bold">{price.toFixed(2)} {c.ron}</p>
             )}

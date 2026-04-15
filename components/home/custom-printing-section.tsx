@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Sparkles, Mail, MessageCircle } from "lucide-react";
 import { messages } from "@/lib/messages";
+import { getPublicContactEmail } from "@/lib/public-contact-email";
 
 export function CustomPrintingSection() {
   const t = messages.home;
+  const contactEmail = getPublicContactEmail();
   const phoneDigits = process.env.NEXT_PUBLIC_WHATSAPP_PHONE?.replace(/\D/g, "") ?? "";
   const waHref = `https://wa.me/${phoneDigits}`;
 
@@ -33,15 +35,19 @@ export function CustomPrintingSection() {
                   {t.emailUs}
                 </h3>
                 <p className="text-sm text-muted-foreground mb-4">{t.emailUsDesc}</p>
-                <Button
-                  asChild
-                  className="bg-accent-primary-dark hover:bg-accent-primary-dark/90 text-white w-full sm:w-auto"
-                >
-                  <a href="mailto:custom@maketheprint.com">
-                    custom@maketheprint.com
-                    <Mail className="ml-2 h-4 w-4" />
-                  </a>
-                </Button>
+                {contactEmail ? (
+                  <Button
+                    asChild
+                    className="bg-accent-primary-dark hover:bg-accent-primary-dark/90 text-white w-full sm:w-auto"
+                  >
+                    <a href={`mailto:${contactEmail}`}>
+                      {contactEmail}
+                      <Mail className="ml-2 h-4 w-4" />
+                    </a>
+                  </Button>
+                ) : (
+                  <p className="text-sm text-muted-foreground">{t.publicContactEmailMissing}</p>
+                )}
               </div>
             </div>
           </div>

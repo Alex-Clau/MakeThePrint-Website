@@ -1,4 +1,4 @@
-import type { CustomProductConfig, KeychainConfig } from "@/types/product";
+import type { CustomProductConfig, InquireContactConfig } from "@/types/product";
 import { PRESET_COLORS, PRESET_FONTS } from "@/lib/constants/preset-options";
 
 export interface ProductFormData {
@@ -9,7 +9,7 @@ export interface ProductFormData {
   product_type: "custom" | "seasonal";
   category: string;
   featured: boolean;
-  custom_config?: CustomProductConfig | KeychainConfig;
+  custom_config?: CustomProductConfig | InquireContactConfig;
 }
 
 export function getDefaultConfig(category: string): ProductFormData["custom_config"] {

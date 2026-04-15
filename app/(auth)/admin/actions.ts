@@ -11,7 +11,7 @@ import {
 } from "@/lib/supabase/products";
 import { isAdminOrderStatus } from "@/lib/constants/admin-order-status";
 import { messages } from "@/lib/messages";
-import type { CustomProductConfig, KeychainConfig } from "@/types/product";
+import type { CustomProductConfig, InquireContactConfig } from "@/types/product";
 
 const ORDER_ID_UUID =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -59,15 +59,19 @@ export async function createProductAction(product: {
   featured?: boolean;
   product_type?: "custom" | "seasonal";
   category?: string;
-  custom_config?: CustomProductConfig | KeychainConfig;
+  custom_config?: CustomProductConfig | InquireContactConfig;
 }): Promise<AdminToastResult> {
   try {
     await requireAdmin();
-    await createProduct({
+    const created = await createProduct({
       ...product,
       images: product.images || [],
     });
     revalidatePath("/admin/products");
+    revalidatePath("/products");
+    if (created?.id) {
+      revalidatePath(`/products/${created.id}`);
+    }
     return { success: true, message: messages.admin.productCreated };
   } catch {
     return { success: false, message: messages.admin.adminActionFailed };
@@ -87,7 +91,7 @@ export async function updateProductAction(
     featured: boolean;
     product_type?: "custom" | "seasonal";
     category?: string;
-    custom_config?: CustomProductConfig | KeychainConfig;
+    custom_config?: CustomProductConfig | InquireContactConfig;
   }>
 ): Promise<AdminToastResult> {
   try {
