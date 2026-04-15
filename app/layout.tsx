@@ -8,7 +8,7 @@ import {messages} from "@/lib/messages";
 import {getSiteOrigin} from "@/lib/site-url";
 import "./globals.css";
 
-const defaultTitle = "Make The Print";
+const defaultTitle = "MakeThePrint";
 const defaultDescription = "Descoperă colecția noastră de produse printate 3D de calitate.";
 
 export const metadata: Metadata = {
