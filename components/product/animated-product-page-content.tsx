@@ -4,11 +4,9 @@ import { useState } from "react";
 import { ProductDetailForm } from "@/components/product/product-detail-form";
 import { ProductImageGallery } from "@/components/product/product-image-gallery";
 import { AnimatedProductPageContentProps } from "@/types/components";
-import {
-  getProductDisplayName,
-  isPresetLettersConfig,
-  normalizeProductCategory,
-} from "@/lib/utils/products";
+import type { CustomProductConfig } from "@/types/product";
+import { getProductDisplayName, normalizeProductCategory } from "@/lib/utils/products";
+import { isPresetCustomLettersProduct } from "@/lib/utils/preset-letter-config";
 
 export function AnimatedProductPageContent({
   product,
@@ -17,10 +15,11 @@ export function AnimatedProductPageContent({
   isInWishlist = false,
 }: AnimatedProductPageContentProps) {
   const displayName = getProductDisplayName(product);
-  const isPreset = normalizeProductCategory(product.category) === "preset";
-  const customConfig =
-    isPreset && isPresetLettersConfig(product.custom_config)
-      ? product.custom_config
+  const category = normalizeProductCategory(product.category);
+  const isPreset = category === "preset";
+  const lettersPreviewConfig: CustomProductConfig | null =
+    isPreset && isPresetCustomLettersProduct(category, product.custom_config)
+      ? (product.custom_config as CustomProductConfig)
       : null;
   const [preview, setPreview] = useState<{
     text: string;
@@ -29,8 +28,8 @@ export function AnimatedProductPageContent({
     size: string;
   }>({
     text: "",
-    font: customConfig?.fonts?.[0] || customConfig?.defaultFont  || "",
-    color: customConfig?.colors?.[0] || "black",
+    font: lettersPreviewConfig?.fonts?.[0] || lettersPreviewConfig?.defaultFont || "",
+    color: lettersPreviewConfig?.colors?.[0] || "black",
     size: "",
   });
   // Get all images, using image as fallback if images array is empty

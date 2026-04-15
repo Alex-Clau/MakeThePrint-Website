@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { messages } from "@/lib/messages";
 import { getDefaultConfig, type ProductFormData } from "./admin-product-form-types";
 import type { Product } from "@/types/product";
+import { presetCustomLettersEnabled } from "@/lib/utils/preset-letter-config";
 
 interface AdminProductBasicCardProps {
   formData: ProductFormData;
@@ -26,6 +27,11 @@ export function AdminProductBasicCard({
   isInquireCategory,
 }: AdminProductBasicCardProps) {
   const t = messages.admin;
+  const presetConfig =
+    isPresetCategory && formData.custom_config && "colors" in formData.custom_config
+      ? formData.custom_config
+      : undefined;
+  const presetLettersOn = isPresetCategory && presetCustomLettersEnabled(presetConfig);
 
   return (
     <Card>
@@ -135,7 +141,7 @@ export function AdminProductBasicCard({
         <div className="space-y-2">
           <Label htmlFor="price">
             {isPresetCategory
-              ? t.basePricePresetLabel
+              ? t.presetDefaultPriceLabel
               : isInquireCategory
               ? t.contactForPricingLabel
               : t.priceRonRequired}
@@ -151,7 +157,7 @@ export function AdminProductBasicCard({
           />
           {isPresetCategory && (
             <p className="text-xs text-muted-foreground">
-              {t.presetConfigureBelow}
+              {presetLettersOn ? t.presetPriceHintLettersOn : t.presetPriceHintLettersOff}
             </p>
           )}
           {isInquireCategory && (

@@ -17,9 +17,9 @@ import {
   getProductDisplayName,
   hasInquiryDisplayPrice,
   isInquiryCategory,
-  isPresetLettersConfig,
   normalizeProductCategory,
 } from "@/lib/utils/products";
+import { isPresetCustomLettersProduct } from "@/lib/utils/preset-letter-config";
 import { messages } from "@/lib/messages";
 import { CART_UPDATED_EVENT } from "@/lib/cart/events";
 
@@ -39,13 +39,13 @@ export function ProductDetailForm({
   const category = normalizeProductCategory(product.category);
   const isPreset = category === "preset";
   const isInquire = isInquiryCategory(category);
+  const isPresetWithLetters = isPresetCustomLettersProduct(category, product.custom_config);
 
   const [quantity, setQuantity] = useState(1);
 
-  const customProductConfig =
-    isPreset && isPresetLettersConfig(product.custom_config)
-      ? product.custom_config
-      : null;
+  const customProductConfig = isPresetWithLetters
+    ? (product.custom_config as CustomProductConfig)
+    : null;
   const inquireConfig = isInquire && product.custom_config && "whatsappNumber" in product.custom_config
     ? (product.custom_config as InquireContactConfig)
     : null;
@@ -74,7 +74,7 @@ export function ProductDetailForm({
 
   const [isAdding, setIsAdding] = useState(false);
 
-  const totalPrice = isPreset
+  const totalPrice = isPresetWithLetters
     ? customConfig.totalPrice
     : product.price * quantity;
   const maxQuantity = 10; // Limit to 10 per order
@@ -124,18 +124,20 @@ export function ProductDetailForm({
       await addToCartClient({
         user_id: user.id,
         product_id: product.id,
-        quantity: isPreset ? 1 : quantity,
-        customizations: isPreset ? {
-          text: customConfig.text,
-          font: customConfig.font,
-          color: customConfig.color,
-          size: customConfig.size,
-          characterCount: customConfig.characterCount,
-          totalPrice: customConfig.totalPrice,
-          isOutdoor: customConfig.isOutdoor,
-          isLedStrip: customConfig.isLedStrip,
-          isColor: customConfig.isColor,
-        } : undefined,
+        quantity: isPresetWithLetters ? 1 : quantity,
+        customizations: isPresetWithLetters
+          ? {
+              text: customConfig.text,
+              font: customConfig.font,
+              color: customConfig.color,
+              size: customConfig.size,
+              characterCount: customConfig.characterCount,
+              totalPrice: customConfig.totalPrice,
+              isOutdoor: customConfig.isOutdoor,
+              isLedStrip: customConfig.isLedStrip,
+              isColor: customConfig.isColor,
+            }
+          : undefined,
       });
 
       toast.success(t.addedToCart);
@@ -267,7 +269,7 @@ export function ProductDetailForm({
             </div>
           </div>
         </div>
-      ) : isPreset ? (
+      ) : isPresetWithLetters ? (
         <>
           <div>
             <p className="text-3xl sm:text-4xl font-bold mb-1 sm:mb-2">
@@ -312,6 +314,63 @@ export function ProductDetailForm({
               disabled={isAdding || customConfig.totalPrice === 0}
             >
               {isAdding ? t.adding : customConfig.characterCount === 0 && !customConfig.size ? t.enterTextToContinue : t.addToCart}
+            </Button>
+            <div className="flex items-center gap-2">
+              <ProductCardActions
+                productId={product.id}
+                showWishlistOnly
+                isInWishlist={isInWishlist}
+              />
+              <Button variant="outline" size="icon" onClick={handleShare} title={t.share}>
+                <Share2 className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </>
+      ) : isPreset ? (
+        <>
+          <div>
+            <p className="text-3xl sm:text-4xl font-bold mb-1 sm:mb-2">
+              {totalPrice.toFixed(2)} {c.ron}
+            </p>
+            <p className="text-xs sm:text-sm text-muted-foreground">{t.presetFixedPriceHint}</p>
+          </div>
+          <div>
+            <Label className="text-sm sm:text-base font-semibold mb-2 sm:mb-3 lg:mb-4 block">{t.quantity}</Label>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+              <div className="flex items-center border-2 border-gray-300 dark:border-gray-600 rounded-lg w-full sm:w-auto">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-10 w-10 sm:h-12 sm:w-12 touch-manipulation"
+                  onClick={() => handleQuantityChange(-1)}
+                  disabled={quantity <= 1}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <span className="flex-1 sm:w-16 text-center font-semibold text-base sm:text-lg">
+                  {quantity}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-10 w-10 sm:h-12 sm:w-12 touch-manipulation"
+                  onClick={() => handleQuantityChange(1)}
+                  disabled={quantity >= maxQuantity}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button
+              size="lg"
+              className="flex-1 bg-accent-primary-dark hover:bg-accent-primary-dark/90 text-white text-base sm:text-base py-4 sm:py-5 lg:py-6 touch-manipulation"
+              onClick={handleAddToCart}
+              disabled={isAdding}
+            >
+              {isAdding ? t.adding : t.addToCart}
             </Button>
             <div className="flex items-center gap-2">
               <ProductCardActions

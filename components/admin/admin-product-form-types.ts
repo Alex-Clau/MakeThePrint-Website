@@ -18,6 +18,7 @@ export function getDefaultConfig(category: string): ProductFormData["custom_conf
   }
   if (category === "preset") {
     return {
+      customLettersEnabled: false,
       colors: [...PRESET_COLORS],
       fonts: [...PRESET_FONTS],
       defaultFont: PRESET_FONTS[0] ?? "Arial",

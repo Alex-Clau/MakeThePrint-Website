@@ -1,6 +1,7 @@
 import { computePresetCustomizationPrice } from "@/lib/utils/preset-customization-pricing";
-import { isPresetLettersConfig } from "@/lib/utils/products";
+import { isPresetCustomLettersProduct } from "@/lib/utils/preset-letter-config";
 import type { CartCustomizations } from "@/types/cart";
+import type { CustomProductConfig } from "@/types/product";
 
 type PricingProduct = {
   price: number;
@@ -12,20 +13,15 @@ export function resolveServerCartUnitPrice(
   product: PricingProduct,
   customizations?: CartCustomizations
 ): number {
-  const customConfig = product.custom_config as Parameters<
-    typeof isPresetLettersConfig
-  >[0];
+  const customConfig = product.custom_config;
 
-  if (
-    product.category === "preset" &&
-    isPresetLettersConfig(customConfig)
-  ) {
+  if (isPresetCustomLettersProduct(product.category as string | undefined, customConfig)) {
     const text =
       typeof customizations?.text === "string" ? customizations.text : "";
     const size =
       typeof customizations?.size === "string" ? customizations.size : "";
 
-    const pricing = computePresetCustomizationPrice(customConfig, {
+    const pricing = computePresetCustomizationPrice(customConfig as CustomProductConfig, {
       text,
       size,
       isOutdoor: customizations?.isOutdoor === true,

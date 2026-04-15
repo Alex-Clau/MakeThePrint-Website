@@ -10,6 +10,11 @@ export interface SizePriceEntry {
  * Custom product configuration (preset category)
  */
 export interface CustomProductConfig {
+  /**
+   * When false, storefront omits letter UI/pricing; size/font/color rows are not used.
+   * Omitted or true = enabled (backward compatible with existing JSON).
+   */
+  customLettersEnabled?: boolean;
   colors?: string[];
   fonts?: string[];
   defaultFont?: string;

@@ -15,6 +15,11 @@ import Link from "next/link";
 import { messages } from "@/lib/messages";
 import { type ProductFormData, getDefaultConfig } from "./admin-product-form-types";
 import type { Product } from "@/types/product";
+import {
+  countValidSizePricePairs,
+  getValidSizePriceEntries,
+  presetCustomLettersEnabled,
+} from "@/lib/utils/preset-letter-config";
 
 interface AdminProductFormProps {
   product?: Product;
@@ -76,19 +81,33 @@ export function AdminProductForm({product, initialType = "custom"}: AdminProduct
 
       let cleanedConfig = formData.custom_config;
       if (formData.category === "preset") {
-        const presetConfig = formData.custom_config && "colors" in formData.custom_config ? formData.custom_config : undefined;
+        const presetConfig =
+          formData.custom_config && "colors" in formData.custom_config
+            ? formData.custom_config
+            : undefined;
+        const lettersOn = presetCustomLettersEnabled(presetConfig);
+
+        if (lettersOn && countValidSizePricePairs(presetConfig) < 1) {
+          toast.error(t.presetLettersRequireValidSizePrice);
+          setIsSubmitting(false);
+          return;
+        }
+
+        const validSizePrices = lettersOn ? getValidSizePriceEntries(presetConfig?.sizePrices) : [];
+
         cleanedConfig = {
-          colors: presetConfig?.colors || [],
-          fonts: presetConfig?.fonts || [],
-          defaultFont: presetConfig?.defaultFont || "",
-          sizePrices: presetConfig?.sizePrices || [],
+          customLettersEnabled: lettersOn,
+          colors: lettersOn ? presetConfig?.colors || [] : [],
+          fonts: lettersOn ? presetConfig?.fonts || [] : [],
+          defaultFont: lettersOn ? presetConfig?.defaultFont || "" : "",
+          sizePrices: lettersOn ? validSizePrices : [],
           isOutdoor: presetConfig?.isOutdoor ?? false,
           isLedStrip: presetConfig?.isLedStrip ?? false,
           isColor: presetConfig?.isColor ?? false,
           outdoorPrice: presetConfig?.outdoorPrice ?? 0,
           ledStripPrice: presetConfig?.ledStripPrice ?? 0,
           colorPrice: presetConfig?.colorPrice ?? 0,
-          pricePerCharacter: presetConfig?.pricePerCharacter ?? 0,
+          pricePerCharacter: lettersOn ? presetConfig?.pricePerCharacter ?? 0 : 0,
         };
       } else if (formData.category === "inquire") {
         const inquireConfig = formData.custom_config && "whatsappNumber" in formData.custom_config ? formData.custom_config : undefined;
